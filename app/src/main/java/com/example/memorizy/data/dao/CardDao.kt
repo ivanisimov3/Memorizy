@@ -1,10 +1,11 @@
-package com.example.memorizy.data.card
+package com.example.memorizy.data.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.memorizy.data.entity.Card
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -16,5 +17,5 @@ interface CardDao {
     suspend fun deleteCard(card: Card)
 
     @Query("SELECT * FROM cards WHERE setId = :setId ORDER BY id ASC")
-    fun getAllCards(setId: Int): Flow<List<Card>>
+    fun getAllCardsForSet(setId: Int): Flow<List<Card>>
 }

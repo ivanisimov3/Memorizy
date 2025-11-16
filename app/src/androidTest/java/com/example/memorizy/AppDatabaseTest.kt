@@ -5,10 +5,10 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.memorizy.data.AppDatabase
-import com.example.memorizy.data.card.Card
-import com.example.memorizy.data.card.CardDao
-import com.example.memorizy.data.studyset.StudySet
-import com.example.memorizy.data.studyset.StudySetDao
+import com.example.memorizy.data.entity.Card
+import com.example.memorizy.data.dao.CardDao
+import com.example.memorizy.data.entity.StudySet
+import com.example.memorizy.data.dao.StudySetDao
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -72,7 +72,7 @@ class AppDatabaseTest {
         cardDao.insertCard(Card(term = "t2", definition = "d2", setId = 1))
 
         // Act
-        val setsWithCounts = studySetDao.getAllSetsWithCardCount().first()
+        val setsWithCounts = studySetDao.getAllSetsWithCardNumber().first()
 
         // Assert
         val retrievedSet1 = setsWithCounts.find { it.studySet.id == 1 }
@@ -91,13 +91,13 @@ class AppDatabaseTest {
         cardDao.insertCard(Card(term = "t1", definition = "d1", setId = 1, id = 10))
 
         // Убедимся, что все на месте
-        assertEquals(1, cardDao.getAllCards(1).first().size)
+        assertEquals(1, cardDao.getAllCardsForSet(1).first().size)
 
         // Act (Удаляем НАБОР)
         studySetDao.deleteSet(set1)
 
         // Assert (Проверяем, что и карточки удалились)
-        assertEquals(0, cardDao.getAllCards(1).first().size) // Должно быть 0
+        assertEquals(0, cardDao.getAllCardsForSet(1).first().size) // Должно быть 0
         assertEquals(null, studySetDao.getSet(1).first()) // Flow вернет null, если ничего нет
     }
 }

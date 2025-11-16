@@ -60,6 +60,8 @@ dependencies {
     implementation(libs.androidx.room.common.jvm)
     implementation(libs.androidx.room.ktx)
     implementation("androidx.room:room-runtime:${roomVersion}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test-jvm:1.10.2")
+    testImplementation("io.mockk:mockk:1.14.6")
     testImplementation(libs.junit)
     testImplementation("androidx.room:room-testing:${roomVersion}")
     androidTestImplementation(libs.androidx.junit)

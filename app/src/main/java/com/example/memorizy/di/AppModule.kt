@@ -3,8 +3,10 @@ package com.example.memorizy.di
 import android.content.Context
 import androidx.room.Room
 import com.example.memorizy.data.AppDatabase
-import com.example.memorizy.data.card.CardDao
-import com.example.memorizy.data.studyset.StudySetDao
+import com.example.memorizy.data.dao.CardDao
+import com.example.memorizy.data.dao.StudySetDao
+import com.example.memorizy.domain.repository.StudySetRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -1,4 +1,4 @@
-package com.example.memorizy.data.studyset
+package com.example.memorizy.data.entity
 
 import androidx.room.Embedded
 
