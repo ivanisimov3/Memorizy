@@ -7,7 +7,7 @@ import com.example.memorizy.data.dao.StudySetDao
 import com.example.memorizy.data.entity.Card
 import com.example.memorizy.data.entity.StudySet
 
-@Database(entities = [StudySet::class, Card::class], version = 1)
+@Database(entities = [StudySet::class, Card::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun studySetDao(): StudySetDao
     abstract fun cardDao(): CardDao
