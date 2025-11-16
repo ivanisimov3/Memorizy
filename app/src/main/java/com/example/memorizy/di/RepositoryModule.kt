@@ -10,10 +10,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-// Модуль для связывания общих интерфейсов с конкретной реализацией
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class RepositoryModule {
+abstract class RepositoryModule {   // abstract class используем когда связываем
 
     @Binds  // Эффективнее чем Provides при работе с интерфейсами
     @Singleton

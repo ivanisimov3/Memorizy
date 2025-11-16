@@ -8,7 +8,7 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
 // Конкретная реализация для работы с StudySetDao
-class StudySetRepositoryImpl @Inject constructor(
+class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет связать создание этого репозитория с dao
     private val dao: StudySetDao
 ) : StudySetRepository {
     override suspend fun insertSet(studySet: StudySet) {

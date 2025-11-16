@@ -21,7 +21,7 @@ class StudySetRepositoryImplTest {
 
     // Создаем "фальшивый" DAO.
     // @RelaxedMockK значит, что нам не нужно описывать поведение для каждой его функции
-    @RelaxedMockK
+    @RelaxedMockK   // Позволяет проверять какие методы были вызваны у Dao
     private lateinit var studySetDao: StudySetDao
 
     // Наш класс, который мы будем тестировать
