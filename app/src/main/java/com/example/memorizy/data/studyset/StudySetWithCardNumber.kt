@@ -1,10 +1,10 @@
-package com.example.memorizy.data
+package com.example.memorizy.data.studyset
 
 import androidx.room.Embedded
 
-data class StudySetWithCardCount(
+data class StudySetWithCardNumber(
     @Embedded
     val studySet: StudySet, // встраиваем столбцы StudySet
 
-    val cardsNumber: Int
+    val cardNumber: Int
 )
