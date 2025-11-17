@@ -1,4 +1,4 @@
-package com.example.memorizy.data.entity
+package com.example.memorizy.data.studyset
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -1,7 +1,7 @@
-package com.example.memorizy.domain.repository
+package com.example.memorizy.domain.studyset
 
-import com.example.memorizy.data.entity.StudySet
-import com.example.memorizy.data.entity.StudySetWithCardNumber
+import com.example.memorizy.data.StudySetWithCardNumber
+import com.example.memorizy.data.studyset.StudySet
 import kotlinx.coroutines.flow.Flow
 
 // Общий шаблон работы со StudySet

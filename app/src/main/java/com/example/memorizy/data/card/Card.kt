@@ -1,10 +1,10 @@
-package com.example.memorizy.data.entity
+package com.example.memorizy.data.card
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.memorizy.data.entity.StudySet
+import com.example.memorizy.data.studyset.StudySet
 
 @Entity(
     tableName = "cards",

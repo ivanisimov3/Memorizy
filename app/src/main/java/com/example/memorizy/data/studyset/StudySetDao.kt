@@ -1,12 +1,12 @@
-package com.example.memorizy.data.dao
+package com.example.memorizy.data.studyset
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.memorizy.data.entity.StudySet
-import com.example.memorizy.data.entity.StudySetWithCardNumber
+import com.example.memorizy.data.studyset.StudySet
+import com.example.memorizy.data.StudySetWithCardNumber
 import kotlinx.coroutines.flow.Flow
 
 // Data Access Object - определяет методы, с помощью которых происходит взаимодействие с данными

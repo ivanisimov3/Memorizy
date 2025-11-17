@@ -1,11 +1,11 @@
-package com.example.memorizy.data.dao
+package com.example.memorizy.data.card
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.memorizy.data.entity.Card
+import com.example.memorizy.data.card.Card
 import kotlinx.coroutines.flow.Flow
 
 @Dao

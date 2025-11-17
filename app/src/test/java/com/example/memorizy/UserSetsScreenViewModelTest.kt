@@ -1,10 +1,10 @@
 package com.example.memorizy
 
-import com.example.memorizy.data.entity.StudySet
-import com.example.memorizy.data.entity.StudySetWithCardNumber
-import com.example.memorizy.domain.repository.StudySetRepository
-import com.example.memorizy.ui.model.UserSetScreenUIState
-import com.example.memorizy.ui.model.UserSetsScreenViewModel
+import com.example.memorizy.data.studyset.StudySet
+import com.example.memorizy.data.StudySetWithCardNumber
+import com.example.memorizy.domain.studyset.StudySetRepository
+import com.example.memorizy.ui.studysets.StudySetsScreenUIState
+import com.example.memorizy.ui.studysets.StudySetsViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -37,7 +37,7 @@ class UserSetsScreenViewModelTest {
     private lateinit var studySetRepository: StudySetRepository
 
     // 4. Наш тестируемый ViewModel
-    private lateinit var viewModel: UserSetsScreenViewModel
+    private lateinit var viewModel: StudySetsViewModel
 
     // 5. Готовим "фальшивые" данные
     private val fakeSet1 = StudySet(id = 1, name = "Английский", description = "A1", iconId = 1)
@@ -54,7 +54,7 @@ class UserSetsScreenViewModelTest {
         // Добавили это из первого исправления:
         coEvery { studySetRepository.deleteSet(any()) } returns Unit
 
-        viewModel = UserSetsScreenViewModel(studySetRepository)
+        viewModel = StudySetsViewModel(studySetRepository)
     }
 
     // --- ИСПРАВЛЕННЫЙ ТЕСТ 1 ---
@@ -63,7 +63,7 @@ class UserSetsScreenViewModelTest {
     fun `state is loaded correctly after init`() = runTest(mainDispatcherRule.testDispatcher) {
         // Arrange
         // Создаем список, куда будут "складываться" все состояния
-        val states = mutableListOf<UserSetScreenUIState>()
+        val states = mutableListOf<StudySetsScreenUIState>()
 
         // Act
         // Запускаем "фальшивого зрителя", который собирает ВСЕ состояния в список
@@ -96,7 +96,7 @@ class UserSetsScreenViewModelTest {
     @Test
     fun `search query filters the list correctly`() = runTest(mainDispatcherRule.testDispatcher) {
         // Arrange
-        val states = mutableListOf<UserSetScreenUIState>()
+        val states = mutableListOf<StudySetsScreenUIState>()
 
         // Act
         // Запускаем "зрителя"

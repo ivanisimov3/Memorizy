@@ -5,10 +5,10 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.memorizy.data.AppDatabase
-import com.example.memorizy.data.entity.Card
-import com.example.memorizy.data.dao.CardDao
-import com.example.memorizy.data.entity.StudySet
-import com.example.memorizy.data.dao.StudySetDao
+import com.example.memorizy.data.card.Card
+import com.example.memorizy.data.card.CardDao
+import com.example.memorizy.data.studyset.StudySet
+import com.example.memorizy.data.studyset.StudySetDao
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking

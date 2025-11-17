@@ -1,4 +1,4 @@
-package com.example.memorizy.ui.screen
+package com.example.memorizy.ui.studysets
 
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -36,14 +36,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.memorizy.R
-import com.example.memorizy.data.entity.StudySet
-import com.example.memorizy.data.entity.StudySetWithCardNumber
-import com.example.memorizy.ui.model.UserSetsScreenViewModel
+import com.example.memorizy.data.studyset.StudySet
+import com.example.memorizy.data.StudySetWithCardNumber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserSetsScreen(
-    viewModel: UserSetsScreenViewModel = hiltViewModel(),
+fun StudySetsScreen(
+    viewModel: StudySetsViewModel = hiltViewModel(),
     onAddSetClick: () -> Unit,
     onSetClick: (Int) -> Unit
 ){

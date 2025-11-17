@@ -1,9 +1,9 @@
-package com.example.memorizy.ui.model
+package com.example.memorizy.ui.studysets
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.memorizy.data.entity.StudySet
-import com.example.memorizy.domain.repository.StudySetRepository
+import com.example.memorizy.data.studyset.StudySet
+import com.example.memorizy.domain.studyset.StudySetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 // 2. Удаление набора
 // 3. Изменение числа наборов при использовании поиска
 @HiltViewModel
-class UserSetsScreenViewModel @Inject constructor(
+class StudySetsViewModel @Inject constructor(
     private val studySetRepository: StudySetRepository
 ) : ViewModel(){
 
@@ -26,7 +26,7 @@ class UserSetsScreenViewModel @Inject constructor(
 
     private val _allSets = studySetRepository.getAllSetsWithCardNumber()    // уже Flow
 
-    val uiState: StateFlow<UserSetScreenUIState> =
+    val uiState: StateFlow<StudySetsScreenUIState> =
         combine(_searchQuery, _allSets) { query, sets ->    // два Flow влияют на этот экран,
                                                                           // наблюдаем за ними
             val filteredSets = if (query.isBlank()) {   // если пустой то берем все
@@ -37,7 +37,7 @@ class UserSetsScreenViewModel @Inject constructor(
                 }
             }
 
-            UserSetScreenUIState(
+            StudySetsScreenUIState(
                 isLoading = false,
                 studySets = filteredSets,
                 searchQuery = query
@@ -45,7 +45,7 @@ class UserSetsScreenViewModel @Inject constructor(
         }.stateIn(  // Превращаем Flow в StateFlow. Используем для продолжительных операций
             scope = viewModelScope, // Пока живет ViewModel
             started = SharingStarted.WhileSubscribed(5000), // Не отключать StateFlow еще 5 секунд
-            initialValue = UserSetScreenUIState()                           // когда не работает .collectAsState
+            initialValue = StudySetsScreenUIState()                           // когда не работает .collectAsState
         )
 
     // Два события, которые могут повлиять на этот экран

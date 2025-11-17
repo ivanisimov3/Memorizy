@@ -1,6 +1,6 @@
-package com.example.memorizy.domain.repository
+package com.example.memorizy.domain.card
 
-import com.example.memorizy.data.entity.Card
+import com.example.memorizy.data.card.Card
 import kotlinx.coroutines.flow.Flow
 
 // Общий шаблон работы с Card

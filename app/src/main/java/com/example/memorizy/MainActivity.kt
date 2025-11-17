@@ -7,12 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.memorizy.ui.MemorizyApp
-import com.example.memorizy.ui.navigation.Routes
-import com.example.memorizy.ui.screen.UserSetsScreen
 import com.example.memorizy.ui.theme.MemorizyTheme
 import dagger.hilt.android.AndroidEntryPoint
 

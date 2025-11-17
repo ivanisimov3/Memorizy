@@ -2,6 +2,7 @@ package com.example.memorizy.ui.navigation
 
 import kotlinx.serialization.Serializable
 
+// Новый способ навигации вместо строк
 @Serializable
 object Routes {
     @Serializable
@@ -13,7 +14,6 @@ object Routes {
     @Serializable
     data class SetDetails(val setId: Int)
 
-    // 4. Экран добавления карточки (нужен ID набора)
     @Serializable
     data class AddCard(val setId: Int)
 }
