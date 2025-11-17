@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,6 +12,7 @@ import com.example.memorizy.ui.addset.AddStudySetScreen
 import com.example.memorizy.ui.addset.AddStudySetViewModel
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.studysets.StudySetsScreen
+import com.example.memorizy.ui.studysets.StudySetsViewModel
 
 @Composable
 fun MemorizyApp() {
@@ -24,23 +24,27 @@ fun MemorizyApp() {
     ) {
 
         composable<Routes.UserSets> {
+            val viewModel: StudySetsViewModel = hiltViewModel() // Фабрика ViewModel благодаря Hilt
+            val uiState by viewModel.uiState.collectAsState()
+
             StudySetsScreen(
-                onAddSetClick = {
-                    navController.navigate(Routes.AddSet)
-                },
+                onAddSetClick = { navController.navigate(Routes.AddSet) },
                 onSetClick = { setId ->
                     navController.navigate(Routes.SetDetails(setId = setId))
-                }
+                },
+                uiState = uiState,
+                onSearchQueryChanged = viewModel::onSearchQueryChanged,
+                onDeleteSet = viewModel::onDeleteSet
             )
         }
 
         composable<Routes.AddSet> {
-            val viewModel: AddStudySetViewModel = hiltViewModel()   // Фабрика ViewModel благодаря Hilt
+            val viewModel: AddStudySetViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsState()
 
             AddStudySetScreen(
-                onSetCreatedClick = {navController.popBackStack()},
-                onBackClick = {navController.popBackStack()},
+                onSetCreatedClick = { navController.popBackStack() },
+                onBackClick = { navController.popBackStack() },
                 uiState = uiState,
                 onIconSelected = viewModel::onIconSelected,
                 onNameChanged = viewModel::onNameChanged,

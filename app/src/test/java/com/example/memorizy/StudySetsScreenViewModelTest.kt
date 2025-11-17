@@ -3,7 +3,7 @@ package com.example.memorizy
 import com.example.memorizy.data.studyset.StudySet
 import com.example.memorizy.data.StudySetWithCardNumber
 import com.example.memorizy.domain.studyset.StudySetRepository
-import com.example.memorizy.ui.studysets.StudySetsScreenUIState
+import com.example.memorizy.ui.studysets.StudySetsState
 import com.example.memorizy.ui.studysets.StudySetsViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -22,7 +22,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class UserSetsScreenViewModelTest {
+class StudySetsScreenViewModelTest {
 
     // 1. Правило для "подмены" Dispatchers.Main
     @get:Rule
@@ -63,7 +63,7 @@ class UserSetsScreenViewModelTest {
     fun `state is loaded correctly after init`() = runTest(mainDispatcherRule.testDispatcher) {
         // Arrange
         // Создаем список, куда будут "складываться" все состояния
-        val states = mutableListOf<StudySetsScreenUIState>()
+        val states = mutableListOf<StudySetsState>()
 
         // Act
         // Запускаем "фальшивого зрителя", который собирает ВСЕ состояния в список
@@ -96,7 +96,7 @@ class UserSetsScreenViewModelTest {
     @Test
     fun `search query filters the list correctly`() = runTest(mainDispatcherRule.testDispatcher) {
         // Arrange
-        val states = mutableListOf<StudySetsScreenUIState>()
+        val states = mutableListOf<StudySetsState>()
 
         // Act
         // Запускаем "зрителя"

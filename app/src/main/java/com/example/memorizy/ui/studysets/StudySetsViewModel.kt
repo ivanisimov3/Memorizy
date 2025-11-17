@@ -26,7 +26,7 @@ class StudySetsViewModel @Inject constructor(
 
     private val _allSets = studySetRepository.getAllSetsWithCardNumber()    // уже Flow
 
-    val uiState: StateFlow<StudySetsScreenUIState> =
+    val uiState: StateFlow<StudySetsState> =
         combine(_searchQuery, _allSets) { query, sets ->    // два Flow влияют на этот экран,
                                                                           // наблюдаем за ними
             val filteredSets = if (query.isBlank()) {   // если пустой то берем все
@@ -37,15 +37,15 @@ class StudySetsViewModel @Inject constructor(
                 }
             }
 
-            StudySetsScreenUIState(
+            StudySetsState(
                 isLoading = false,
-                studySets = filteredSets,
+                studySetsWithCardNumber = filteredSets,
                 searchQuery = query
             )
-        }.stateIn(  // Превращаем Flow в StateFlow. Используем для продолжительных операций
+        }.stateIn(  // Аналог .asStateFlow
             scope = viewModelScope, // Пока живет ViewModel
             started = SharingStarted.WhileSubscribed(5000), // Не отключать StateFlow еще 5 секунд
-            initialValue = StudySetsScreenUIState()                           // когда не работает .collectAsState
+            initialValue = StudySetsState()                           // когда не работает .collectAsState
         )
 
     // Два события, которые могут повлиять на этот экран

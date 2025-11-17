@@ -22,9 +22,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,40 +34,38 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.memorizy.R
 import com.example.memorizy.data.studyset.StudySet
-import com.example.memorizy.data.StudySetWithCardNumber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudySetsScreen(
-    viewModel: StudySetsViewModel = hiltViewModel(),
     onAddSetClick: () -> Unit,
-    onSetClick: (Int) -> Unit
+    onSetClick: (Int) -> Unit,
+    uiState: StudySetsState,
+    onSearchQueryChanged: (String) -> Unit,
+    onDeleteSet: (StudySet) -> Unit
 ){
-    val state by viewModel.uiState.collectAsState()
+    // Переменные для логики интерфейса
+    var isSearchActive by remember { mutableStateOf(false) }
     var setToDelete by remember { mutableStateOf<StudySet?>(null) }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Memorizy") },
-                actions = {
-                    IconButton(
-                        onClick = { }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_search),
-                            contentDescription = "Поиск"
-                        )
-                    }
-                }
+            UserSetsTopAppBar(
+                isSearchActive = isSearchActive,
+                onSearchClicked = {isSearchActive = true},
+                onSearchDismissed = {
+                    isSearchActive = false
+                    onSearchQueryChanged("")
+                },
+                searchQuery = uiState.searchQuery,
+                onSearchQueryChanged = onSearchQueryChanged
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { onAddSetClick }
+                onClick = onAddSetClick // Навигация
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_add),
@@ -79,25 +77,80 @@ fun StudySetsScreen(
         UserSetsScreenBody(
             modifier = Modifier
                 .padding(paddingValues),
-            isLoading = state.isLoading,
-            sets = state.studySets,
+            uiState = uiState,
             onSetClick = onSetClick,
-            onDeleteSetRequest = {
-                studySet -> setToDelete = studySet
+            onSetToDelete = { studySet ->
+                setToDelete = studySet
+            }
+        )
+    }
+
+    if (setToDelete != null){
+        DeleteSetDialog(
+            studySet = setToDelete!!,
+            onConfirmDelete = {
+                onDeleteSet(it)
+                setToDelete = null
+            },
+            onDismiss = {
+                setToDelete = null
             }
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UserSetsTopAppBar(
+    isSearchActive: Boolean,
+    onSearchClicked: () -> Unit,
+    onSearchDismissed: () -> Unit,
+    searchQuery: String,
+    onSearchQueryChanged: (String) -> Unit
+){
+    TopAppBar(
+        title = {
+            if (isSearchActive) {
+                TextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = searchQuery,
+                    onValueChange = onSearchQueryChanged,
+                )
+            } else {
+                Text("Memorizy")
+            }
+        },
+        navigationIcon = {
+            if (isSearchActive) {
+                IconButton(onClick = onSearchDismissed) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_back),
+                        contentDescription = "Закрыть поиск"
+                    )
+                }
+            }
+        },
+        actions = {
+            if (!isSearchActive) {
+                IconButton(onClick = onSearchClicked) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_search),
+                        contentDescription = "Поиск"
+                    )
+                }
+            }
+        }
+    )
+}
+
 @Composable
 fun UserSetsScreenBody(
     modifier: Modifier,
-    isLoading: Boolean,
-    sets: List<StudySetWithCardNumber>,
+    uiState: StudySetsState,
     onSetClick: (Int) -> Unit,
-    onDeleteSetRequest: (StudySet) -> Unit
+    onSetToDelete: (StudySet) -> Unit
 ){
-    if (isLoading){
+    if (uiState.isLoading){
         Box(
             modifier = modifier
                 .fillMaxSize(),
@@ -113,12 +166,12 @@ fun UserSetsScreenBody(
         ) {
             // используем перебор с ключем, так как в случае удаления набора LazyColumn поймет
             // какой именно элемент пропал и что именно нужно перерисовать
-            items(items = sets, key = { it.studySet.id} ) { studySetWithCount ->
+            items(items = uiState.studySetsWithCardNumber, key = { it.studySet.id} ) { studySetWithCardNumber ->
                 StudySetItem(
-                    studySet = studySetWithCount.studySet,
-                    cardNumber = studySetWithCount.cardNumber,
-                    onClick = { onSetClick(studySetWithCount.studySet.id) },
-                    onLongClick = { onDeleteSetRequest(studySetWithCount.studySet) }
+                    studySet = studySetWithCardNumber.studySet,
+                    cardNumber = studySetWithCardNumber.cardNumber,
+                    onSetClick = { onSetClick(studySetWithCardNumber.studySet.id) },    // переместиться к этому набору
+                    onLongClick = { onSetToDelete(studySetWithCardNumber.studySet) }  // обозначить этот набор для удаления
                 )
             }
         }
@@ -129,14 +182,14 @@ fun UserSetsScreenBody(
 fun StudySetItem(
     studySet: StudySet,
     cardNumber: Int,
-    onClick: () -> Unit,
+    onSetClick: () -> Unit,
     onLongClick: () -> Unit
 ){
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = onClick,
+                onClick = onSetClick,
                 onLongClick = onLongClick
             )
     ) {

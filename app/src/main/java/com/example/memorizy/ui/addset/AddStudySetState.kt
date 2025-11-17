@@ -1,6 +1,6 @@
 package com.example.memorizy.ui.addset
 
-data class AddSetScreenUIState(
+data class AddStudySetState(
     val name: String = "",
     val description: String = "",
     val selectedIconId: Int = 1,
