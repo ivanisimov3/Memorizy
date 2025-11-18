@@ -11,6 +11,8 @@ import androidx.navigation.toRoute
 import com.example.memorizy.ui.addset.AddStudySetScreen
 import com.example.memorizy.ui.addset.AddStudySetViewModel
 import com.example.memorizy.ui.navigation.Routes
+import com.example.memorizy.ui.setdetails.SetDetailsScreen
+import com.example.memorizy.ui.setdetails.SetDetailsViewModel
 import com.example.memorizy.ui.studysets.StudySetsScreen
 import com.example.memorizy.ui.studysets.StudySetsViewModel
 
@@ -53,9 +55,19 @@ fun MemorizyApp() {
             )
         }
 
-        composable<Routes.SetDetails> { backStackEntry ->
-            val route: Routes.SetDetails = backStackEntry.toRoute()
-            val setId = route.setId
+        composable<Routes.SetDetails> {
+            val viewModel: SetDetailsViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            SetDetailsScreen(
+                onAddCardClick = {
+                    val route: Routes.SetDetails = it.toRoute()
+                    navController.navigate(Routes.AddCard(setId = route.setId))
+                },
+                onBackClick = { navController.popBackStack() },
+                uiState = uiState,
+                onDeleteCard = viewModel::onDeleteCard
+            )
         }
 
         composable<Routes.AddCard> {

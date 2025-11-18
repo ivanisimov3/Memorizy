@@ -52,7 +52,7 @@ fun StudySetsScreen(
 
     Scaffold(
         topBar = {
-            UserSetsTopAppBar(
+            StudySetsTopAppBar(
                 isSearchActive = isSearchActive,
                 onSearchClicked = {isSearchActive = true},
                 onSearchDismissed = {
@@ -74,7 +74,7 @@ fun StudySetsScreen(
             }
         }
     ) { paddingValues ->
-        UserSetsScreenBody(
+        StudySetsScreenBody(
             modifier = Modifier
                 .padding(paddingValues),
             uiState = uiState,
@@ -87,9 +87,8 @@ fun StudySetsScreen(
 
     if (setToDelete != null){
         DeleteSetDialog(
-            studySet = setToDelete!!,
             onConfirmDelete = {
-                onDeleteSet(it)
+                onDeleteSet(setToDelete!!)
                 setToDelete = null
             },
             onDismiss = {
@@ -101,7 +100,7 @@ fun StudySetsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserSetsTopAppBar(
+fun StudySetsTopAppBar(
     isSearchActive: Boolean,
     onSearchClicked: () -> Unit,
     onSearchDismissed: () -> Unit,
@@ -144,7 +143,7 @@ fun UserSetsTopAppBar(
 }
 
 @Composable
-fun UserSetsScreenBody(
+fun StudySetsScreenBody(
     modifier: Modifier,
     uiState: StudySetsState,
     onSetClick: (Int) -> Unit,
@@ -227,8 +226,7 @@ fun StudySetItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteSetDialog(
-    studySet: StudySet,
-    onConfirmDelete: (StudySet) -> Unit,
+    onConfirmDelete: () -> Unit,
     onDismiss: () -> Unit
 ){
     AlertDialog(
@@ -237,7 +235,7 @@ fun DeleteSetDialog(
         text = { Text("Вы уверены что хотите удалить набор? Это действие нельзя откатить назад.")},
         confirmButton = {
             TextButton(
-                onClick = { onConfirmDelete(studySet) }
+                onClick = onConfirmDelete
             ) {
                 Text("Удалить")
             }
