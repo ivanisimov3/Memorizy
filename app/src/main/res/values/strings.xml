@@ -1,3 +1,34 @@
 <resources>
     <string name="app_name">Memorizy</string>
+
+    <string name="add_set">Добавить набор</string>
+    <string name="close_search">Закрыть поиск</string>
+    <string name="search">Поиск</string>
+    <string name="set_icon">Иконка набора</string>
+    <string name="number_of_cards">Карточек: %1$d</string>
+    <string name="delete_set_question">Удалить набор?</string>
+    <string name="delete_set_warning">Вы уверены что хотите удалить набор? Это действие нельзя откатить назад.</string>
+    <string name="delete_text">Удалить</string>
+    <string name="cancel_text">Отменить</string>
+
+    <string name="new_set_text">Новый набор</string>
+    <string name="back_button">Назад</string>
+    <string name="set_name_field">Название</string>
+    <string name="set_name_warning">Название не может быть пустым</string>
+    <string name="set_description">Описание</string>
+    <string name="create_set_text">Создать</string>
+
+    <string name="loading_text">Загрузка...</string>
+    <string name="add_card_button">Добавить карточку</string>
+    <string name="learning_mode">Заучивание</string>
+    <string name="delete_card_question">Удалить карточку?</string>
+    <string name="delete_card_warning">Вы уверены что хотите удалить карточку? Это действие нельзя откатить назад.</string>
+
+    <string name="new_card_text">Новая карточка</string>
+    <string name="term_text">Термин</string>
+    <string name="term_text_warning">Термин не может быть пустым</string>
+    <string name="definition_text">Определение</string>
+    <string name="definition_text_warning">Определение не может быть пустым</string>
+    <string name="set_detalization_text">Просмотр набора</string>
+    <string name="expand_more_ic">Раскрыть описание</string>
 </resources>

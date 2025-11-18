@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
 
@@ -44,14 +45,14 @@ fun AddCardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Новая карточка") },
+                title = { Text(stringResource(R.string.new_card_text)) },
                 navigationIcon = {
                     IconButton(
                         onClick = onBackClick
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_back),
-                            contentDescription = "Назад"
+                            contentDescription = stringResource(R.string.back_button)
                         )
                     }
                 }
@@ -87,13 +88,13 @@ fun AddCardScreenBody(
         OutlinedTextField(
             value = uiState.term,
             onValueChange = onTermChanged,
-            label = { Text("Термин") },
+            label = { Text(stringResource(R.string.term_text)) },
             modifier = Modifier.fillMaxWidth(),
             isError = uiState.isTermEmptyError,
             singleLine = true
         )
         if (uiState.isTermEmptyError) {
-            Text("Термин не может быть пустым")
+            Text(stringResource(R.string.term_text_warning))
         }
 
         Spacer(Modifier.height(8.dp))
@@ -101,12 +102,12 @@ fun AddCardScreenBody(
         OutlinedTextField(
             value = uiState.definition,
             onValueChange = onDefinitionChanged,
-            label = { Text("Определение") },
+            label = { Text(stringResource(R.string.definition_text)) },
             modifier = Modifier.fillMaxWidth(),
             minLines = 3
         )
         if (uiState.isDefinitionEmptyError) {
-            Text("Определение не может быть пустым")
+            Text(stringResource(R.string.definition_text_warning))
         }
 
         Spacer(Modifier.weight(1f))
@@ -116,10 +117,10 @@ fun AddCardScreenBody(
             horizontalArrangement = Arrangement.End
         ) {
             TextButton(onClick = onBackClick) { // Навигация
-                Text("Отмена")
+                Text(stringResource(R.string.cancel_text))
             }
             Button(onClick = onCreateButtonClicked) {
-                Text("Создать")
+                Text(stringResource(R.string.create_set_text))
             }
         }
     }

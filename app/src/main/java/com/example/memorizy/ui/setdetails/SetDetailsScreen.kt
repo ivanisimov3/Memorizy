@@ -22,6 +22,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,9 +35,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
 import com.example.memorizy.data.source.local.card.Card
+import com.example.memorizy.ui.utils.AppIcons.getIconResById
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,14 +56,14 @@ fun SetDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(uiState.studySet?.name ?: "Загрузка...") },
+                title = { Text(stringResource(R.string.set_detalization_text) ?: stringResource(R.string.loading_text)) },
                 navigationIcon = {
                     IconButton(
                         onClick = onBackClick
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_back),
-                            contentDescription = "Назад"
+                            contentDescription = stringResource(R.string.back_button)
                         )
                     }
                 }
@@ -72,7 +75,7 @@ fun SetDetailsScreen(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_add),
-                    contentDescription = "Добавить карточку"
+                    contentDescription = stringResource(R.string.add_card_button)
                 )
             }
         }
@@ -104,7 +107,8 @@ fun SetDetailsScreen(
 fun SetDetailsScreenBody(
     modifier: Modifier,
     uiState: SetDetailsState,
-    onCardToDelete: (Card) -> Unit
+    onCardToDelete: (Card) -> Unit,
+    getIconRes: (Int) -> (Int) = { getIconResById(it) }
 ){
     if (uiState.isLoading || uiState.studySet == null){
         Box(
@@ -124,11 +128,10 @@ fun SetDetailsScreenBody(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ){
-                val iconRes = getIconResById(uiState.studySet.iconId)
-
                 Icon(
-                    painter = painterResource(iconRes),
-                    contentDescription = "Иконка набора"
+                    painter = painterResource(getIconRes(uiState.studySet.iconId)),
+                    contentDescription = stringResource(R.string.set_icon),
+                    tint = MaterialTheme.colorScheme.primary
                 )
                 Spacer(Modifier.width(16.dp))
                 Text(
@@ -152,7 +155,7 @@ fun SetDetailsScreenBody(
                 enabled = false,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Заучивание")
+                Text(stringResource(R.string.learning_mode))
             }
 
             HorizontalDivider()
@@ -188,7 +191,7 @@ fun CardItem(
                 onLongClick = onLongClick
             )
     ) {
-        Column() {
+        Column {
             Text(
                 text = card.term
             )
@@ -214,33 +217,21 @@ fun DeleteCardDialog(
 ){
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Удалить карточку?") },
-        text = { Text("Вы уверены что хотите удалить карточку? Это действие нельзя откатить назад.")},
+        title = { Text(stringResource(R.string.delete_card_question)) },
+        text = { Text(stringResource(R.string.delete_card_warning))},
         confirmButton = {
             TextButton(
                 onClick = onConfirmDelete
             ) {
-                Text("Удалить")
+                Text(stringResource(R.string.delete_text))
             }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss
             ) {
-                Text("Отменить")
+                Text(stringResource(R.string.cancel_text))
             }
         }
     )
-}
-
-// Простая вспомогательная функция (можно положить в конец файла)
-fun getIconResById(id: Int): Int {
-    return when(id) {
-        1 -> R.drawable.random_ic // Замените на ваши реальные иконки
-        2 -> R.drawable.random_ic
-        3 -> R.drawable.random_ic
-        4 -> R.drawable.random_ic
-        5 -> R.drawable.random_ic
-        else -> R.drawable.random_ic
-    }
 }

@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -19,10 +22,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,10 +36,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
 import com.example.memorizy.data.source.local.studyset.StudySet
+import com.example.memorizy.ui.utils.AppIcons.getIconResById
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,7 +76,7 @@ fun StudySetsScreen(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_add),
-                    contentDescription = "Добавить набор"
+                    contentDescription = stringResource(R.string.add_set)
                 )
             }
         }
@@ -110,13 +117,22 @@ fun StudySetsTopAppBar(
     TopAppBar(
         title = {
             if (isSearchActive) {
-                TextField(
-                    modifier = Modifier.fillMaxWidth(),
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
                     value = searchQuery,
                     onValueChange = onSearchQueryChanged,
+                    shape = RoundedCornerShape(50),
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
                 )
             } else {
-                Text("Memorizy")
+                Text(
+                    text = "Memorizy",
+                    style = MaterialTheme.typography.displayMedium
+                )
             }
         },
         navigationIcon = {
@@ -124,7 +140,7 @@ fun StudySetsTopAppBar(
                 IconButton(onClick = onSearchDismissed) {
                     Icon(
                         painter = painterResource(R.drawable.ic_back),
-                        contentDescription = "Закрыть поиск"
+                        contentDescription = stringResource(R.string.close_search)
                     )
                 }
             }
@@ -134,7 +150,7 @@ fun StudySetsTopAppBar(
                 IconButton(onClick = onSearchClicked) {
                     Icon(
                         painter = painterResource(R.drawable.ic_search),
-                        contentDescription = "Поиск"
+                        contentDescription = stringResource(R.string.search)
                     )
                 }
             }
@@ -182,7 +198,8 @@ fun StudySetItem(
     studySet: StudySet,
     cardNumber: Int,
     onSetClick: () -> Unit,
-    onLongClick: () -> Unit
+    onLongClick: () -> Unit,
+    getIconRes: (Int) -> (Int) = { getIconResById(it) }
 ){
     Card(
         modifier = Modifier
@@ -191,34 +208,54 @@ fun StudySetItem(
                 onClick = onSetClick,
                 onLongClick = onLongClick
             )
+            .padding(8.dp)
     ) {
-        Row(
+        Column (
             modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.random_ic),
-                contentDescription = "Иконка набора"
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(
-                modifier = Modifier
-                    .weight(1f)
+                .padding(16.dp),
+        ){
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = studySet.name
+                Icon(
+                    painter = painterResource(getIconRes(studySet.iconId)),
+                    contentDescription = stringResource(R.string.set_icon),
+                    tint = MaterialTheme.colorScheme.primary
                 )
-                Text(
-                    text = "Карточек: $cardNumber"
-                )
-                if (studySet.description != null){
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
                     Text(
-                        text = studySet.description,
+                        text = studySet.name.uppercase(),
+                        style = MaterialTheme.typography.displayLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+
+                    if (!studySet.description.isNullOrEmpty()) {
+                        Text(
+                            text = studySet.description,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }else{
+                        Text(
+                            text = "нет описания"
+                        )
+                    }
                 }
             }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = stringResource(R.string.number_of_cards, cardNumber),
+                style = MaterialTheme.typography.labelSmall
+            )
         }
     }
 }
@@ -231,20 +268,34 @@ fun DeleteSetDialog(
 ){
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Удалить набор?") },
-        text = { Text("Вы уверены что хотите удалить набор? Это действие нельзя откатить назад.")},
+        title = {
+            Text(
+                text = stringResource(R.string.delete_set_question),
+                style = MaterialTheme.typography.displayMedium
+            ) },
+        text = {
+            Text(
+                text = stringResource(R.string.delete_set_warning),
+                style = MaterialTheme.typography.bodyMedium
+            )},
         confirmButton = {
             TextButton(
                 onClick = onConfirmDelete
             ) {
-                Text("Удалить")
+                Text(
+                    text = stringResource(R.string.delete_text),
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss
             ) {
-                Text("Отменить")
+                Text(
+                    text = stringResource(R.string.cancel_text),
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         }
     )

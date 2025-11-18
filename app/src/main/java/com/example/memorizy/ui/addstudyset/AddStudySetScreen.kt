@@ -26,8 +26,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
+import com.example.memorizy.ui.utils.AppIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,14 +52,14 @@ fun AddStudySetScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Новый набор") },
+                title = { Text(stringResource(R.string.new_set_text)) },
                 navigationIcon = {
                     IconButton(
                         onClick = onBackClick
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_back),
-                            contentDescription = "Назад"
+                            contentDescription = stringResource(R.string.back_button)
                         )
                     }
                 }
@@ -102,13 +104,13 @@ fun AddStudySetScreenBody(
         OutlinedTextField(
             value = uiState.name,
             onValueChange = onNameChanged,
-            label = { Text("Название") },
+            label = { Text(stringResource(R.string.set_name_field)) },
             modifier = Modifier.fillMaxWidth(),
             isError = uiState.isNameEmptyError,
             singleLine = true
         )
         if (uiState.isNameEmptyError) {
-            Text("Название не может быть пустым")
+            Text(stringResource(R.string.set_name_warning))
         }
 
         Spacer(Modifier.height(8.dp))
@@ -116,7 +118,7 @@ fun AddStudySetScreenBody(
         OutlinedTextField(
             value = uiState.description,
             onValueChange = onDescriptionChanged,
-            label = { Text("Описание") },
+            label = { Text(stringResource(R.string.set_description)) },
             modifier = Modifier.fillMaxWidth(),
             minLines = 3
         )
@@ -128,10 +130,10 @@ fun AddStudySetScreenBody(
             horizontalArrangement = Arrangement.End
         ) {
             TextButton(onClick = onBackClick) { // Навигация
-                Text("Отмена")
+                Text(stringResource(R.string.cancel_text))
             }
             Button(onClick = onCreateButtonClicked) {
-                Text("Создать")
+                Text(stringResource(R.string.create_set_text))
             }
         }
     }
@@ -140,23 +142,16 @@ fun AddStudySetScreenBody(
 @Composable
 fun IconSelector(
     selectedIconId: Int,
-    onIconSelected: (Int) -> Unit
+    onIconSelected: (Int) -> Unit,
+    availableIcons: Map<Int, Int> = AppIcons.allIcons
 ) {
-    val icons = listOf(
-        1 to R.drawable.random_ic,
-        2 to R.drawable.random_ic,
-        3 to R.drawable.random_ic,
-        4 to R.drawable.random_ic,
-        5 to R.drawable.random_ic
-    )
-
     Row(
         horizontalArrangement = Arrangement.SpaceAround,
         modifier = Modifier.fillMaxWidth()
     ) {
-        icons.forEach { (id, iconId) ->
+        availableIcons.forEach { (id, iconResId) ->
             Icon(
-                painter = painterResource(iconId),
+                painter = painterResource(iconResId),
                 contentDescription = null,
                 modifier = Modifier
                     .size(48.dp)

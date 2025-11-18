@@ -22,21 +22,21 @@ val Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = Commissioner,
         fontWeight = FontWeight.Bold,
-        fontSize = 36.sp
+        fontSize = 32.sp
     ),
     displayMedium = TextStyle(
         fontFamily = TikTokSans,
         fontWeight = FontWeight.Normal,
-        fontSize = 20.sp
+        fontSize = 24.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = TikTokSans,
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp
+        fontSize = 18.sp
     ),
     labelSmall = TextStyle(
         fontFamily = TikTokSans,
         fontWeight = FontWeight.Bold,
-        fontSize = 14.sp
+        fontSize = 18.sp
     )
 )
