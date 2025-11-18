@@ -1,4 +1,4 @@
-package com.example.memorizy.ui.addset
+package com.example.memorizy.ui.addstudyset
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

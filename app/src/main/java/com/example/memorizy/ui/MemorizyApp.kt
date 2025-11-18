@@ -8,8 +8,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.memorizy.ui.addset.AddStudySetScreen
-import com.example.memorizy.ui.addset.AddStudySetViewModel
+import com.example.memorizy.ui.addcard.AddCardScreen
+import com.example.memorizy.ui.addcard.AddCardViewModel
+import com.example.memorizy.ui.addstudyset.AddStudySetScreen
+import com.example.memorizy.ui.addstudyset.AddStudySetViewModel
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.setdetails.SetDetailsScreen
 import com.example.memorizy.ui.setdetails.SetDetailsViewModel
@@ -71,6 +73,17 @@ fun MemorizyApp() {
         }
 
         composable<Routes.AddCard> {
+            val viewModel: AddCardViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            AddCardScreen(
+                onCardCreatedClick = { navController.popBackStack() },
+                onBackClick = { navController.popBackStack() },
+                uiState = uiState,
+                onTermChanged = viewModel::onTermChanged,
+                onDefinitionChanged = viewModel::onDefinitionChanged,
+                onCreateButtonClicked = viewModel::onCreateButtonClicked
+            )
         }
     }
 }
