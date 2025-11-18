@@ -84,8 +84,8 @@ class StudySetsScreenViewModelTest {
         val currentState = states.last()
 
         assertFalse(currentState.isLoading) // <-- Теперь должно быть false
-        assertEquals(2, currentState.studySets.size)
-        assertEquals("Английский", currentState.studySets[0].studySet.name)
+        assertEquals(2, currentState.studySetsWithCardNumber.size)
+        assertEquals("Английский", currentState.studySetsWithCardNumber[0].studySet.name)
 
         // Очищаем корутину-зрителя
         job.cancel()
@@ -124,8 +124,8 @@ class StudySetsScreenViewModelTest {
         val currentState = states.last()
 
         assertFalse(currentState.isLoading)
-        assertEquals(1, currentState.studySets.size)
-        assertEquals("Испанский", currentState.studySets[0].studySet.name)
+        assertEquals(1, currentState.studySetsWithCardNumber.size)
+        assertEquals("Испанский", currentState.studySetsWithCardNumber[0].studySet.name)
         assertEquals("Испан", currentState.searchQuery)
 
         job.cancel()
