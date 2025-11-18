@@ -1,22 +1,24 @@
-package com.example.memorizy.data.studyset
+package com.example.memorizy.data.source.local.studyset
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.memorizy.data.studyset.StudySet
-import com.example.memorizy.data.StudySetWithCardNumber
+import com.example.memorizy.data.source.local.StudySetWithCardNumber
 import kotlinx.coroutines.flow.Flow
 
-// Data Access Object - определяет методы, с помощью которых происходит взаимодействие с данными
+// Data Access Object for the Study_set table.
 @Dao
 interface StudySetDao {
 
-    // При конфликте (например если одинаковые id наборов) использовать первый добавленный
-    @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
-    suspend fun insertSet(studySet: StudySet)   // suspend для одноразовых операций
+    // Insert a set in the database and Ignore property to keep the existing rows
+    // @param studySet the set to be inserted
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertSet(studySet: StudySet)
 
+    // Delete chosen set from the table
+    // @param studySet the set to be deleted
     @Delete
     suspend fun deleteSet(studySet: StudySet)
 

@@ -20,15 +20,15 @@ fun MemorizyApp() {
 
     NavHost(
         navController = navController,
-        startDestination = Routes.UserSets
+        startDestination = Routes.StudySets
     ) {
 
-        composable<Routes.UserSets> {
+        composable<Routes.StudySets> {
             val viewModel: StudySetsViewModel = hiltViewModel() // Фабрика ViewModel благодаря Hilt
             val uiState by viewModel.uiState.collectAsState()
 
             StudySetsScreen(
-                onAddSetClick = { navController.navigate(Routes.AddSet) },
+                onAddSetClick = { navController.navigate(Routes.AddStudySet) },
                 onSetClick = { setId ->
                     navController.navigate(Routes.SetDetails(setId = setId))
                 },
@@ -38,7 +38,7 @@ fun MemorizyApp() {
             )
         }
 
-        composable<Routes.AddSet> {
+        composable<Routes.AddStudySet> {
             val viewModel: AddStudySetViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsState()
 

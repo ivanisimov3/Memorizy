@@ -1,6 +1,8 @@
-package com.example.memorizy.data.card
+package com.example.memorizy.data.cardrepository
 
-import com.example.memorizy.domain.card.CardRepository
+import com.example.memorizy.data.source.local.card.Card
+import com.example.memorizy.data.source.local.card.CardDao
+import com.example.memorizy.data.cardrepository.CardRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

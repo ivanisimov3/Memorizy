@@ -1,7 +1,7 @@
-package com.example.memorizy.data
+package com.example.memorizy.data.source.local
 
 import androidx.room.Embedded
-import com.example.memorizy.data.studyset.StudySet
+import com.example.memorizy.data.source.local.studyset.StudySet
 
 data class StudySetWithCardNumber(
     @Embedded

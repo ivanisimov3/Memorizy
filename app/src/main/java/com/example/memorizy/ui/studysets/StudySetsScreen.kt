@@ -35,7 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
-import com.example.memorizy.data.studyset.StudySet
+import com.example.memorizy.data.source.local.studyset.StudySet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

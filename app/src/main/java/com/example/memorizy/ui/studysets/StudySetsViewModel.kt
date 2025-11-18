@@ -2,8 +2,8 @@ package com.example.memorizy.ui.studysets
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.memorizy.data.studyset.StudySet
-import com.example.memorizy.domain.studyset.StudySetRepository
+import com.example.memorizy.data.source.local.studyset.StudySet
+import com.example.memorizy.data.studysetrepository.StudySetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
