@@ -1,9 +1,9 @@
 package com.example.memorizy.di
 
-import com.example.memorizy.data.cardrepository.CardRepositoryImpl
-import com.example.memorizy.data.studysetrepository.StudySetRepositoryImpl
-import com.example.memorizy.data.cardrepository.CardRepository
-import com.example.memorizy.data.studysetrepository.StudySetRepository
+import com.example.memorizy.data.repository.cardrepository.CardRepositoryImpl
+import com.example.memorizy.data.repository.studysetrepository.StudySetRepositoryImpl
+import com.example.memorizy.data.repository.cardrepository.CardRepository
+import com.example.memorizy.data.repository.studysetrepository.StudySetRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

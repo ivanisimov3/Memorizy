@@ -22,11 +22,12 @@ interface StudySetDao {
     @Delete
     suspend fun deleteSet(studySet: StudySet)
 
+    // Select specific set
+    // @param setId the set id to choose
     @Query("SELECT * FROM study_sets WHERE id = :setId")
     fun getSet(setId: Int): Flow<StudySet>  // Flow для операций с использованием SELECT
 
-    // считаем сколько карточек принадлежит конкретному набору с помощью соотнесения id и setId
-    // и возвращаем все наборы с подчитанным количеством карточек
+    // Study_sets left join cards by setId and group by id
     @Query("""
         SELECT
             study_sets.*,

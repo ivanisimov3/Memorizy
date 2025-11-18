@@ -12,7 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import jakarta.inject.Singleton
 
-@Module
+@Module // Инструкция как создавать объекты
 @InstallIn(SingletonComponent::class) // Зависимости живут, пока живо приложение
 object DataModule { // object используем когда нужно произвести объекты (фабрика)
 

@@ -1,10 +1,10 @@
-package com.example.memorizy.data.studysetrepository
+package com.example.memorizy.data.repository.studysetrepository
 
 import com.example.memorizy.data.source.local.StudySetWithCardNumber
 import com.example.memorizy.data.source.local.studyset.StudySet
 import kotlinx.coroutines.flow.Flow
 
-// Общий шаблон работы со StudySet
+// Interface to the data layer (study_set).
 interface StudySetRepository {
 
     suspend fun insertSet(studySet: StudySet)

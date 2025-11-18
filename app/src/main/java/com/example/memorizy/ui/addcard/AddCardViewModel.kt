@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.memorizy.data.cardrepository.CardRepository
+import com.example.memorizy.data.repository.cardrepository.CardRepository
 import com.example.memorizy.data.source.local.card.Card
 import com.example.memorizy.ui.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,9 +60,9 @@ class AddCardViewModel @Inject constructor(
             definition = currentState.definition
         )
 
-        viewModelScope.launch { // обращаемся к бд поэтому корутина
+        viewModelScope.launch {
             cardRepository.insertCard(newCard)
-            _uiState.update { it.copy(isCardCreated = true) }
+            _uiState.update { it.copy(isCardCreated = true) }   // обновляем только когда добавим в бд
         }
     }
 }

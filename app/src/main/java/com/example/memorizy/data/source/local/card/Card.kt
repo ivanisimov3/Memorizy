@@ -6,13 +6,17 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.memorizy.data.source.local.studyset.StudySet
 
+/*
+Internal model used to represent a task stored locally in a Room database. This is used inside
+the data layer only.
+*/
 @Entity(
     tableName = "cards",
     foreignKeys = [ForeignKey(
         entity = StudySet::class,
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("setId"),
-        onDelete = ForeignKey.Companion.CASCADE  // удаляем все карточки если удалится набор
+        onDelete = ForeignKey.CASCADE  // удаляем все карточки если удалится набор
     )],
     indices = [Index(value = ["setId"])]    // ускоряем операцию SELECT по столбцу setId
 )

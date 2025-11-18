@@ -41,7 +41,7 @@ fun AddStudySetScreen(
     onCreateButtonClicked: () -> Unit
 ){
 
-    LaunchedEffect(uiState.isSetCreated) {    // запуск корутин при появлении или изменении key
+    LaunchedEffect(uiState.isSetCreated) {    // уходим с экрана только когда набор сохранился в БД
         if (uiState.isSetCreated){
             onSetCreatedClick() // Навигация
         }

@@ -1,13 +1,12 @@
-package com.example.memorizy.data.studysetrepository
+package com.example.memorizy.data.repository.studysetrepository
 
 import com.example.memorizy.data.source.local.StudySetWithCardNumber
 import com.example.memorizy.data.source.local.studyset.StudySet
 import com.example.memorizy.data.source.local.studyset.StudySetDao
-import com.example.memorizy.data.studysetrepository.StudySetRepository
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
-// Конкретная реализация для работы с StudySetDao
+// Конкретная реализация для работы с StudySetDao (Default implementation)
 class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет связать создание этого репозитория с dao
     private val dao: StudySetDao
 ) : StudySetRepository {

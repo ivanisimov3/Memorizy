@@ -3,6 +3,7 @@ package com.example.memorizy.data.source.local
 import androidx.room.Embedded
 import com.example.memorizy.data.source.local.studyset.StudySet
 
+// Custom data class to connect entities
 data class StudySetWithCardNumber(
     @Embedded
     val studySet: StudySet, // встраиваем столбцы StudySet

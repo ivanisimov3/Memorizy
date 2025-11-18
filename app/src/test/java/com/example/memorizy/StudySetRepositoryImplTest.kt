@@ -2,8 +2,8 @@ package com.example.memorizy
 
 import com.example.memorizy.data.source.local.studyset.StudySetDao
 import com.example.memorizy.data.source.local.studyset.StudySet
-import com.example.memorizy.data.studysetrepository.StudySetRepositoryImpl
-import com.example.memorizy.data.studysetrepository.StudySetRepository
+import com.example.memorizy.data.repository.studysetrepository.StudySetRepositoryImpl
+import com.example.memorizy.data.repository.studysetrepository.StudySetRepository
 import io.mockk.coVerify
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit4.MockKRule

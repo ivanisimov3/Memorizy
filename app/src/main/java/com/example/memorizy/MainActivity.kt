@@ -11,7 +11,7 @@ import com.example.memorizy.ui.MemorizyApp
 import com.example.memorizy.ui.theme.MemorizyTheme
 import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
+@AndroidEntryPoint  // MainActivity получает все зависимости
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,7 +20,6 @@ class MainActivity : ComponentActivity() {
             MemorizyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    // color = MaterialTheme.colorScheme.background
                 ) {
                     MemorizyApp()
                 }

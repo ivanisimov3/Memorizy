@@ -3,7 +3,7 @@ package com.example.memorizy.ui.addstudyset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.memorizy.data.source.local.studyset.StudySet
-import com.example.memorizy.data.studysetrepository.StudySetRepository
+import com.example.memorizy.data.repository.studysetrepository.StudySetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow

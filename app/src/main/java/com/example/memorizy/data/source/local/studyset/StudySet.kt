@@ -3,7 +3,10 @@ package com.example.memorizy.data.source.local.studyset
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-// сущность набор
+/*
+Internal model used to represent a task stored locally in a Room database. This is used inside
+the data layer only.
+*/
 @Entity(tableName = "study_sets")
 data class StudySet(
     @PrimaryKey(autoGenerate = true)

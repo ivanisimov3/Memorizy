@@ -35,7 +35,7 @@ fun AddCardScreen(
     onCreateButtonClicked: () -> Unit
 ){
 
-    LaunchedEffect(uiState.isCardCreated) {    // запуск корутин при появлении или изменении key
+    LaunchedEffect(uiState.isCardCreated) {    // уходим с экрана только когда карточка сохранилась в БД
         if (uiState.isCardCreated){
             onCardCreatedClick() // Навигация
         }

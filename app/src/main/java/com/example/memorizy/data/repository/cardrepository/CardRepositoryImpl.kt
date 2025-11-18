@@ -1,12 +1,11 @@
-package com.example.memorizy.data.cardrepository
+package com.example.memorizy.data.repository.cardrepository
 
 import com.example.memorizy.data.source.local.card.Card
 import com.example.memorizy.data.source.local.card.CardDao
-import com.example.memorizy.data.cardrepository.CardRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-// Конкретная реализация для работы с Card
+// Конкретная реализация для работы с Card (Default implementation)
 class CardRepositoryImpl @Inject constructor(   // Inject позволяет связать создание этого репозитория с dao
     private val dao: CardDao
 ) : CardRepository {

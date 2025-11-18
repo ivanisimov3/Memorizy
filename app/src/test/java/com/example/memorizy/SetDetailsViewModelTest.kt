@@ -2,10 +2,10 @@ package com.example.memorizy
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.toRoute
-import com.example.memorizy.data.cardrepository.CardRepository
+import com.example.memorizy.data.repository.cardrepository.CardRepository
 import com.example.memorizy.data.source.local.card.Card
 import com.example.memorizy.data.source.local.studyset.StudySet
-import com.example.memorizy.data.studysetrepository.StudySetRepository
+import com.example.memorizy.data.repository.studysetrepository.StudySetRepository
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.setdetails.SetDetailsViewModel
 import io.mockk.every
