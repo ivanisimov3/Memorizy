@@ -37,6 +37,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -212,7 +214,7 @@ fun StudySetItem(
             )
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(5.dp),
-        border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.secondary)
+        border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.secondary),
     ) {
         Column (
             modifier = Modifier
@@ -243,7 +245,7 @@ fun StudySetItem(
                     if (!studySet.description.isNullOrEmpty()) {
                         Text(
                             text = studySet.description,
-                            maxLines = 2,
+                            maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodyMedium,
                         )
