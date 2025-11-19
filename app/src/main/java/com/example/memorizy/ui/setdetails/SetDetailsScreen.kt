@@ -1,5 +1,6 @@
 package com.example.memorizy.ui.setdetails
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -36,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
 import com.example.memorizy.data.source.local.card.Card
@@ -56,7 +59,14 @@ fun SetDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.set_detalization_text) ?: stringResource(R.string.loading_text)) },
+                title = {
+                    Text(
+                        text =
+                            stringResource(R.string.set_detalization_text)
+                                ?: stringResource(R.string.loading_text),
+                        style = MaterialTheme.typography.displayMedium
+                    )
+                },
                 navigationIcon = {
                     IconButton(
                         onClick = onBackClick
@@ -135,7 +145,8 @@ fun SetDetailsScreenBody(
                 )
                 Spacer(Modifier.width(16.dp))
                 Text(
-                    text = uiState.studySet.name
+                    text = uiState.studySet.name,
+                    style = MaterialTheme.typography.displayLarge
                 )
             }
 
@@ -145,6 +156,7 @@ fun SetDetailsScreenBody(
 
                 Text(
                     text = uiState.studySet.description,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
@@ -155,15 +167,19 @@ fun SetDetailsScreenBody(
                 enabled = false,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(stringResource(R.string.learning_mode))
+                Text(
+                    stringResource(R.string.learning_mode),
+                    style = MaterialTheme.typography.displayMedium
+                )
             }
+
+            Spacer(Modifier.height(4.dp))
 
             HorizontalDivider()
 
             LazyColumn(
                 modifier = Modifier
                     .weight(1f),
-                contentPadding = PaddingValues(16.dp)
             ) {
                 // используем перебор с ключем, так как в случае удаления карточки LazyColumn поймет
                 // какой именно элемент пропал и что именно нужно перерисовать
@@ -190,10 +206,18 @@ fun CardItem(
                 onClick = { },
                 onLongClick = onLongClick
             )
+            .padding(vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(5.dp),
+        border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.secondary)
     ) {
-        Column {
+        Column (
+            modifier = Modifier
+                .padding(8.dp)
+        ){
             Text(
-                text = card.term
+                text = card.term,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold
             )
 
             Spacer(Modifier.height(4.dp))
@@ -203,7 +227,8 @@ fun CardItem(
             Spacer(Modifier.height(4.dp))
 
             Text(
-                text = card.definition
+                text = card.definition,
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
     }

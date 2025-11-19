@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
 import com.example.memorizy.ui.utils.AppIcons
@@ -52,7 +55,12 @@ fun AddStudySetScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.new_set_text)) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.new_set_text),
+                        style = MaterialTheme.typography.displayMedium
+                    )
+                },
                 navigationIcon = {
                     IconButton(
                         onClick = onBackClick
@@ -104,13 +112,22 @@ fun AddStudySetScreenBody(
         OutlinedTextField(
             value = uiState.name,
             onValueChange = onNameChanged,
-            label = { Text(stringResource(R.string.set_name_field)) },
+            label = {
+                Text(
+                    text = stringResource(R.string.set_name_field),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
             modifier = Modifier.fillMaxWidth(),
             isError = uiState.isNameEmptyError,
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
         )
         if (uiState.isNameEmptyError) {
-            Text(stringResource(R.string.set_name_warning))
+            Text(
+                text = stringResource(R.string.set_name_warning),
+                style = MaterialTheme.typography.labelSmall
+            )
         }
 
         Spacer(Modifier.height(8.dp))
@@ -118,9 +135,15 @@ fun AddStudySetScreenBody(
         OutlinedTextField(
             value = uiState.description,
             onValueChange = onDescriptionChanged,
-            label = { Text(stringResource(R.string.set_description)) },
+            label = {
+                Text(
+                    text = stringResource(R.string.set_description),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
             modifier = Modifier.fillMaxWidth(),
-            minLines = 3
+            minLines = 5,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
         )
 
         Spacer(Modifier.weight(1f))
@@ -130,10 +153,16 @@ fun AddStudySetScreenBody(
             horizontalArrangement = Arrangement.End
         ) {
             TextButton(onClick = onBackClick) { // Навигация
-                Text(stringResource(R.string.cancel_text))
+                Text(
+                    text = stringResource(R.string.cancel_text),
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
             Button(onClick = onCreateButtonClicked) {
-                Text(stringResource(R.string.create_set_text))
+                Text(
+                    text = stringResource(R.string.create_set_text),
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         }
     }

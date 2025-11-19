@@ -11,7 +11,7 @@ import com.example.memorizy.ui.MemorizyApp
 import com.example.memorizy.ui.theme.MemorizyTheme
 import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint  // MainActivity получает все зависимости
+@AndroidEntryPoint  // Говорим Hilt где вклиниться в приложение
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

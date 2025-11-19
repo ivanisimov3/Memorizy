@@ -12,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -45,7 +46,12 @@ fun AddCardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.new_card_text)) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.new_card_text),
+                        style = MaterialTheme.typography.displayMedium
+                    )
+                },
                 navigationIcon = {
                     IconButton(
                         onClick = onBackClick
@@ -88,13 +94,21 @@ fun AddCardScreenBody(
         OutlinedTextField(
             value = uiState.term,
             onValueChange = onTermChanged,
-            label = { Text(stringResource(R.string.term_text)) },
+            label = {
+                Text(
+                    text = stringResource(R.string.term_text),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
             modifier = Modifier.fillMaxWidth(),
             isError = uiState.isTermEmptyError,
             singleLine = true
         )
         if (uiState.isTermEmptyError) {
-            Text(stringResource(R.string.term_text_warning))
+            Text(
+                text = stringResource(R.string.term_text_warning),
+                style = MaterialTheme.typography.labelSmall
+            )
         }
 
         Spacer(Modifier.height(8.dp))
@@ -102,12 +116,20 @@ fun AddCardScreenBody(
         OutlinedTextField(
             value = uiState.definition,
             onValueChange = onDefinitionChanged,
-            label = { Text(stringResource(R.string.definition_text)) },
+            label = {
+                Text(
+                    text = stringResource(R.string.definition_text),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
             modifier = Modifier.fillMaxWidth(),
-            minLines = 3
+            minLines = 3,
         )
         if (uiState.isDefinitionEmptyError) {
-            Text(stringResource(R.string.definition_text_warning))
+            Text(
+                text = stringResource(R.string.definition_text_warning),
+                style = MaterialTheme.typography.labelSmall
+            )
         }
 
         Spacer(Modifier.weight(1f))
@@ -117,10 +139,16 @@ fun AddCardScreenBody(
             horizontalArrangement = Arrangement.End
         ) {
             TextButton(onClick = onBackClick) { // Навигация
-                Text(stringResource(R.string.cancel_text))
+                Text(
+                    text = stringResource(R.string.cancel_text),
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
             Button(onClick = onCreateButtonClicked) {
-                Text(stringResource(R.string.create_set_text))
+                Text(
+                    text = stringResource(R.string.create_set_text),
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         }
     }

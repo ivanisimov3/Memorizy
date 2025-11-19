@@ -8,8 +8,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.memorizy.R
 
-val Commissioner = FontFamily(
-    Font(R.font.commissioner_regular)
+val Sansation = FontFamily(
+    Font(R.font.sansation_regular)
 )
 
 val TikTokSans = FontFamily(
@@ -20,23 +20,23 @@ val TikTokSans = FontFamily(
 // Set of Material typography styles to start with
 val Typography = Typography(
     displayLarge = TextStyle(
-        fontFamily = Commissioner,
+        fontFamily = TikTokSans,
         fontWeight = FontWeight.Bold,
-        fontSize = 32.sp
+        fontSize = 28.sp
     ),
     displayMedium = TextStyle(
-        fontFamily = TikTokSans,
-        fontWeight = FontWeight.Normal,
-        fontSize = 24.sp
+        fontFamily = Sansation,
+        fontWeight = FontWeight.Bold,
+        fontSize = 22.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = TikTokSans,
         fontWeight = FontWeight.Normal,
-        fontSize = 18.sp
+        fontSize = 22.sp
     ),
     labelSmall = TextStyle(
         fontFamily = TikTokSans,
         fontWeight = FontWeight.Bold,
-        fontSize = 18.sp
+        fontSize = 16.sp
     )
 )

@@ -1,5 +1,6 @@
 package com.example.memorizy.ui.studysets
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -208,7 +210,9 @@ fun StudySetItem(
                 onClick = onSetClick,
                 onLongClick = onLongClick
             )
-            .padding(8.dp)
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(5.dp),
+        border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.secondary)
     ) {
         Column (
             modifier = Modifier
@@ -232,20 +236,21 @@ fun StudySetItem(
                     Text(
                         text = studySet.name.uppercase(),
                         style = MaterialTheme.typography.displayLarge,
-                        maxLines = 1,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
 
                     if (!studySet.description.isNullOrEmpty()) {
                         Text(
                             text = studySet.description,
-                            maxLines = 1,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }else{
                         Text(
-                            text = "нет описания"
+                            text = "нет описания",
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
