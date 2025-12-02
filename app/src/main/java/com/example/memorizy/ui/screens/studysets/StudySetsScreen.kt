@@ -1,4 +1,4 @@
-package com.example.memorizy.ui.studysets
+package com.example.memorizy.ui.screens.studysets
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
@@ -37,8 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -52,7 +50,7 @@ import com.example.memorizy.ui.utils.AppIcons.getIconResById
 @Composable
 fun StudySetsScreen(
     onAddSetClick: () -> Unit,
-    onSetClick: (Int) -> Unit,
+    onSetClick: (Long) -> Unit,
     uiState: StudySetsState,
     onSearchQueryChanged: (String) -> Unit,
     onDeleteSet: (StudySet) -> Unit
@@ -111,7 +109,7 @@ fun StudySetsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StudySetsTopAppBar(
+private fun StudySetsTopAppBar(
     isSearchActive: Boolean,
     onSearchClicked: () -> Unit,
     onSearchDismissed: () -> Unit,
@@ -163,10 +161,10 @@ fun StudySetsTopAppBar(
 }
 
 @Composable
-fun StudySetsScreenBody(
+private fun StudySetsScreenBody(
     modifier: Modifier,
     uiState: StudySetsState,
-    onSetClick: (Int) -> Unit,
+    onSetClick: (Long) -> Unit,
     onSetToDelete: (StudySet) -> Unit
 ){
     if (uiState.isLoading){
@@ -198,9 +196,9 @@ fun StudySetsScreenBody(
 }
 
 @Composable
-fun StudySetItem(
+private fun StudySetItem(
     studySet: StudySet,
-    cardNumber: Int,
+    cardNumber: Long,
     onSetClick: () -> Unit,
     onLongClick: () -> Unit,
     getIconRes: (Int) -> (Int) = { getIconResById(it) }
@@ -269,7 +267,7 @@ fun StudySetItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeleteSetDialog(
+private fun DeleteSetDialog(
     onConfirmDelete: () -> Unit,
     onDismiss: () -> Unit
 ){

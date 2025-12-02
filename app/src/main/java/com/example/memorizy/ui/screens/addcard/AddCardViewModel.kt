@@ -1,4 +1,4 @@
-package com.example.memorizy.ui.addcard
+package com.example.memorizy.ui.screens.addcard
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

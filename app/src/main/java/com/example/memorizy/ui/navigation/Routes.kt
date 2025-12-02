@@ -15,8 +15,8 @@ object Routes { // Почему имеено object Routes? а не class Routes
     object AddStudySet
 
     @Serializable
-    data class SetDetails(val setId: Int)
+    data class SetDetails(val setId: Long)
 
     @Serializable
-    data class AddCard(val setId: Int)
+    data class AddCard(val setId: Long)
 }

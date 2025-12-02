@@ -1,4 +1,4 @@
-package com.example.memorizy.ui.setdetails
+package com.example.memorizy.ui.screens.setdetails
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

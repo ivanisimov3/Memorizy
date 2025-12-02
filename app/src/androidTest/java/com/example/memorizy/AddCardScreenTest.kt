@@ -5,7 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextInput
 import com.example.memorizy.ui.addcard.AddCardScreenBody
-import com.example.memorizy.ui.addcard.AddCardState
+import com.example.memorizy.ui.screens.addcard.AddCardState
 import org.junit.Rule
 import org.junit.Test
 

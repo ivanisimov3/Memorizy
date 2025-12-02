@@ -7,7 +7,8 @@ import com.example.memorizy.data.source.local.card.Card
 import com.example.memorizy.data.source.local.studyset.StudySet
 import com.example.memorizy.data.repository.studysetrepository.StudySetRepository
 import com.example.memorizy.ui.navigation.Routes
-import com.example.memorizy.ui.setdetails.SetDetailsViewModel
+import com.example.memorizy.ui.screens.setdetails.SetDetailsState
+import com.example.memorizy.ui.screens.setdetails.SetDetailsViewModel
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit4.MockKRule
@@ -61,7 +62,7 @@ class SetDetailsViewModelTest {
         viewModel = SetDetailsViewModel(savedStateHandle, studySetRepository, cardRepository)
 
         // Act (Собираем состояние)
-        val states = mutableListOf<com.example.memorizy.ui.setdetails.SetDetailsState>()
+        val states = mutableListOf<SetDetailsState>()
 
         // Запускаем сборщика в фоновой корутине
         val job = launch {

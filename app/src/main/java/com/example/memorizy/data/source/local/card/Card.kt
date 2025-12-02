@@ -22,9 +22,9 @@ the data layer only.
 )
 data class Card(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
 
-    val setId: Int, // внешний ключ
+    val setId: Long, // внешний ключ
     val term: String,
     val definition: String
 )

@@ -10,5 +10,5 @@ interface CardRepository {
 
     suspend fun deleteCard(card: Card)
 
-    fun getAllCardsForSet(setId: Int): Flow<List<Card>>
+    fun getAllCardsForSet(setId: Long): Flow<List<Card>>
 }

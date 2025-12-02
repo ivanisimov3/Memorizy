@@ -1,4 +1,4 @@
-package com.example.memorizy.ui.addcard
+package com.example.memorizy.ui.screens.addcard
 
 data class AddCardState (
     val term: String = "",

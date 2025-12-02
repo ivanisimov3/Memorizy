@@ -1,4 +1,4 @@
-package com.example.memorizy.ui.addstudyset
+package com.example.memorizy.ui.screens.addstudyset
 
 data class AddStudySetState(
     val name: String = "",

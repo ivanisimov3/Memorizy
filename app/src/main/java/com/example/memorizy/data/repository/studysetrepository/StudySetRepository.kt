@@ -11,7 +11,7 @@ interface StudySetRepository {
 
     suspend fun deleteSet(studySet: StudySet)
 
-    fun getSet(setId: Int): Flow<StudySet>
+    fun getSet(setId: Long): Flow<StudySet>
 
     fun getAllSetsWithCardNumber(): Flow<List<StudySetWithCardNumber>>
 }

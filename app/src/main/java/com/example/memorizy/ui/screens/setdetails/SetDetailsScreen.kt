@@ -1,10 +1,9 @@
-package com.example.memorizy.ui.setdetails
+package com.example.memorizy.ui.screens.setdetails
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -114,7 +113,7 @@ fun SetDetailsScreen(
 }
 
 @Composable
-fun SetDetailsScreenBody(
+private fun SetDetailsScreenBody(
     modifier: Modifier,
     uiState: SetDetailsState,
     onCardToDelete: (Card) -> Unit,
@@ -195,7 +194,7 @@ fun SetDetailsScreenBody(
 }
 
 @Composable
-fun CardItem(
+private fun CardItem(
     card: Card,
     onLongClick: () -> Unit
 ){
@@ -236,7 +235,7 @@ fun CardItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeleteCardDialog(
+private fun DeleteCardDialog(
     onConfirmDelete: () -> Unit,
     onDismiss: () -> Unit
 ){

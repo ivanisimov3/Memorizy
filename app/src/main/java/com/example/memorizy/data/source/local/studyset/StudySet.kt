@@ -10,7 +10,7 @@ the data layer only.
 @Entity(tableName = "study_sets")
 data class StudySet(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
 
     val name: String,
     val description: String?,   // необязательно поле

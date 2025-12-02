@@ -18,7 +18,7 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
         return dao.deleteSet(studySet)
     }
 
-    override fun getSet(setId: Int): Flow<StudySet> {
+    override fun getSet(setId: Long): Flow<StudySet> {
         return dao.getSet(setId)
     }
 

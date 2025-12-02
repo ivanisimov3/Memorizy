@@ -17,7 +17,7 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
         return dao.deleteCard(card)
     }
 
-    override fun getAllCardsForSet(setId: Int): Flow<List<Card>> {
+    override fun getAllCardsForSet(setId: Long): Flow<List<Card>> {
         return dao.getAllCardsForSet(setId)
     }
 }

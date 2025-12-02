@@ -3,7 +3,7 @@ package com.example.memorizy
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.toRoute
 import com.example.memorizy.data.repository.cardrepository.CardRepository
-import com.example.memorizy.ui.addcard.AddCardViewModel
+import com.example.memorizy.ui.screens.addcard.AddCardViewModel
 import com.example.memorizy.ui.navigation.Routes
 import io.mockk.coEvery
 import io.mockk.coVerify

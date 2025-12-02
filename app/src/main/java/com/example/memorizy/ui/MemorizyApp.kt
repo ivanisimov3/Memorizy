@@ -8,15 +8,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.memorizy.ui.addcard.AddCardScreen
-import com.example.memorizy.ui.addcard.AddCardViewModel
-import com.example.memorizy.ui.addstudyset.AddStudySetScreen
-import com.example.memorizy.ui.addstudyset.AddStudySetViewModel
+import com.example.memorizy.ui.screens.addcard.AddCardScreen
+import com.example.memorizy.ui.screens.addcard.AddCardViewModel
+import com.example.memorizy.ui.screens.addstudyset.AddStudySetScreen
+import com.example.memorizy.ui.screens.addstudyset.AddStudySetViewModel
 import com.example.memorizy.ui.navigation.Routes
-import com.example.memorizy.ui.setdetails.SetDetailsScreen
-import com.example.memorizy.ui.setdetails.SetDetailsViewModel
-import com.example.memorizy.ui.studysets.StudySetsScreen
-import com.example.memorizy.ui.studysets.StudySetsViewModel
+import com.example.memorizy.ui.screens.setdetails.SetDetailsScreen
+import com.example.memorizy.ui.screens.setdetails.SetDetailsViewModel
+import com.example.memorizy.ui.screens.studysets.StudySetsScreen
+import com.example.memorizy.ui.screens.studysets.StudySetsViewModel
 
 @Composable
 fun MemorizyApp() {

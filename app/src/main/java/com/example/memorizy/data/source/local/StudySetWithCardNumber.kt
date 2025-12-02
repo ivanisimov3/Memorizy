@@ -8,5 +8,5 @@ data class StudySetWithCardNumber(
     @Embedded
     val studySet: StudySet, // встраиваем столбцы StudySet
 
-    val cardNumber: Int
+    val cardNumber: Long
 )

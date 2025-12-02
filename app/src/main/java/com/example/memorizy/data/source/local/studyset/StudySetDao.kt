@@ -25,7 +25,7 @@ interface StudySetDao {
     // Select specific set
     // @param setId the set id to choose
     @Query("SELECT * FROM study_sets WHERE id = :setId")
-    fun getSet(setId: Int): Flow<StudySet>  // Flow для операций с использованием SELECT
+    fun getSet(setId: Long): Flow<StudySet>  // Flow для операций с использованием SELECT
 
     // Study_sets left join cards by setId and group by id
     @Query("""

@@ -1,4 +1,4 @@
-package com.example.memorizy.ui.setdetails
+package com.example.memorizy.ui.screens.setdetails
 
 import com.example.memorizy.data.source.local.card.Card
 import com.example.memorizy.data.source.local.studyset.StudySet

@@ -1,4 +1,4 @@
-package com.example.memorizy.ui.addstudyset
+package com.example.memorizy.ui.screens.addstudyset
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -88,7 +87,7 @@ fun AddStudySetScreen(
 }
 
 @Composable
-fun AddStudySetScreenBody(
+private fun AddStudySetScreenBody(
     modifier: Modifier,
     onBackClick: () -> Unit,
     uiState: AddStudySetState,
@@ -169,7 +168,7 @@ fun AddStudySetScreenBody(
 }
 
 @Composable
-fun IconSelector(
+private fun IconSelector(
     selectedIconId: Int,
     onIconSelected: (Int) -> Unit,
     availableIcons: Map<Int, Int> = AppIcons.allIcons

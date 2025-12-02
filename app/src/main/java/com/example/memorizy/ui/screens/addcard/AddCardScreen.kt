@@ -1,4 +1,4 @@
-package com.example.memorizy.ui.addcard
+package com.example.memorizy.ui.screens.addcard
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -23,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
 
@@ -78,7 +80,7 @@ fun AddCardScreen(
 }
 
 @Composable
-fun AddCardScreenBody(
+private fun AddCardScreenBody(
     modifier: Modifier,
     onBackClick: () -> Unit,
     uiState: AddCardState,
@@ -102,7 +104,8 @@ fun AddCardScreenBody(
             },
             modifier = Modifier.fillMaxWidth(),
             isError = uiState.isTermEmptyError,
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
         )
         if (uiState.isTermEmptyError) {
             Text(
@@ -124,6 +127,7 @@ fun AddCardScreenBody(
             },
             modifier = Modifier.fillMaxWidth(),
             minLines = 3,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
         )
         if (uiState.isDefinitionEmptyError) {
             Text(
