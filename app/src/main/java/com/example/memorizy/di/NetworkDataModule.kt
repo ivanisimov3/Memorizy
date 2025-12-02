@@ -1,0 +1,48 @@
+package com.example.memorizy.di
+
+import com.example.memorizy.data.source.network.MemorizyApiService
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import dagger.Provides
+import jakarta.inject.Singleton
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+
+@Module // Инструкция как создавать объекты
+@InstallIn(SingletonComponent::class)
+object NetworkDataModule {
+
+    // The base URL for the computer localhost
+    private const val BASE_URL = "http://10.0.2.2:8080/"
+
+    // Учим создавать OkHttpClient - передатчик Http запросов
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(HttpLoggingInterceptor().apply {    // Смотреть логи
+                level = HttpLoggingInterceptor.Level.BODY
+            })
+            .build()
+    }
+
+    // Учим создавать MemorizyApiService
+    @Provides
+    @Singleton
+    fun provideMemorizyApiService(client: OkHttpClient): MemorizyApiService {
+        val contentType = "application/json".toMediaType()  // Общаемся используя именно JSON
+
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client)
+            // Подключаем Kotlin Serialization
+            .addConverterFactory(Json.asConverterFactory(contentType))
+            .build()
+            .create(MemorizyApiService::class.java) // Генерация кода для HTTP запросов
+    }
+}

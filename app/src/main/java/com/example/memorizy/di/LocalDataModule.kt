@@ -14,11 +14,11 @@ import jakarta.inject.Singleton
 
 @Module // Инструкция как создавать объекты
 @InstallIn(SingletonComponent::class) // Зависимости живут, пока живо приложение
-object DataModule { // object используем когда нужно произвести объекты (фабрика)
+object LocalDataModule { // object используем когда нужно произвести объекты (фабрика)
 
     // Учим создавать AppDatabase
     @Provides
-    @Singleton  // Будет создан ТОЛЬКО ОДИН экземпляр
+    @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase { // контекст всего приложения
         return Room.databaseBuilder(
             context = context,

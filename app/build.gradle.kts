@@ -45,7 +45,7 @@ android {
 }
 
 dependencies {
-    val roomVersion = "2.8.3"
+    val roomVersion = "2.8.4"
 
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
@@ -83,4 +83,11 @@ dependencies {
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
 }
