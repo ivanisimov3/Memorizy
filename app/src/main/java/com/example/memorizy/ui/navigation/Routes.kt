@@ -8,6 +8,10 @@ import kotlinx.serialization.Serializable
 // - Class: Use a class or data class for routes with arguments.
 @Serializable
 object Routes { // Почему имеено object Routes? а не class Routes и тд
+
+    @Serializable
+    object Auth
+
     @Serializable
     object StudySets
 

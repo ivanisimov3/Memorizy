@@ -31,4 +31,9 @@
     <string name="definition_text_warning">Определение не может быть пустым</string>
     <string name="set_detalization_text">Просмотр набора</string>
     <string name="expand_more_ic">Раскрыть описание</string>
+    <string name="register_screen_lable">Вход в личный аккаунт</string>
+    <string name="login_text">Логин</string>
+    <string name="password_text">Пароль\n</string>
+    <string name="login_button_text">Войти</string>
+    <string name="register_button_text">Зарегистрироваться</string>
 </resources>

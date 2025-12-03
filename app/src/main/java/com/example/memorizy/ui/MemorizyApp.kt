@@ -13,6 +13,8 @@ import com.example.memorizy.ui.screens.addcard.AddCardViewModel
 import com.example.memorizy.ui.screens.addstudyset.AddStudySetScreen
 import com.example.memorizy.ui.screens.addstudyset.AddStudySetViewModel
 import com.example.memorizy.ui.navigation.Routes
+import com.example.memorizy.ui.screens.auth.AuthScreen
+import com.example.memorizy.ui.screens.auth.AuthViewModel
 import com.example.memorizy.ui.screens.setdetails.SetDetailsScreen
 import com.example.memorizy.ui.screens.setdetails.SetDetailsViewModel
 import com.example.memorizy.ui.screens.studysets.StudySetsScreen
@@ -24,8 +26,26 @@ fun MemorizyApp() {
 
     NavHost(
         navController = navController,
-        startDestination = Routes.StudySets
+        startDestination = Routes.Auth
     ) {
+
+        composable<Routes.Auth> {
+            val viewModel: AuthViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            AuthScreen(
+                onAuthClick = {
+                    navController.navigate(Routes.StudySets) {
+                        popUpTo(0)
+                    }
+                },
+                uiState = uiState,
+                onUsernameChanged = viewModel::onUsernameChanged,
+                onPasswordChanged = viewModel::onPasswordChanged,
+                onLoginClick = viewModel::onLoginClick,
+                onRegisterClick = viewModel::onRegisterClick
+            )
+        }
 
         composable<Routes.StudySets> {
             val viewModel: StudySetsViewModel = hiltViewModel() // Фабрика ViewModel благодаря Hilt

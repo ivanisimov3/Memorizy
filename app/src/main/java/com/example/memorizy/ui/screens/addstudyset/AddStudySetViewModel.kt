@@ -60,7 +60,7 @@ class AddStudySetViewModel  @Inject constructor(
             iconId = currentState.selectedIconId
         )
 
-        viewModelScope.launch { // обращаемся к бд поэтому корутина
+        viewModelScope.launch { // Обращаемся к БД поэтому корутина
             studySetRepository.insertSet(newSet)
             _uiState.update { it.copy(isSetCreated = true) }
         }
