@@ -5,5 +5,6 @@ import com.example.memorizy.data.source.local.room.StudySetWithCardNumber
 data class StudySetsState(
     val isLoading: Boolean = true,
     val studySetsWithCardNumber: List<StudySetWithCardNumber> = emptyList(),
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val isLoggedIn: Boolean = false
 )

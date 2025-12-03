@@ -26,8 +26,24 @@ fun MemorizyApp() {
 
     NavHost(
         navController = navController,
-        startDestination = Routes.Auth
+        startDestination = Routes.StudySets
     ) {
+
+        composable<Routes.StudySets> {
+            val viewModel: StudySetsViewModel = hiltViewModel() // Фабрика ViewModel благодаря Hilt
+            val uiState by viewModel.uiState.collectAsState()
+
+            StudySetsScreen(
+                onProfileClick = { navController.navigate(Routes.Auth) },
+                onAddSetClick = { navController.navigate(Routes.AddStudySet) },
+                onSetClick = { setId ->
+                    navController.navigate(Routes.SetDetails(setId = setId))
+                },
+                uiState = uiState,
+                onSearchQueryChanged = viewModel::onSearchQueryChanged,
+                onDeleteSet = viewModel::onDeleteSet
+            )
+        }
 
         composable<Routes.Auth> {
             val viewModel: AuthViewModel = hiltViewModel()
@@ -44,21 +60,6 @@ fun MemorizyApp() {
                 onPasswordChanged = viewModel::onPasswordChanged,
                 onLoginClick = viewModel::onLoginClick,
                 onRegisterClick = viewModel::onRegisterClick
-            )
-        }
-
-        composable<Routes.StudySets> {
-            val viewModel: StudySetsViewModel = hiltViewModel() // Фабрика ViewModel благодаря Hilt
-            val uiState by viewModel.uiState.collectAsState()
-
-            StudySetsScreen(
-                onAddSetClick = { navController.navigate(Routes.AddStudySet) },
-                onSetClick = { setId ->
-                    navController.navigate(Routes.SetDetails(setId = setId))
-                },
-                uiState = uiState,
-                onSearchQueryChanged = viewModel::onSearchQueryChanged,
-                onDeleteSet = viewModel::onDeleteSet
             )
         }
 

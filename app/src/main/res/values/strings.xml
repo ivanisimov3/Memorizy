@@ -36,4 +36,6 @@
     <string name="password_text">Пароль\n</string>
     <string name="login_button_text">Войти</string>
     <string name="register_button_text">Зарегистрироваться</string>
+    <string name="profile">Иконка профиля</string>
+    <string name="no_profile">Иконка нет профиля</string>
 </resources>

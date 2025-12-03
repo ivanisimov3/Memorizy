@@ -24,6 +24,6 @@ interface CardDao {
 
     // Select all cards from set
     // @param setId the set id to choose cards from
-    @Query("SELECT * FROM cards WHERE setId = :setId ORDER BY id ASC")
+    @Query("SELECT * FROM cards WHERE setId = :setId ORDER BY createdAt ASC")
     fun getAllCardsForSet(setId: Long): Flow<List<Card>>
 }

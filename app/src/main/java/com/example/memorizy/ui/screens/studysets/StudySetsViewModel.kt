@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.data.repository.StudySetRepository
+import com.example.memorizy.data.source.local.datastore.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -19,16 +21,20 @@ import kotlinx.coroutines.launch
 // 3. Изменение числа наборов при использовании поиска
 @HiltViewModel
 class StudySetsViewModel @Inject constructor(
-    private val studySetRepository: StudySetRepository
+    private val studySetRepository: StudySetRepository,
+    private val tokenManager: TokenManager
 ) : ViewModel(){
+
+    private val _isLoggedIn = tokenManager.tokenKey.map { it != null }
 
     private val _searchQuery = MutableStateFlow("")
 
     private val _allSets = studySetRepository.getAllSetsWithCardNumber()    // уже Flow
 
     val uiState: StateFlow<StudySetsState> =
-        combine(_searchQuery, _allSets) { query, sets ->    // два Flow влияют на этот экран,
-                                                                          // наблюдаем за ними
+        // три Flow влияют на этот экран, наблюдаем за ними
+        combine(_searchQuery, _allSets, _isLoggedIn) { query, sets, loggedIn ->
+
             val filteredSets = if (query.isBlank()) {   // если пустой то берем все
                 sets
             } else{
@@ -40,12 +46,13 @@ class StudySetsViewModel @Inject constructor(
             StudySetsState(
                 isLoading = false,
                 studySetsWithCardNumber = filteredSets,
-                searchQuery = query
+                searchQuery = query,
+                isLoggedIn = loggedIn
             )
         }.stateIn(  // Аналог .asStateFlow
             scope = viewModelScope, // Пока живет ViewModel
             started = SharingStarted.WhileSubscribed(5000), // Не отключать StateFlow еще 5 секунд
-            initialValue = StudySetsState()                           // когда не работает .collectAsState
+            initialValue = StudySetsState()                                 // когда не работает .collectAsState
         )
 
     // Два события, которые могут повлиять на этот экран

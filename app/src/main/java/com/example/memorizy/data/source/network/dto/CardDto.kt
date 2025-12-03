@@ -7,5 +7,6 @@ data class CardDto (
     val id: Long? = null,   // ID может не быть при создании
     val term: String,
     val definition: String,
-    val studySetId: Long
+    val studySetId: Long,
+    val createdAt: Long? = null
 )

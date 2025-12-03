@@ -49,6 +49,7 @@ import com.example.memorizy.ui.utils.AppIcons.getIconResById
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudySetsScreen(
+    onProfileClick: () -> Unit,
     onAddSetClick: () -> Unit,
     onSetClick: (Long) -> Unit,
     uiState: StudySetsState,
@@ -62,13 +63,14 @@ fun StudySetsScreen(
     Scaffold(
         topBar = {
             StudySetsTopAppBar(
+                uiState = uiState,
+                onProfileClick = onProfileClick,
                 isSearchActive = isSearchActive,
                 onSearchClicked = {isSearchActive = true},
                 onSearchDismissed = {
                     isSearchActive = false
                     onSearchQueryChanged("")
                 },
-                searchQuery = uiState.searchQuery,
                 onSearchQueryChanged = onSearchQueryChanged
             )
         },
@@ -110,10 +112,11 @@ fun StudySetsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StudySetsTopAppBar(
+    uiState: StudySetsState,
+    onProfileClick: () -> Unit,
     isSearchActive: Boolean,
     onSearchClicked: () -> Unit,
     onSearchDismissed: () -> Unit,
-    searchQuery: String,
     onSearchQueryChanged: (String) -> Unit
 ){
     TopAppBar(
@@ -123,7 +126,7 @@ private fun StudySetsTopAppBar(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp),
-                    value = searchQuery,
+                    value = uiState.searchQuery,
                     onValueChange = onSearchQueryChanged,
                     shape = RoundedCornerShape(50),
                     textStyle = MaterialTheme.typography.bodyMedium,
@@ -154,6 +157,19 @@ private fun StudySetsTopAppBar(
                         painter = painterResource(R.drawable.ic_search),
                         contentDescription = stringResource(R.string.search)
                     )
+                }
+                IconButton(onClick = onProfileClick) {
+                    if (uiState.isLoggedIn){
+                        Icon(
+                            painter = painterResource(R.drawable.ic_account),
+                            contentDescription = stringResource(R.string.profile)
+                        )
+                    }else{
+                        Icon(
+                            painter = painterResource(R.drawable.ic_no_account),
+                            contentDescription = stringResource(R.string.no_profile)
+                        )
+                    }
                 }
             }
         }

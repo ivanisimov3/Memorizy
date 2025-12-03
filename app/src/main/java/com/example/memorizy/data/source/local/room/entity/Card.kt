@@ -25,5 +25,7 @@ data class Card(
 
     val setId: Long, // внешний ключ
     val term: String,
-    val definition: String
+    val definition: String,
+    val createdAt: Long = System.currentTimeMillis(),
+    val remoteId: Int? = null   // если remoteId == null, тогда набор не синхронизирован
 )

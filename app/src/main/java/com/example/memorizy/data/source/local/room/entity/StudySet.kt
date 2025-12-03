@@ -14,5 +14,7 @@ data class StudySet(
 
     val name: String,
     val description: String?,   // необязательно поле
-    val iconId: Int
+    val iconId: Int,
+    val createdAt: Long = System.currentTimeMillis(),
+    val remoteId: Int? = null   // если remoteId == null, тогда набор не синхронизирован
 )

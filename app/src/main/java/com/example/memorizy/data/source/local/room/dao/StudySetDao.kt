@@ -40,7 +40,7 @@ interface StudySetDao {
         GROUP BY
             study_sets.id
         ORDER BY
-            study_sets.id ASC
+            study_sets.createdAt ASC
     """)
     fun getAllSetsWithCardNumber(): Flow<List<StudySetWithCardNumber>>
 }
