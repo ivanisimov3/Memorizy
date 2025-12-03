@@ -27,5 +27,5 @@ data class Card(
     val term: String,
     val definition: String,
     val createdAt: Long = System.currentTimeMillis(),
-    val remoteId: Int? = null   // если remoteId == null, тогда набор не синхронизирован
+    val remoteId: Long? = null   // если remoteId == null, тогда набор не синхронизирован
 )

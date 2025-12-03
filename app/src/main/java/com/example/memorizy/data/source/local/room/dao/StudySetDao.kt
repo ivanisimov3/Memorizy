@@ -15,7 +15,7 @@ interface StudySetDao {
 
     // Insert a set in the database and Ignore property to keep the existing rows
     // @param studySet the set to be inserted
-    @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertSet(studySet: StudySet)
 
     // Delete chosen set from the table
@@ -43,4 +43,14 @@ interface StudySetDao {
             study_sets.createdAt ASC
     """)
     fun getAllSetsWithCardNumber(): Flow<List<StudySetWithCardNumber>>
+
+    // Select all unsynced sets
+    @Query("SELECT * FROM study_sets WHERE remoteId IS NULL")
+    suspend fun getUnsyncedSets(): List<StudySet>
+
+    // Select specific set
+    // @param remoteId the remote id to choose
+    // LIMIT 1 - stop as soon as you find needed set (optimization)
+    @Query("SELECT * FROM study_sets WHERE remoteId = :remoteId LIMIT 1")
+    suspend fun getSetByRemoteId(remoteId: Long): StudySet?
 }

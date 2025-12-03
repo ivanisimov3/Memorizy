@@ -14,4 +14,8 @@ interface StudySetRepository {
     fun getSet(setId: Long): Flow<StudySet>
 
     fun getAllSetsWithCardNumber(): Flow<List<StudySetWithCardNumber>>
+
+    suspend fun syncLocalChanges()
+
+    suspend fun fetchRemoteChanges()
 }

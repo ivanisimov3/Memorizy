@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.memorizy.data.repository.AuthRepository
 import com.example.memorizy.data.source.network.dto.AuthRequest
+import com.example.memorizy.data.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +14,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val repository: AuthRepository
+    private val repository: AuthRepository,
+    private val syncManager: SyncManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthState())
@@ -73,6 +75,8 @@ class AuthViewModel @Inject constructor(
             val result = action(request)
 
             if (result.isSuccess) {
+                syncManager.scheduleOneTimeSync()
+
                 _uiState.update { it.copy(isLoading = false, isAuthenticated = true) }
             } else {
                 val errorMsg = result.exceptionOrNull()?.message ?: "Ошибка сети"
