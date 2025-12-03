@@ -1,7 +1,7 @@
-package com.example.memorizy.data.source.local
+package com.example.memorizy.data.source.local.room
 
 import androidx.room.Embedded
-import com.example.memorizy.data.source.local.studyset.StudySet
+import com.example.memorizy.data.source.local.room.entity.StudySet
 
 // Custom data class to connect entities
 data class StudySetWithCardNumber(

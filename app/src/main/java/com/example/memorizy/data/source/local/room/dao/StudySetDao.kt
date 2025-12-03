@@ -1,11 +1,12 @@
-package com.example.memorizy.data.source.local.studyset
+package com.example.memorizy.data.source.local.room.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.memorizy.data.source.local.StudySetWithCardNumber
+import com.example.memorizy.data.source.local.room.StudySetWithCardNumber
+import com.example.memorizy.data.source.local.room.entity.StudySet
 import kotlinx.coroutines.flow.Flow
 
 // Data Access Object for the Study_set table.
@@ -14,7 +15,7 @@ interface StudySetDao {
 
     // Insert a set in the database and Ignore property to keep the existing rows
     // @param studySet the set to be inserted
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
     suspend fun insertSet(studySet: StudySet)
 
     // Delete chosen set from the table

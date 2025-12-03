@@ -1,6 +1,6 @@
 package com.example.memorizy
 
-import com.example.memorizy.data.repository.studysetrepository.StudySetRepository
+import com.example.memorizy.data.repository.StudySetRepository
 import com.example.memorizy.ui.screens.addstudyset.AddStudySetViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify

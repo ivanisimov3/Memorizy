@@ -43,7 +43,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
-import com.example.memorizy.data.source.local.studyset.StudySet
+import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.ui.utils.AppIcons.getIconResById
 
 @OptIn(ExperimentalMaterial3Api::class)

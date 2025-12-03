@@ -1,8 +1,8 @@
-package com.example.memorizy.data.repository.studysetrepository
+package com.example.memorizy.data.repository
 
-import com.example.memorizy.data.source.local.StudySetWithCardNumber
-import com.example.memorizy.data.source.local.studyset.StudySet
-import com.example.memorizy.data.source.local.studyset.StudySetDao
+import com.example.memorizy.data.source.local.room.StudySetWithCardNumber
+import com.example.memorizy.data.source.local.room.entity.StudySet
+import com.example.memorizy.data.source.local.room.dao.StudySetDao
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 

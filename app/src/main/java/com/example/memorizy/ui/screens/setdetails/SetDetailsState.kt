@@ -1,7 +1,7 @@
 package com.example.memorizy.ui.screens.setdetails
 
-import com.example.memorizy.data.source.local.card.Card
-import com.example.memorizy.data.source.local.studyset.StudySet
+import com.example.memorizy.data.source.local.room.entity.Card
+import com.example.memorizy.data.source.local.room.entity.StudySet
 
 data class SetDetailsState(
     val isLoading: Boolean = true,

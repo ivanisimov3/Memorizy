@@ -1,8 +1,8 @@
 package com.example.memorizy
 
-import com.example.memorizy.data.source.local.studyset.StudySet
-import com.example.memorizy.data.source.local.StudySetWithCardNumber
-import com.example.memorizy.data.repository.studysetrepository.StudySetRepository
+import com.example.memorizy.data.source.local.room.entity.StudySet
+import com.example.memorizy.data.source.local.room.StudySetWithCardNumber
+import com.example.memorizy.data.repository.StudySetRepository
 import com.example.memorizy.ui.screens.studysets.StudySetsState
 import com.example.memorizy.ui.screens.studysets.StudySetsViewModel
 import io.mockk.coEvery

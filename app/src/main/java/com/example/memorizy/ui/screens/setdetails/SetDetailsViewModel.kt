@@ -4,9 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.memorizy.data.repository.cardrepository.CardRepository
-import com.example.memorizy.data.source.local.card.Card
-import com.example.memorizy.data.repository.studysetrepository.StudySetRepository
+import com.example.memorizy.data.repository.CardRepository
+import com.example.memorizy.data.source.local.room.entity.Card
+import com.example.memorizy.data.repository.StudySetRepository
 import com.example.memorizy.ui.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject

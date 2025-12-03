@@ -40,7 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
-import com.example.memorizy.data.source.local.card.Card
+import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.ui.utils.AppIcons.getIconResById
 
 

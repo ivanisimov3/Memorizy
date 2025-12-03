@@ -1,6 +1,6 @@
-package com.example.memorizy.data.repository.cardrepository
+package com.example.memorizy.data.repository
 
-import com.example.memorizy.data.source.local.card.Card
+import com.example.memorizy.data.source.local.room.entity.Card
 import kotlinx.coroutines.flow.Flow
 
 // Interface to the data layer (card).

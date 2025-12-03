@@ -1,7 +1,7 @@
-package com.example.memorizy.data.repository.studysetrepository
+package com.example.memorizy.data.repository
 
-import com.example.memorizy.data.source.local.StudySetWithCardNumber
-import com.example.memorizy.data.source.local.studyset.StudySet
+import com.example.memorizy.data.source.local.room.StudySetWithCardNumber
+import com.example.memorizy.data.source.local.room.entity.StudySet
 import kotlinx.coroutines.flow.Flow
 
 // Interface to the data layer (study_set).
