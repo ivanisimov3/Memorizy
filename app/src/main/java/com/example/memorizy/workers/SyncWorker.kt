@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.repository.StudySetRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -25,6 +26,7 @@ class SyncWorker @AssistedInject constructor(
     @Assisted ctx: Context,
     @Assisted params: WorkerParameters,
     private val studySetRepository: StudySetRepository,
+    private val cardRepository: CardRepository
     // private val cardRepository: CardRepository
 ) : CoroutineWorker(ctx , params) {
 
@@ -33,6 +35,9 @@ class SyncWorker @AssistedInject constructor(
         return try {
             studySetRepository.syncLocalChanges()
             studySetRepository.fetchRemoteChanges()
+
+            cardRepository.syncLocalChanges()
+            cardRepository.fetchRemoteChanges()
 
             Result.success()
         } catch (e: Exception) {
