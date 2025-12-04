@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.data.repository.StudySetRepository
+import com.example.memorizy.data.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +15,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AddStudySetViewModel  @Inject constructor(
-    private val studySetRepository: StudySetRepository
+    private val studySetRepository: StudySetRepository,
+    private val syncManager: SyncManager
 ) : ViewModel(){
 
     private val _uiState = MutableStateFlow(AddStudySetState())
@@ -62,6 +64,9 @@ class AddStudySetViewModel  @Inject constructor(
 
         viewModelScope.launch { // Обращаемся к БД поэтому корутина
             studySetRepository.insertSet(newSet)
+
+            syncManager.scheduleOneTimeSync()
+
             _uiState.update { it.copy(isSetCreated = true) }
         }
     }

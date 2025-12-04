@@ -9,6 +9,8 @@ interface StudySetRepository {
 
     suspend fun insertSet(studySet: StudySet)
 
+    suspend fun updateSet(studySet: StudySet)
+
     suspend fun deleteSet(studySet: StudySet)
 
     fun getSet(setId: Long): Flow<StudySet>

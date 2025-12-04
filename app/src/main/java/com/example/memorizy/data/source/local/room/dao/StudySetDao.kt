@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.memorizy.data.source.local.room.StudySetWithCardNumber
 import com.example.memorizy.data.source.local.room.entity.StudySet
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +18,11 @@ interface StudySetDao {
     // @param studySet the set to be inserted
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertSet(studySet: StudySet)
+
+    // Update a set in the database
+    // @param studySet the set to be updated
+    @Update
+    suspend fun updateSet(studySet: StudySet)
 
     // Delete chosen set from the table
     // @param studySet the set to be deleted

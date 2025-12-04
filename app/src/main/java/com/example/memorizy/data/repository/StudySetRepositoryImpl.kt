@@ -22,6 +22,10 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
         return dao.insertSet(studySet)
     }
 
+    override suspend fun updateSet(studySet: StudySet) {
+        return dao.updateSet(studySet)
+    }
+
     override suspend fun deleteSet(studySet: StudySet) {
         return dao.deleteSet(studySet)
     }
@@ -48,7 +52,7 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
                     remoteId = remoteDto.id,
                     createdAt = remoteDto.createdAt ?: localSet.createdAt
                 )
-                dao.insertSet(syncedSet)
+                dao.updateSet(syncedSet)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
