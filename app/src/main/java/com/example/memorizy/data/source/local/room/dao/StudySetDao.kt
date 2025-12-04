@@ -53,4 +53,8 @@ interface StudySetDao {
     // LIMIT 1 - stop as soon as you find needed set (optimization)
     @Query("SELECT * FROM study_sets WHERE remoteId = :remoteId LIMIT 1")
     suspend fun getSetByRemoteId(remoteId: Long): StudySet?
+
+    // Delete all sets from study_sets
+    @Query("DELETE FROM study_sets")
+    suspend fun clearAll()
 }
