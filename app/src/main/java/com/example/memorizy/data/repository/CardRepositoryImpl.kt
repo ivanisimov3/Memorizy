@@ -2,7 +2,7 @@ package com.example.memorizy.data.repository
 
 import com.example.memorizy.data.mapper.toDto
 import com.example.memorizy.data.mapper.toEntity
-import com.example.memorizy.data.source.local.datastore.TokenManager
+import com.example.memorizy.data.source.local.datastore.SettingsDataStore
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.source.local.room.dao.CardDao
 import com.example.memorizy.data.source.local.room.dao.StudySetDao
@@ -16,7 +16,7 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
     private val dao: CardDao,
     private val studySetDao: StudySetDao,
     private val api: MemorizyApiService,
-    private val tokenManager: TokenManager
+    private val settingsDataStore: SettingsDataStore
 ) : CardRepository {
     override suspend fun insertCard(card: Card) {
         return dao.insertCard(card)
@@ -35,10 +35,12 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
     }
 
     override suspend fun syncLocalChanges() {
-        val tokenString = tokenManager.tokenKey.first() ?: return
+        val tokenString = settingsDataStore.token.first() ?: return
         val authHeader = "Bearer $tokenString"
 
         val unsyncedCards = dao.getUnsyncedCards()
+
+        var hasError = false
 
         unsyncedCards.forEach { localCard ->
             val parentSet = studySetDao.getSetByIdSimple(localCard.setId)
@@ -54,15 +56,21 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
                 dao.updateCard(syncedCard)
             } catch (e: Exception) {
                 e.printStackTrace()
+                hasError = true
             }
         }
+
+        if (!hasError)
+            settingsDataStore.updateLastSyncTime()
     }
 
     override suspend fun fetchRemoteChanges() {
-        val tokenString = tokenManager.tokenKey.first() ?: return
+        val tokenString = settingsDataStore.token.first() ?: return
         val authHeader = "Bearer $tokenString"
 
         val syncedSets = studySetDao.getSyncedSets()
+
+        var hasError = false
 
         syncedSets.forEach { localSet->
             try {
@@ -96,7 +104,11 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
 
             } catch (e: Exception) {
                 e.printStackTrace()
+                hasError = true
             }
         }
+
+        if (!hasError)
+            settingsDataStore.updateLastSyncTime()
     }
 }

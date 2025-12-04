@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.data.repository.StudySetRepository
-import com.example.memorizy.data.source.local.datastore.TokenManager
+import com.example.memorizy.data.source.local.datastore.SettingsDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,10 +22,10 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class StudySetsViewModel @Inject constructor(
     private val studySetRepository: StudySetRepository,
-    private val tokenManager: TokenManager
+    private val settingsDataStore: SettingsDataStore
 ) : ViewModel(){
 
-    private val _isLoggedIn = tokenManager.tokenKey.map { it != null }
+    private val _isLoggedIn = settingsDataStore.token.map { it != null }
 
     private val _searchQuery = MutableStateFlow("")
 

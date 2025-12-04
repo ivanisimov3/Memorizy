@@ -2,7 +2,7 @@ package com.example.memorizy.data.repository
 
 import com.example.memorizy.data.mapper.toDto
 import com.example.memorizy.data.mapper.toEntity
-import com.example.memorizy.data.source.local.datastore.TokenManager
+import com.example.memorizy.data.source.local.datastore.SettingsDataStore
 import com.example.memorizy.data.source.local.room.StudySetWithCardNumber
 import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.data.source.local.room.dao.StudySetDao
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.first
 class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет связать создание этого репозитория с dao
     private val dao: StudySetDao,
     private val api: MemorizyApiService,
-    private val tokenManager: TokenManager
+    private val settingsDataStore: SettingsDataStore
 ) : StudySetRepository {
 
     override suspend fun insertSet(studySet: StudySet) {
@@ -39,10 +39,12 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
     }
 
     override suspend fun syncLocalChanges() {
-        val tokenString = tokenManager.tokenKey.first() ?: return
+        val tokenString = settingsDataStore.token.first() ?: return
         val authHeader = "Bearer $tokenString"
 
         val unsyncedSets = dao.getUnsyncedSets()
+
+        var hasError = false
 
         unsyncedSets.forEach { localSet ->
             try {
@@ -55,12 +57,16 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
                 dao.updateSet(syncedSet)
             } catch (e: Exception) {
                 e.printStackTrace()
+                hasError = true
             }
         }
+
+        if (!hasError)
+            settingsDataStore.updateLastSyncTime()
     }
 
     override suspend fun fetchRemoteChanges() {
-        val tokenString = tokenManager.tokenKey.first() ?: return
+        val tokenString = settingsDataStore.token.first() ?: return
         val authHeader = "Bearer $tokenString"
 
         try {
@@ -94,8 +100,10 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
                     dao.deleteSet(localSet)
             }
 
+            settingsDataStore.updateLastSyncTime()
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
     }
 }
