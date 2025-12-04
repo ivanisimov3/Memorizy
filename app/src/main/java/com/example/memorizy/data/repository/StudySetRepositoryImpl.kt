@@ -79,7 +79,7 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
                         createdAt = dto.createdAt ?: localSet.createdAt,
                         remoteId = dto.id
                     )
-                    dao.insertSet(updatedSet)
+                    dao.updateSet(updatedSet)
                 }
             }
         } catch (e: Exception) {
