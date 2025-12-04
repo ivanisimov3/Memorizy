@@ -66,12 +66,13 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
         try {
             val remoteSets = api.getAllSets(authHeader)
 
+            // Смотрим все наборы в сети
             remoteSets.forEach { dto ->
                 val localSet = dao.getSetByRemoteId(dto.id!!)
 
-                if (localSet == null) {
+                if (localSet == null) { // Если такого набора нет локально (с таким remoteId) - добавляем
                     dao.insertSet(dto.toEntity())
-                } else {
+                } else {    // Если такой набор есть локально (с таким remoteId) - обновляем данными из сети
                     val updatedSet = localSet.copy(
                         name = dto.name,
                         description = dto.description,
@@ -82,6 +83,17 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
                     dao.updateSet(updatedSet)
                 }
             }
+
+            // Множество всех Id наборов на сервере
+            val remoteIds = remoteSets.mapNotNull { it.id }.toSet()
+            val localSyncedSets = dao.getSyncedSets()
+
+            // Смотрим все наборы локально
+            localSyncedSets.forEach { localSet ->
+                if (localSet.remoteId!! !in remoteIds)  // Если такого Id нет на сервере, то удаляем и локально
+                    dao.deleteSet(localSet)
+            }
+
         } catch (e: Exception) {
             e.printStackTrace()
         }

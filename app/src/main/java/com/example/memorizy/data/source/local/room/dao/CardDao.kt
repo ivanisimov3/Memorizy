@@ -38,6 +38,10 @@ interface CardDao {
     @Query("SELECT * FROM cards WHERE remoteId IS NULL")
     suspend fun getUnsyncedCards(): List<Card>
 
+    // Select all synced cards
+    @Query("SELECT * FROM cards WHERE remoteId IS NOT NULL AND setId = :setId")
+    suspend fun getSyncedCardsBySet(setId: Long): List<Card>
+
     // Select specific card
     // @param remoteId the remote id to choose
     // LIMIT 1 - stop as soon as you find needed set (optimization)

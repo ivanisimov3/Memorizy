@@ -83,6 +83,17 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
                         dao.updateCard(updatedCard)
                     }
                 }
+
+                // Множество всех Id карточек на сервере
+                val remoteIds = remoteCards.mapNotNull { it.id }.toSet()
+                val localSyncedCards = dao.getSyncedCardsBySet(localSet.id)
+
+                // Смотрим все карточки локально
+                localSyncedCards.forEach { localCard ->
+                    if (localCard.remoteId!! !in remoteIds)  // Если такого Id нет на сервере, то удаляем и локально
+                        dao.deleteCard(localCard)
+                }
+
             } catch (e: Exception) {
                 e.printStackTrace()
             }
