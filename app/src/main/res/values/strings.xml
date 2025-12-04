@@ -38,4 +38,19 @@
     <string name="register_button_text">Зарегистрироваться</string>
     <string name="profile">Иконка профиля</string>
     <string name="no_profile">Иконка нет профиля</string>
+    <string name="settings_title">Настройки</string>
+    <string name="logout_question">Выйти из аккаунта?</string>
+    <string name="logout_warning">Вы действительно хотите выйти? Локальные данные останутся, но синхронизация отключится</string>
+    <string name="logout">Выйти</string>
+    <string name="account_text">Аккаунт</string>
+    <string name="settings_guest_warning">Вы используете приложение как Гость</string>
+    <string name="settings_user_warning">Вы вошли как: %1$s</string>
+    <string name="Synchronization_text">Синхронизация</string>
+    <string name="synchronize_button_text">Синхронизировать</string>
+    <string name="settings_sync_warning">Войдите в аккаунт, чтобы сохранять данные в облаке.</string>
+    <string name="sync_last_time">Время последней синхронизации: %1$s</string>
+    <string name="app_theme_text">Тема приложения</string>
+    <string name="settings_dark_theme_text">Темная тема:</string>
+    <string name="settings_ic">Иконка настройки</string>
+    <string name="guest_text">Гость</string>
 </resources>

@@ -233,7 +233,6 @@ private fun CardItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DeleteCardDialog(
     onConfirmDelete: () -> Unit,

@@ -49,7 +49,7 @@ import com.example.memorizy.ui.utils.AppIcons.getIconResById
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudySetsScreen(
-    onProfileClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     onAddSetClick: () -> Unit,
     onSetClick: (Long) -> Unit,
     uiState: StudySetsState,
@@ -64,7 +64,7 @@ fun StudySetsScreen(
         topBar = {
             StudySetsTopAppBar(
                 uiState = uiState,
-                onProfileClick = onProfileClick,
+                onProfileClick = onSettingsClick,
                 isSearchActive = isSearchActive,
                 onSearchClicked = {isSearchActive = true},
                 onSearchDismissed = {
@@ -159,17 +159,10 @@ private fun StudySetsTopAppBar(
                     )
                 }
                 IconButton(onClick = onProfileClick) {
-                    if (uiState.isLoggedIn){
-                        Icon(
-                            painter = painterResource(R.drawable.ic_account),
-                            contentDescription = stringResource(R.string.profile)
-                        )
-                    }else{
-                        Icon(
-                            painter = painterResource(R.drawable.ic_no_account),
-                            contentDescription = stringResource(R.string.no_profile)
-                        )
-                    }
+                    Icon(
+                        painter = painterResource(R.drawable.ic_settings),
+                        contentDescription = stringResource(R.string.settings_ic)
+                    )
                 }
             }
         }

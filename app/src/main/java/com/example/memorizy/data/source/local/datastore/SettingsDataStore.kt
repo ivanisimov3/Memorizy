@@ -58,9 +58,9 @@ class SettingsDataStore @Inject constructor(
             preferences[LAST_SYNC_KEY]
         }
 
-    val isDarkTheme: Flow<Boolean?> = context.dataStore.data
+    val isDarkTheme: Flow<Boolean> = context.dataStore.data
         .map { preferences ->
-            preferences[IS_DARK_THEME_KEY]
+            preferences[IS_DARK_THEME_KEY] ?: false
         }
 
     // Writing data to Preferences DataStore

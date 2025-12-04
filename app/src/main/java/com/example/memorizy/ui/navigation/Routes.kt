@@ -10,6 +10,9 @@ import kotlinx.serialization.Serializable
 object Routes { // Почему имеено object Routes? а не class Routes и тд
 
     @Serializable
+    object Settings
+
+    @Serializable
     object Auth
 
     @Serializable

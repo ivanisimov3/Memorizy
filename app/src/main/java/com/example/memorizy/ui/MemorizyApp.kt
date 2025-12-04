@@ -17,6 +17,8 @@ import com.example.memorizy.ui.screens.auth.AuthScreen
 import com.example.memorizy.ui.screens.auth.AuthViewModel
 import com.example.memorizy.ui.screens.setdetails.SetDetailsScreen
 import com.example.memorizy.ui.screens.setdetails.SetDetailsViewModel
+import com.example.memorizy.ui.screens.settings.SettingsScreen
+import com.example.memorizy.ui.screens.settings.SettingsViewModel
 import com.example.memorizy.ui.screens.studysets.StudySetsScreen
 import com.example.memorizy.ui.screens.studysets.StudySetsViewModel
 
@@ -34,7 +36,7 @@ fun MemorizyApp() {
             val uiState by viewModel.uiState.collectAsState()
 
             StudySetsScreen(
-                onProfileClick = { navController.navigate(Routes.Auth) },
+                onSettingsClick = { navController.navigate(Routes.Settings) },
                 onAddSetClick = { navController.navigate(Routes.AddStudySet) },
                 onSetClick = { setId ->
                     navController.navigate(Routes.SetDetails(setId = setId))
@@ -45,13 +47,27 @@ fun MemorizyApp() {
             )
         }
 
+        composable<Routes.Settings> {
+            val viewModel: SettingsViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            SettingsScreen(
+                onLoginClick = { navController.navigate(Routes.Auth) },
+                onLogoutClick = viewModel::onLogout,
+                onBackClick = { navController.popBackStack() },
+                uiState = uiState,
+                onSyncClick = viewModel::onSyncNow,
+                onThemeChange = viewModel::onThemeChanged
+            )
+        }
+
         composable<Routes.Auth> {
             val viewModel: AuthViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsState()
 
             AuthScreen(
                 onAuthClick = {
-                    navController.navigate(Routes.StudySets) {
+                    navController.navigate(Routes.Settings) {
                         popUpTo(0)
                     }
                 },

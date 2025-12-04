@@ -1,6 +1,9 @@
 package com.example.memorizy.ui.utils
 
 import com.example.memorizy.R
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object AppIcons {
     val allIcons = mapOf(
@@ -14,4 +17,9 @@ object AppIcons {
     fun getIconResById(iconId: Int): Int {
         return allIcons[iconId] ?: R.drawable.ic_set1
     }
+}
+
+fun formatDate(timestamp: Long): String {
+    val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+    return formatter.format(Date(timestamp))
 }
