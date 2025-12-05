@@ -44,8 +44,6 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
 
         val unsyncedSets = dao.getUnsyncedSets()
 
-        var hasError = false
-
         unsyncedSets.forEach { localSet ->
             try {
                 val remoteDto = api.createSet(token = authHeader, dto = localSet.toDto())
@@ -57,12 +55,8 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
                 dao.updateSet(syncedSet)
             } catch (e: Exception) {
                 e.printStackTrace()
-                hasError = true
             }
         }
-
-        if (!hasError)
-            settingsDataStore.updateLastSyncTime()
     }
 
     override suspend fun fetchRemoteChanges() {

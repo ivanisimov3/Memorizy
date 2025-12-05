@@ -40,8 +40,6 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
 
         val unsyncedCards = dao.getUnsyncedCards()
 
-        var hasError = false
-
         unsyncedCards.forEach { localCard ->
             val parentSet = studySetDao.getSetByIdSimple(localCard.setId)
             val parentRemoteId = parentSet?.remoteId ?: return@forEach  // Буквально аналог continue, переходим к следующей карточке
@@ -56,12 +54,8 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
                 dao.updateCard(syncedCard)
             } catch (e: Exception) {
                 e.printStackTrace()
-                hasError = true
             }
         }
-
-        if (!hasError)
-            settingsDataStore.updateLastSyncTime()
     }
 
     override suspend fun fetchRemoteChanges() {
@@ -69,8 +63,6 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
         val authHeader = "Bearer $tokenString"
 
         val syncedSets = studySetDao.getSyncedSets()
-
-        var hasError = false
 
         syncedSets.forEach { localSet->
             try {
@@ -104,11 +96,7 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
 
             } catch (e: Exception) {
                 e.printStackTrace()
-                hasError = true
             }
         }
-
-        if (!hasError)
-            settingsDataStore.updateLastSyncTime()
     }
 }

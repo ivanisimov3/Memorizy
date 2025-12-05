@@ -24,9 +24,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        syncManager.schedulePeriodicSync()
-
         enableEdgeToEdge()
         setContent {
             val viewModel: MainViewModel = hiltViewModel()

@@ -20,6 +20,6 @@ object AppIcons {
 }
 
 fun formatDate(timestamp: Long): String {
-    val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+    val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
     return formatter.format(Date(timestamp))
 }

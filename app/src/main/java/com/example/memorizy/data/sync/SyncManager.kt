@@ -3,6 +3,7 @@ package com.example.memorizy.data.sync
 import android.content.Context
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
@@ -32,23 +33,9 @@ class SyncManager @Inject constructor(
             .setConstraints(constraints)
             .build()
 
-        WorkManager.getInstance(context).enqueue(request)
-    }
-
-    fun schedulePeriodicSync() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val request = PeriodicWorkRequestBuilder<SyncWorker>(
-            15, TimeUnit.MINUTES    // Periodic work has a minimum interval of 15 minutes.
-        )
-            .setConstraints(constraints)
-            .build()
-
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "PeriodicSync",
-            ExistingPeriodicWorkPolicy.KEEP,
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "OneTimeSync",
+            ExistingWorkPolicy.REPLACE,
             request
         )
     }
