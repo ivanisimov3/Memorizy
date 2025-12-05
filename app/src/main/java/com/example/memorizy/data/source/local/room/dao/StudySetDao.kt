@@ -69,7 +69,7 @@ interface StudySetDao {
     @Query("SELECT * FROM study_sets WHERE id = :id")
     suspend fun getSetByIdSimple(id: Long): StudySet?
 
-    // Delete all sets from study_sets
-    @Query("DELETE FROM study_sets")
-    suspend fun clearAll()
+    // Delete all sets that related to another profile from study_sets
+    @Query("DELETE FROM study_sets WHERE remoteId IS NOT NULL")
+    suspend fun clearSyncedData()
 }

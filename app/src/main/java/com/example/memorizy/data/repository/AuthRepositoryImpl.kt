@@ -23,7 +23,7 @@ class AuthRepositoryImpl @Inject constructor(   // Inject coonstructor связ�
 
             // Если уже кто то был залогинен и это не он сейчас входит
             if (lastUserId != null && lastUserId != newUserId){
-                studySetDao.clearAll()  // Очищаем все наборы на устройстве
+                studySetDao.clearSyncedData()  // Очищаем все наборы, связанные с другим аккаунтом
             }
 
             settingsDataStore.saveUserUtilInfo(response.token, newUserId)
@@ -47,7 +47,7 @@ class AuthRepositoryImpl @Inject constructor(   // Inject coonstructor связ�
 
             // Если уже кто то был залогинен и это не он сейчас входит
             if (lastUserId != null && lastUserId != newUserId){
-                studySetDao.clearAll()  // Очищаем все наборы на устройстве
+                studySetDao.clearSyncedData()  // Очищаем все наборы, связанные с другим аккаунтом
             }
 
             settingsDataStore.saveUserUtilInfo(response.token, newUserId)
