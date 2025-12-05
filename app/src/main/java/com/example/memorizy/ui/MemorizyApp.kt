@@ -67,9 +67,7 @@ fun MemorizyApp() {
 
             AuthScreen(
                 onAuthClick = {
-                    navController.navigate(Routes.Settings) {
-                        popUpTo(0)
-                    }
+                    navController.popBackStack()
                 },
                 uiState = uiState,
                 onUsernameChanged = viewModel::onUsernameChanged,

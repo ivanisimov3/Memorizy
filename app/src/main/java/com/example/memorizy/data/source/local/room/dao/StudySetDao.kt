@@ -26,6 +26,11 @@ interface StudySetDao {
 
     // Delete chosen set from the table
     // @param studySet the set to be deleted
+    @Query("UPDATE study_sets SET isDeleted = 1 WHERE id = :id")
+    suspend fun markAsDeletedSet(id: Long)
+
+    // Delete chosen set from the table
+    // @param studySet the set to be deleted
     @Delete
     suspend fun deleteSet(studySet: StudySet)
 
@@ -42,13 +47,18 @@ interface StudySetDao {
         FROM
             study_sets
         LEFT JOIN
-            cards ON study_sets.id = cards.setId
+            cards ON study_sets.id = cards.setId AND cards.isDeleted = 0
+        WHERE
+            study_sets.isDeleted = 0
         GROUP BY
             study_sets.id
         ORDER BY
             study_sets.createdAt ASC
     """)
     fun getAllSetsWithCardNumber(): Flow<List<StudySetWithCardNumber>>
+
+    @Query("SELECT * FROM study_sets WHERE isDeleted = 1 AND remoteId IS NOT NULL")
+    suspend fun getSetsToDelete(): List<StudySet>
 
     // Select all unsynced sets
     @Query("SELECT * FROM study_sets WHERE remoteId IS NULL")

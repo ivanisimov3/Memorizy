@@ -24,6 +24,11 @@ interface CardDao {
     @Update
     suspend fun updateCard(card: Card)
 
+    // Delete chosen set from the table
+    // @param studySet the set to be deleted
+    @Query("UPDATE cards SET isDeleted = 1 WHERE id = :id")
+    suspend fun markAsDeletedCard(id: Long)
+
     // Delete chosen card from the table
     // @param card the card to be deleted
     @Delete
@@ -31,8 +36,20 @@ interface CardDao {
 
     // Select all cards from set
     // @param setId the set id to choose cards from
-    @Query("SELECT * FROM cards WHERE setId = :setId ORDER BY createdAt ASC")
+    @Query("""
+        SELECT 
+            * 
+        FROM 
+            cards 
+        WHERE 
+            setId = :setId AND isDeleted = 0
+        ORDER BY 
+            createdAt ASC
+    """)
     fun getAllCardsForSet(setId: Long): Flow<List<Card>>
+
+    @Query("SELECT * FROM cards WHERE isDeleted = 1 AND remoteId IS NOT NULL")
+    suspend fun getCardsToDelete(): List<Card>
 
     // Select all unsynced cards
     @Query("SELECT * FROM cards WHERE remoteId IS NULL")

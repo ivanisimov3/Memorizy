@@ -8,8 +8,7 @@ import androidx.room.PrimaryKey
 /*
 Internal model used to represent a task stored locally in a Room database. This is used inside
 the data layer only.
-*/
-@Entity(
+*/@Entity(
     tableName = "cards",
     foreignKeys = [ForeignKey(
         entity = StudySet::class,
@@ -27,5 +26,6 @@ data class Card(
     val term: String,
     val definition: String,
     val createdAt: Long = System.currentTimeMillis(),
-    val remoteId: Long? = null   // если remoteId == null, тогда набор не синхронизирован
+    val remoteId: Long? = null, // если remoteId == null, тогда набор не синхронизирован
+    val isDeleted: Boolean = false
 )

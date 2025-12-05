@@ -26,6 +26,10 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
         return dao.updateSet(studySet)
     }
 
+    override suspend fun markAsDeleted(id: Long) {
+        dao.markAsDeletedSet(id)
+    }
+
     override suspend fun deleteSet(studySet: StudySet) {
         return dao.deleteSet(studySet)
     }
@@ -53,6 +57,18 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
                     createdAt = remoteDto.createdAt ?: localSet.createdAt
                 )
                 dao.updateSet(syncedSet)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        val deletedSets = dao.getSetsToDelete()
+
+        deletedSets.forEach { localSet ->
+            try{
+                api.deleteSet(token = authHeader, id = localSet.remoteId!!)
+
+                dao.deleteSet(localSet)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

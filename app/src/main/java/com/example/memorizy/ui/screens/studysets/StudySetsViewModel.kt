@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.data.repository.StudySetRepository
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore
+import com.example.memorizy.data.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class StudySetsViewModel @Inject constructor(
     private val studySetRepository: StudySetRepository,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
+    private val syncManager: SyncManager
 ) : ViewModel(){
 
     private val _isLoggedIn = settingsDataStore.token.map { it != null }
@@ -63,7 +65,13 @@ class StudySetsViewModel @Inject constructor(
 
     fun onDeleteSet(studySet: StudySet){
         viewModelScope.launch {
-            studySetRepository.deleteSet(studySet)
+            if (studySet.remoteId == null) {
+                studySetRepository.deleteSet(studySet)
+            } else {
+                studySetRepository.markAsDeleted(studySet.id)
+            }
+
+            syncManager.scheduleOneTimeSync()
         }
     }
 }

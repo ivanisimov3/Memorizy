@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.repository.StudySetRepository
+import com.example.memorizy.data.sync.SyncManager
 import com.example.memorizy.ui.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -20,7 +21,8 @@ import kotlinx.coroutines.launch
 class SetDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle, // аргументы навигации
     private val studySetRepository: StudySetRepository,
-    private val cardRepository: CardRepository
+    private val cardRepository: CardRepository,
+    private val syncManager: SyncManager
 ) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<Routes.SetDetails>()
@@ -45,7 +47,14 @@ class SetDetailsViewModel @Inject constructor(
 
     fun onDeleteCard(card: Card){
         viewModelScope.launch {
-            cardRepository.deleteCard(card)
+
+            if (card.remoteId == null) {
+                cardRepository.deleteCard(card)
+            } else {
+                cardRepository.markAsDeleted(card.id)
+            }
+
+            syncManager.scheduleOneTimeSync()
         }
     }
 }

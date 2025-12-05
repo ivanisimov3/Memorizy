@@ -11,6 +11,8 @@ interface StudySetRepository {
 
     suspend fun updateSet(studySet: StudySet)
 
+    suspend fun markAsDeleted(id: Long)
+
     suspend fun deleteSet(studySet: StudySet)
 
     fun getSet(setId: Long): Flow<StudySet>

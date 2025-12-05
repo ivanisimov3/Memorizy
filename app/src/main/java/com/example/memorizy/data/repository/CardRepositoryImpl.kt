@@ -26,6 +26,10 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
         return dao.updateCard(card)
     }
 
+    override suspend fun markAsDeleted(id: Long) {
+        dao.markAsDeletedCard(id)
+    }
+
     override suspend fun deleteCard(card: Card) {
         return dao.deleteCard(card)
     }
@@ -52,6 +56,18 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
                     createdAt = remoteDto.createdAt ?: localCard.createdAt
                 )
                 dao.updateCard(syncedCard)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        val deletedCards = dao.getCardsToDelete()
+
+        deletedCards.forEach { localCard ->
+            try{
+                api.deleteCard(token = authHeader, id = localCard.remoteId!!)
+
+                dao.deleteCard(localCard)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
