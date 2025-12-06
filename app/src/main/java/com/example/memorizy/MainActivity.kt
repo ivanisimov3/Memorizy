@@ -6,9 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.memorizy.data.sync.SyncManager
 import com.example.memorizy.ui.MemorizyApp
@@ -28,6 +30,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewModel: MainViewModel = hiltViewModel()
             val isDarkTheme by viewModel.isDarkTheme.collectAsState()
+
+            LaunchedEffect(isDarkTheme) {
+                val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+                insetsController.isAppearanceLightStatusBars = !isDarkTheme
+            }
 
             MemorizyTheme(darkTheme = isDarkTheme) {
                 Surface(
