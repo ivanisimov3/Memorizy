@@ -11,10 +11,9 @@ import com.example.memorizy.data.sync.SyncManager
 import com.example.memorizy.ui.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -28,23 +27,33 @@ class SetDetailsViewModel @Inject constructor(
     private val route = savedStateHandle.toRoute<Routes.SetDetails>()
     private val setId = route.setId
 
-    private val _studySet = studySetRepository.getSet(setId)
+    private val _uiState = MutableStateFlow(SetDetailsState())
+    val uiState = _uiState.asStateFlow()
 
-    private val _cards = cardRepository.getAllCardsForSet(setId)
+    init {
+        viewModelScope.launch {
+            studySetRepository.getSet(setId).collect { set ->
+                _uiState.update {
+                    it.copy(
+                        studySet = set,
+                        isLoading = (set == null)
+                    )
+                }
+            }
+        }
 
-    val uiState: StateFlow<SetDetailsState> =
-        combine(_studySet, _cards) { studySet, cards ->    // два Flow влияют на этот экран,
-            SetDetailsState(
-                isLoading = false,
-                studySet = studySet,
-                cards = cards
-            )
-        }.stateIn(  // Аналог .asStateFlow
-            scope = viewModelScope, // Пока живет ViewModel
-            started = SharingStarted.WhileSubscribed(5000), // Не отключать StateFlow еще 5 секунд
-            initialValue = SetDetailsState()                                // когда не работает .collectAsState
-        )
+        viewModelScope.launch {
+            cardRepository.getAllCardsForSet(setId).collect { cards ->
+                _uiState.update {
+                    it.copy(
+                        cards = cards
+                    )
+                }
+            }
+        }
+    }
 
+    // Удержали палец на наборе
     fun onDeleteCard(card: Card){
         viewModelScope.launch {
 
@@ -55,6 +64,89 @@ class SetDetailsViewModel @Inject constructor(
             }
 
             syncManager.scheduleOneTimeSync()
+        }
+    }
+
+    // Нажали редактировать набор
+    fun onStartEditing() {
+        val currentState = _uiState.value
+        val currentSet = currentState.studySet ?: return
+
+        _uiState.update { state ->
+            state.copy(
+                isEditing = true,
+                draftSet = currentSet.copy(),
+                draftCards = currentState.cards.map { it.copy() }
+            )
+        }
+    }
+
+    // Меняем название набора
+    fun updateDraftName(name: String) {
+        _uiState.update { state ->
+            state.copy(
+                draftSet = state.draftSet?.copy(name = name)
+            )
+        }
+    }
+
+    // Меняем описание набора
+    fun updateDraftDescription(description: String) {
+        _uiState.update { state ->
+            state.copy(
+                draftSet = state.draftSet?.copy(description = description)
+            )
+        }
+    }
+
+    // Меняем иконку набора
+    fun updateDraftIcon(iconId: Int) {
+        _uiState.update { state ->
+            state.copy(
+                draftSet = state.draftSet?.copy(iconId = iconId)
+            )
+        }
+    }
+
+    // Меняем данные карточки
+    fun updateDraftCard(index: Int, term: String, definition: String) {
+        _uiState.update { state ->
+            val updatedCards = state.draftCards.toMutableList()
+            updatedCards[index] = updatedCards[index].copy(term = term, definition = definition)
+            state.copy(draftCards = updatedCards)
+        }
+    }
+
+    // Нажали отменить редактирование
+    fun onCancelEditing() {
+        _uiState.update { state ->
+            state.copy(
+                isEditing = false,
+                draftSet = null,
+                draftCards = emptyList()
+            )
+        }
+    }
+
+    // Нажали подтвердить редактирование
+    fun onSaveChanges() {
+        val state = _uiState.value
+        val draftSet = state.draftSet ?: return
+        val draftCards = state.draftCards
+
+        if (draftSet.name.isBlank()) return
+        if (draftCards.any {
+            it.term.isBlank() || it.definition.isBlank()
+        }) return
+
+        viewModelScope.launch {
+            studySetRepository.updateSet(draftSet)
+
+            draftCards.forEach { card ->
+                cardRepository.updateCard(card)
+            }
+
+            onCancelEditing()
         }
     }
 }

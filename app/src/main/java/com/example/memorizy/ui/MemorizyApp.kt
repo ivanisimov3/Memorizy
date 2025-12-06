@@ -103,7 +103,14 @@ fun MemorizyApp() {
                 },
                 onBackClick = { navController.popBackStack() },
                 uiState = uiState,
-                onDeleteCard = viewModel::onDeleteCard
+                onDeleteCard = viewModel::onDeleteCard,
+                onStartEditing = viewModel::onStartEditing,
+                updateDraftName = viewModel::updateDraftName,
+                updateDraftDescription = viewModel::updateDraftDescription,
+                updateDraftIcon = viewModel::updateDraftIcon,
+                updateDraftCard = viewModel::updateDraftCard,
+                onCancelEditing = viewModel::onCancelEditing,
+                onSaveChanges = viewModel::onSaveChanges
             )
         }
 

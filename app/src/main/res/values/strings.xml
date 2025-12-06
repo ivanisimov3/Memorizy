@@ -55,4 +55,9 @@
     <string name="error_user_exists">Пользователь с таким именем уже существует.</string>
     <string name="error_server_error">Ошибка на сервере. Попробуйте позже.</string>
     <string name="error_fill_fields">Заполните все поля</string>
+    <string name="set_edit_mode">Редактирование</string>
+    <string name="cancel_edit_mode">Отменить режим редактирования</string>
+    <string name="confirm_edit">Подтвердить изменение набора</string>
+    <string name="start_edit_mode">Войти в режим редактирования</string>
+    <string name="select_ic_text">Выберите иконку</string>
 </resources>

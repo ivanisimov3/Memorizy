@@ -40,7 +40,7 @@ class AddStudySetViewModel  @Inject constructor(
         }
     }
 
-    // нажали на иконку
+    // Нажали на иконку
     fun onIconSelected(iconId: Int) {
         _uiState.update { currentState ->
             currentState.copy(selectedIconId = iconId)
