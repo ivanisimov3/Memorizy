@@ -49,7 +49,6 @@
     <string name="settings_dark_theme_text">Темная тема:</string>
     <string name="settings_ic">Иконка настройки</string>
     <string name="guest_text">Гость</string>
-
     <string name="error_unknown">Неизвестная ошибка</string>
     <string name="error_no_internet">Не удалось подключиться к серверу. Проверьте интернет.</string>
     <string name="error_wrong_credentials">Неверный логин или пароль.</string>

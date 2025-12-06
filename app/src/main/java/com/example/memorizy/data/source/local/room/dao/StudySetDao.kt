@@ -14,32 +14,34 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface StudySetDao {
 
-    // Insert a set in the database and Ignore property to keep the existing rows
-    // @param studySet the set to be inserted
+    /*
+    Добавить набор в Room (если уже существует, заменить последним добавленным)
+    Нажали кнопку добавить набор ИЛИ на сервере есть, а в клиенте нет
+    */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSet(studySet: StudySet)
 
-    // Update a set in the database
-    // @param studySet the set to be updated
-    @Update
-    suspend fun updateSet(studySet: StudySet)
+    /*
+    Выбрать все несинхронизированные наборы
+    Чтобы попытаться их отправить на сервер
+    */
+    @Query("SELECT * FROM study_sets WHERE remoteId IS NULL")
+    suspend fun getUnsyncedSets(): List<StudySet>
 
-    // Delete chosen set from the table
-    // @param studySet the set to be deleted
-    @Query("UPDATE study_sets SET isDeleted = 1 WHERE id = :id")
-    suspend fun markAsDeletedSet(id: Long)
+    /*
+    Выбрать все синхронизированные наборы локально
+    Чтобы потом их удалить локально (если на сервере их уже нет)
+    ИЛИ чтобы убедиться, что набор существует и на сервере, значит можно начать скачивать карточки
+    */
+    @Query("SELECT * FROM study_sets WHERE remoteId IS NOT NULL")
+    suspend fun getSyncedSets(): List<StudySet>
 
-    // Delete chosen set from the table
-    // @param studySet the set to be deleted
-    @Delete
-    suspend fun deleteSet(studySet: StudySet)
-
-    // Select specific set
-    // @param setId the set id to choose
-    @Query("SELECT * FROM study_sets WHERE id = :setId")
-    fun getSet(setId: Long): Flow<StudySet>  // Flow для операций с использованием SELECT
-
-    // Study_sets left join cards by setId and group by id
+    /*
+    В таблице с карточками посчитать сколько карточек принадлежит каждому набору (неудаленных карточек),
+    выбрать все из таблицы с наборами, присоединить столбец с подсчитанными карточками к каждому набору),
+    отсортировать по времени создания набора
+    Чтобы отобразить все наборы с инфой о карточках на главном экране
+    */
     @Query("""
         SELECT
             study_sets.*,
@@ -57,29 +59,62 @@ interface StudySetDao {
     """)
     fun getAllSetsWithCardNumber(): Flow<List<StudySetWithCardNumber>>
 
-    @Query("SELECT * FROM study_sets WHERE isDeleted = 1 AND remoteId IS NOT NULL")
-    suspend fun getSetsToDelete(): List<StudySet>
+    /*
+    Выбрать опеределенный набор
+    Чтобы отобразить всю информацию об этом наборе на экране набора
+    */
+    @Query("SELECT * FROM study_sets WHERE id = :setId")
+    fun getSet(setId: Long): Flow<StudySet>  // Flow для операций с использованием SELECT
 
-    // Select all unsynced sets
-    @Query("SELECT * FROM study_sets WHERE remoteId IS NULL")
-    suspend fun getUnsyncedSets(): List<StudySet>
-
-    // Select all synced sets
-    @Query("SELECT * FROM study_sets WHERE remoteId IS NOT NULL")
-    suspend fun getSyncedSets(): List<StudySet>
-
-    // Select specific set
-    // @param remoteId the remote id to choose
-    // LIMIT 1 - stop as soon as you find needed set (optimization)
-    @Query("SELECT * FROM study_sets WHERE remoteId = :remoteId LIMIT 1")
-    suspend fun getSetByRemoteId(remoteId: Long): StudySet?
-
-    // Select specific set
-    // @param id the set id to choose
+    /*
+    Выбрать опеределенный набор
+    Чтобы убедиться, что он синхронизирован, тогда можно начать отправлять на сервер карточки
+    */
     @Query("SELECT * FROM study_sets WHERE id = :id")
     suspend fun getSetByIdSimple(id: Long): StudySet?
 
-    // Delete all sets that related to another profile from study_sets
+    /*
+    Найти локально набор с id с сервера
+    Чтобы либо обновить его данными с сервера
+    ИЛИ чтобы добавить полностью набор (если функция вернет null)
+    */
+    @Query("SELECT * FROM study_sets WHERE remoteId = :remoteId LIMIT 1")
+    suspend fun getSetByRemoteId(remoteId: Long): StudySet?
+
+    /*
+    Выбрать (все помеченные для удаления и синхронизированные) наборы
+    Чтобы потом попытаться их удалить на сервере + локально
+    */
+    @Query("SELECT * FROM study_sets WHERE isDeleted = 1 AND remoteId IS NOT NULL")
+    suspend fun getSetsToDelete(): List<StudySet>
+
+    /*
+    Обновить существующий набор
+    Синхронизируем локальные с сервером (добавляем remoteId у несинхронизированных)
+    ИЛИ скачиваем обновляем данные в соответствии с данными сервера (если набор существует)
+    */
+    @Update
+    suspend fun updateSet(studySet: StudySet)
+
+    /*
+    Пометить набор как удаленный локально
+    Если пользователь удалил набор у себя на устройстве
+    */
+    @Query("UPDATE study_sets SET isDeleted = 1 WHERE id = :id")
+    suspend fun markAsDeletedSet(id: Long)
+
+    /*
+    Удалить набор из Room
+    Если успешно синхронизировались с сервером, удалили запись там, удалили и локально
+    ИЛИ если на сервере такого набора не существует, то удаляем локально (СРЕДИ ТЕХ, КОТОРЫЕ ПОМЕЧЕНЫ КАК СИНХРОНИЗИРОВАННЫЕ)
+    */
+    @Delete
+    suspend fun deleteSet(studySet: StudySet)
+
+    /*
+    Удалить все наборы, которые связаны с другим пользователем
+    Если аутентификацию пройдет другой пользователь
+    */
     @Query("DELETE FROM study_sets WHERE remoteId IS NOT NULL")
     suspend fun clearSyncedData()
 }

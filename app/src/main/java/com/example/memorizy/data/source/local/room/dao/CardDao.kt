@@ -14,28 +14,32 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CardDao {
 
-    // Insert a card in the database and Ignore property to keep the existing rows
-    // @param card the card to be inserted
+    /*
+    Добавить карточку в Room (если уже существует, заменить последним добавленным)
+    Нажали кнопку добавить карточку ИЛИ на сервере есть, а в клиенте нет
+    */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCard(card: Card)
 
-    // Update a card in the database
-    // @param card the card to be updated
-    @Update
-    suspend fun updateCard(card: Card)
+    /*
+    Выбрать все несинхронизированные карточки
+    Чтобы попытаться их отправить на сервер
+    */
+    @Query("SELECT * FROM cards WHERE remoteId IS NULL")
+    suspend fun getUnsyncedCards(): List<Card>
 
-    // Delete chosen set from the table
-    // @param studySet the set to be deleted
-    @Query("UPDATE cards SET isDeleted = 1 WHERE id = :id")
-    suspend fun markAsDeletedCard(id: Long)
+    /*
+    Выбрать все синхронизированные карточки определенного набора локально
+    Чтобы потом их удалить локально (если на сервере их уже нет)
+    */
+    @Query("SELECT * FROM cards WHERE remoteId IS NOT NULL AND setId = :setId")
+    suspend fun getSyncedCardsBySet(setId: Long): List<Card>
 
-    // Delete chosen card from the table
-    // @param card the card to be deleted
-    @Delete
-    suspend fun deleteCard(card: Card)
-
-    // Select all cards from set
-    // @param setId the set id to choose cards from
+    /*
+    В таблице с карточками выбрать все карточки определенного набора (неудаленные карточки),
+    отсортировать по времени создания карточки
+    Чтобы отобразить все карточки на экране определенного набора
+    */
     @Query("""
         SELECT 
             * 
@@ -48,20 +52,41 @@ interface CardDao {
     """)
     fun getAllCardsForSet(setId: Long): Flow<List<Card>>
 
+    /*
+    Найти локально карточку с id с сервера
+    Чтобы либо обновить его данными с сервера
+    ИЛИ чтобы добавить полностью карточку (если функция вернет null)
+    */
+    @Query("SELECT * FROM cards WHERE remoteId = :remoteId LIMIT 1")
+    suspend fun getCardByRemoteId(remoteId: Long): Card?
+
+    /*
+    Выбрать (все помеченные для удаления и синхронизированные) карточки
+    Чтобы потом попытаться их удалить на сервере + локально
+    */
     @Query("SELECT * FROM cards WHERE isDeleted = 1 AND remoteId IS NOT NULL")
     suspend fun getCardsToDelete(): List<Card>
 
-    // Select all unsynced cards
-    @Query("SELECT * FROM cards WHERE remoteId IS NULL")
-    suspend fun getUnsyncedCards(): List<Card>
+    /*
+    Обновить существующую карточку
+    Синхронизируем локальные с сервером (добавляем remoteId у несинхронизированных)
+    ИЛИ скачиваем обновляем данные в соответствии с данными сервера (если карточка существует)
+    */
+    @Update
+    suspend fun updateCard(card: Card)
 
-    // Select all synced cards
-    @Query("SELECT * FROM cards WHERE remoteId IS NOT NULL AND setId = :setId")
-    suspend fun getSyncedCardsBySet(setId: Long): List<Card>
+    /*
+    Пометить карточку как удаленную локально
+    Если пользователь удалил карточку у себя на устройстве
+    */
+    @Query("UPDATE cards SET isDeleted = 1 WHERE id = :id")
+    suspend fun markAsDeletedCard(id: Long)
 
-    // Select specific card
-    // @param remoteId the remote id to choose
-    // LIMIT 1 - stop as soon as you find needed set (optimization)
-    @Query("SELECT * FROM cards WHERE remoteId = :remoteId LIMIT 1")
-    suspend fun getCardByRemoteId(remoteId: Long): Card?
+    /*
+    Удалить карточку из Room
+    Если успешно синхронизировались с сервером, удалили запись там, удалили и локально
+    ИЛИ если на сервере такой карточки не существует, то удаляем локально (СРЕДИ ТЕХ, КОТОРЫЕ ПОМЕЧЕНЫ КАК СИНХРОНИЗИРОВАННЫЕ)
+    */
+    @Delete
+    suspend fun deleteCard(card: Card)
 }
