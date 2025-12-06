@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Memorizy</string>
-
     <string name="add_set">Добавить набор</string>
     <string name="close_search">Закрыть поиск</string>
     <string name="search">Поиск</string>
@@ -10,20 +9,17 @@
     <string name="delete_set_warning">Вы уверены что хотите удалить набор? Это действие нельзя откатить назад.</string>
     <string name="delete_text">Удалить</string>
     <string name="cancel_text">Отменить</string>
-
     <string name="new_set_text">Новый набор</string>
     <string name="back_button">Назад</string>
     <string name="set_name_field">Название</string>
     <string name="set_name_warning">Название не может быть пустым</string>
     <string name="set_description">Описание</string>
     <string name="create_set_text">Создать</string>
-
     <string name="loading_text">Загрузка...</string>
     <string name="add_card_button">Добавить карточку</string>
     <string name="learning_mode">Заучивание</string>
     <string name="delete_card_question">Удалить карточку?</string>
     <string name="delete_card_warning">Вы уверены что хотите удалить карточку? Это действие нельзя откатить назад.</string>
-
     <string name="new_card_text">Новая карточка</string>
     <string name="term_text">Термин</string>
     <string name="term_text_warning">Термин не может быть пустым</string>
@@ -53,4 +49,11 @@
     <string name="settings_dark_theme_text">Темная тема:</string>
     <string name="settings_ic">Иконка настройки</string>
     <string name="guest_text">Гость</string>
+
+    <string name="error_unknown">Неизвестная ошибка</string>
+    <string name="error_no_internet">Не удалось подключиться к серверу. Проверьте интернет.</string>
+    <string name="error_wrong_credentials">Неверный логин или пароль.</string>
+    <string name="error_user_exists">Пользователь с таким именем уже существует.</string>
+    <string name="error_server_error">Ошибка на сервере. Попробуйте позже.</string>
+    <string name="error_fill_fields">Заполните все поля</string>
 </resources>

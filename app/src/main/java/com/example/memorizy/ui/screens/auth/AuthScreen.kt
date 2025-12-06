@@ -125,7 +125,7 @@ private fun AuthScreenBody(
                 if (uiState.error != null) {
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = uiState.error,
+                        text = stringResource(uiState.error),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.error
                     )

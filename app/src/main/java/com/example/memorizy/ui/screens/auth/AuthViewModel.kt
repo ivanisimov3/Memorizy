@@ -1,5 +1,6 @@
 package com.example.memorizy.ui.screens.auth
 
+import com.example.memorizy.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.memorizy.data.repository.AuthRepository
@@ -11,6 +12,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.net.ConnectException
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
@@ -64,7 +67,7 @@ class AuthViewModel @Inject constructor(
         val currentState = _uiState.value
 
         if (currentState.username.isBlank() || currentState.password.isBlank()) {
-            _uiState.update { it.copy(error = "Заполните все поля") }
+            _uiState.update { it.copy(error = R.string.error_fill_fields) }
             return
         }
 
@@ -79,9 +82,24 @@ class AuthViewModel @Inject constructor(
 
                 _uiState.update { it.copy(isLoading = false, isAuthenticated = true) }
             } else {
-                val errorMsg = result.exceptionOrNull()?.message ?: "Ошибка сети"
+                val errorMsg = parseError(result.exceptionOrNull())
                 _uiState.update { it.copy(isLoading = false, error = errorMsg) }
             }
+        }
+    }
+
+    private fun parseError(e: Throwable?) : Int{
+        return when (e) {
+            is HttpException -> {
+                when (e.code()) {
+                    401 -> R.string.error_wrong_credentials
+                    409 -> R.string.error_user_exists
+                    in 500..599 -> R.string.error_server_error
+                    else -> R.string.error_unknown
+                }
+            }
+            is ConnectException -> R.string.error_no_internet
+            else -> R.string.error_unknown
         }
     }
 }
