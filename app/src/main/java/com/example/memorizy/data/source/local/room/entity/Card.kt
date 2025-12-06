@@ -27,5 +27,6 @@ data class Card(
     val definition: String,
     val createdAt: Long = System.currentTimeMillis(),
     val remoteId: Long? = null, // если remoteId == null, тогда набор не синхронизирован
-    val isDeleted: Boolean = false
+    val isDeleted: Boolean = false,
+    val isEdited: Boolean = false
 )

@@ -43,7 +43,6 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
         val authHeader = "Bearer $tokenString"
 
         val unsyncedCards = dao.getUnsyncedCards()
-
         unsyncedCards.forEach { localCard ->
             val parentSet = studySetDao.getSetByIdSimple(localCard.setId)
             val parentRemoteId = parentSet?.remoteId ?: return@forEach  // Буквально аналог continue, переходим к следующей карточке
@@ -61,8 +60,29 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
             }
         }
 
-        val deletedCards = dao.getCardsToDelete()
+        val editedCards = dao.getEditedCards()
+        editedCards.forEach { localCard ->
+            val parentSet = studySetDao.getSetByIdSimple(localCard.setId)
+            val parentRemoteId = parentSet?.remoteId ?: return@forEach
 
+            try {
+                val remoteDto = api.updateCard(
+                    token = authHeader,
+                    id = localCard.remoteId!!,
+                    dto = localCard.toDto(parentRemoteId)
+                )
+
+                val syncedCard = localCard.copy(
+                    isEdited = false,
+                    createdAt = remoteDto.createdAt ?: localCard.createdAt
+                )
+                dao.updateCard(syncedCard)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        val deletedCards = dao.getCardsToDelete()
         deletedCards.forEach { localCard ->
             try{
                 api.deleteCard(token = authHeader, id = localCard.remoteId!!)
@@ -94,7 +114,8 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
                             term = dto.term,
                             definition = dto.definition,
                             createdAt = dto.createdAt ?: localCard.createdAt,
-                            remoteId = dto.id
+                            remoteId = dto.id,
+                            isEdited = false
                         )
                         dao.updateCard(updatedCard)
                     }

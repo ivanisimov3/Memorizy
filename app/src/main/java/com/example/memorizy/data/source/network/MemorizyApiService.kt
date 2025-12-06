@@ -9,6 +9,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface MemorizyApiService{
@@ -30,6 +31,13 @@ interface MemorizyApiService{
         @Body dto: StudySetDto
     ): StudySetDto
 
+    @PUT("api/sets/{id}")
+    suspend fun updateSet(
+        @Header("Authorization") token: String,
+        @Path("id") id: Long,
+        @Body dto: StudySetDto
+    ): StudySetDto
+
     @DELETE("api/sets/{id}")
     suspend fun deleteSet(
         @Header("Authorization") token: String,
@@ -46,6 +54,13 @@ interface MemorizyApiService{
     @POST("api/cards")
     suspend fun createCard(
         @Header("Authorization") token: String,
+        @Body dto: CardDto
+    ): CardDto
+
+    @PUT("api/cards/{id}")
+    suspend fun updateCard(
+        @Header("Authorization") token: String,
+        @Path("id") id: Long,
         @Body dto: CardDto
     ): CardDto
 

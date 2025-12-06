@@ -47,7 +47,6 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
         val authHeader = "Bearer $tokenString"
 
         val unsyncedSets = dao.getUnsyncedSets()
-
         unsyncedSets.forEach { localSet ->
             try {
                 val remoteDto = api.createSet(token = authHeader, dto = localSet.toDto())
@@ -62,8 +61,26 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
             }
         }
 
-        val deletedSets = dao.getSetsToDelete()
+        val editedSets = dao.getEditedSets()
+        editedSets.forEach { localSet ->
+            try {
+                val remoteDto = api.updateSet(
+                    token = authHeader,
+                    id = localSet.remoteId!!,
+                    dto = localSet.toDto()
+                )
 
+                val syncedSet = localSet.copy(
+                    isEdited = false,
+                    createdAt = remoteDto.createdAt ?: localSet.createdAt
+                )
+                dao.updateSet(syncedSet)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        val deletedSets = dao.getSetsToDelete()
         deletedSets.forEach { localSet ->
             try{
                 api.deleteSet(token = authHeader, id = localSet.remoteId!!)
@@ -94,7 +111,8 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
                         description = dto.description,
                         iconId = dto.iconId,
                         createdAt = dto.createdAt ?: localSet.createdAt,
-                        remoteId = dto.id
+                        remoteId = dto.id,
+                        isEdited = false
                     )
                     dao.updateSet(updatedSet)
                 }

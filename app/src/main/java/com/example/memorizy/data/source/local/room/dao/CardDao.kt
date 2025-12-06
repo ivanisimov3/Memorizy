@@ -61,6 +61,13 @@ interface CardDao {
     suspend fun getCardByRemoteId(remoteId: Long): Card?
 
     /*
+    Выбрать все карточки, которые синхронизированы с сервером, не должны быть удалены и изменены
+    Чтобы отправить обновление на сервер
+    */
+    @Query("SELECT * FROM cards WHERE isEdited = 1 AND remoteId IS NOT NULL AND isDeleted = 0")
+    suspend fun getEditedCards(): List<Card>
+
+    /*
     Выбрать (все помеченные для удаления и синхронизированные) карточки
     Чтобы потом попытаться их удалить на сервере + локально
     */

@@ -82,6 +82,13 @@ interface StudySetDao {
     suspend fun getSetByRemoteId(remoteId: Long): StudySet?
 
     /*
+    Выбрать все наборы, которые синхронизированы с сервером, не должны быть удалены и изменены
+    Чтобы отправить обновление на сервер
+    */
+    @Query("SELECT * FROM study_sets WHERE isEdited = 1 AND remoteId IS NOT NULL AND isDeleted = 0")
+    suspend fun getEditedSets(): List<StudySet>
+
+    /*
     Выбрать (все помеченные для удаления и синхронизированные) наборы
     Чтобы потом попытаться их удалить на сервере + локально
     */

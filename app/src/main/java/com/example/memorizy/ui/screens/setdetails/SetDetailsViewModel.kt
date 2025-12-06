@@ -140,13 +140,17 @@ class SetDetailsViewModel @Inject constructor(
         }) return
 
         viewModelScope.launch {
-            studySetRepository.updateSet(draftSet)
+            val updatedSet = draftSet.copy(
+                isEdited = true
+            )
+            studySetRepository.updateSet(updatedSet)
 
             draftCards.forEach { card ->
-                cardRepository.updateCard(card)
+                cardRepository.updateCard(card.copy(isEdited = true))
             }
 
             onCancelEditing()
+            syncManager.scheduleOneTimeSync()
         }
     }
 }
