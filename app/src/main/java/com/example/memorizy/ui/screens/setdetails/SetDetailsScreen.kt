@@ -219,117 +219,122 @@ private fun SetDetailsScreenBody(
         }
     }
     else{
-        Column(
+        LazyColumn(
             modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ){
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Icon(
-                    painter = painterResource(getIconRes(
-                        if (editMode)
-                            uiState.draftSet.iconId
-                        else
-                            uiState.studySet.iconId)
-                    ),
-                    contentDescription = stringResource(R.string.set_icon),
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .then(  // Returns a Modifier representing this modifier followed by other in sequence.
-                            if (editMode) Modifier
-                                .clip(CircleShape)
-                                .clickable { onIconClick() }
-                            else Modifier
+                .fillMaxSize(),
+            contentPadding = PaddingValues(16.dp)
+        ) {
+            item {
+                Column{
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                getIconRes(
+                                    if (editMode)
+                                        uiState.draftSet.iconId
+                                    else
+                                        uiState.studySet.iconId
+                                )
+                            ),
+                            contentDescription = stringResource(R.string.set_icon),
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .then(  // Returns a Modifier representing this modifier followed by other in sequence.
+                                    if (editMode) Modifier
+                                        .clip(CircleShape)
+                                        .clickable { onIconClick() }
+                                    else Modifier
+                                )
                         )
-                )
-                Spacer(Modifier.width(16.dp))
-                if (editMode){
-                    OutlinedTextField(
-                        value = uiState.draftSet.name,
-                        onValueChange = updateDraftName,
-                        label = { Text(
-                            text = stringResource(R.string.set_name_field),
-                            style = MaterialTheme.typography.displayMedium
-                        )},
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-                    )
-                } else{
-                    Text(
-                        text = uiState.studySet.name,
-                        style = MaterialTheme.typography.displayLarge
-                    )
+                        Spacer(Modifier.width(16.dp))
+                        if (editMode) {
+                            OutlinedTextField(
+                                value = uiState.draftSet.name,
+                                onValueChange = updateDraftName,
+                                label = {
+                                    Text(
+                                        text = stringResource(R.string.set_name_field),
+                                        style = MaterialTheme.typography.displayMedium
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                            )
+                        } else {
+                            Text(
+                                text = uiState.studySet.name,
+                                style = MaterialTheme.typography.displayLarge
+                            )
+                        }
+                    }
+
+                    if (editMode) {
+                        OutlinedTextField(
+                            value = uiState.draftSet.description ?: "",
+                            onValueChange = updateDraftDescription,
+                            label = {
+                                Text(
+                                    text = stringResource(R.string.set_description),
+                                    style = MaterialTheme.typography.displayMedium
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            minLines = 3,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                        )
+                    } else {
+                        if (!uiState.studySet.description.isNullOrBlank()) {
+
+                            Spacer(Modifier.height(8.dp))
+
+                            Text(
+                                text = uiState.studySet.description,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    if (!editMode) {
+                        Button( // Кнопка заучивание
+                            onClick = { /* Пока неактивна */ },
+                            enabled = false,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                stringResource(R.string.learning_mode),
+                                style = MaterialTheme.typography.displayMedium
+                            )
+                        }
+
+                        Spacer(Modifier.height(4.dp))
+                    }
+
+                    HorizontalDivider()
                 }
             }
 
+            
             if (editMode){
-                OutlinedTextField(
-                    value = uiState.draftSet.description ?: "",
-                    onValueChange = updateDraftDescription,
-                    label = { Text(
-                        text = stringResource(R.string.set_description),
-                        style = MaterialTheme.typography.displayMedium
-                    )},
-                    modifier = Modifier.fillMaxWidth(),
-                    minLines = 3,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
-                )
+                itemsIndexed(items = uiState.draftCards) { index, draftCard ->
+                    EditCardItem(
+                        draftCard = draftCard,
+                        onTermChange = { updateDraftCard(index, it, draftCard.definition) },
+                        onDefChange = { updateDraftCard(index, draftCard.term, it) }
+                    )
+                }
             } else{
-                if (!uiState.studySet.description.isNullOrBlank()) {
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Text(
-                        text = uiState.studySet.description,
-                        style = MaterialTheme.typography.bodyMedium
+                // используем перебор с ключем, так как в случае удаления карточки LazyColumn поймет
+                // какой именно элемент пропал и что именно нужно перерисовать
+                items(items = uiState.cards, key = { it.id } ) { card ->
+                    CardItem(
+                        card = card,
+                        onLongClick = { onCardToDelete(card) }  // обозначить этот набор для удаления
                     )
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            if (!editMode){
-                Button( // Кнопка заучивание
-                    onClick = { /* Пока неактивна */ },
-                    enabled = false,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        stringResource(R.string.learning_mode),
-                        style = MaterialTheme.typography.displayMedium
-                    )
-                }
-
-                Spacer(Modifier.height(4.dp))
-            }
-
-            HorizontalDivider()
-
-
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-            ) {
-                if (editMode){
-                    itemsIndexed(items = uiState.draftCards) { index, draftCard ->
-                        EditCardItem(
-                            draftCard = draftCard,
-                            onTermChange = { updateDraftCard(index, it, draftCard.definition) },
-                            onDefChange = { updateDraftCard(index, draftCard.term, it) }
-                        )
-                    }
-                } else{
-                    // используем перебор с ключем, так как в случае удаления карточки LazyColumn поймет
-                    // какой именно элемент пропал и что именно нужно перерисовать
-                    items(items = uiState.cards, key = { it.id } ) { card ->
-                        CardItem(
-                            card = card,
-                            onLongClick = { onCardToDelete(card) }  // обозначить этот набор для удаления
-                        )
-                    }
                 }
             }
         }
