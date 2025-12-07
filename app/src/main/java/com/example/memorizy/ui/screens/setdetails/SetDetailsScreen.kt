@@ -69,7 +69,8 @@ fun SetDetailsScreen(
     updateDraftIcon: (Int) -> Unit,
     updateDraftCard: (Int, String, String) -> Unit,
     onCancelEditing: () -> Unit,
-    onSaveChanges: () -> Unit
+    onSaveChanges: () -> Unit,
+    onLearningModeClick: () -> Unit
 ){
     // Переменные для логики интерфейса
     var cardToDelete by remember { mutableStateOf<Card?>(null) }
@@ -110,7 +111,8 @@ fun SetDetailsScreen(
             updateDraftCard = updateDraftCard,
             onIconClick = {
                 if (uiState.isEditing) showIconDialog = true
-            }
+            },
+            onLearningModeClick = onLearningModeClick
         )
     }
 
@@ -142,7 +144,7 @@ fun SetDetailsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SetDetailsTopBar(
+private fun SetDetailsTopBar(
     onBackClick: () -> Unit,
     onCancelEditing: () -> Unit,
     onSaveChanges: () -> Unit,
@@ -205,7 +207,8 @@ private fun SetDetailsScreenBody(
     updateDraftName: (String) -> Unit,
     updateDraftDescription: (String) -> Unit,
     updateDraftCard: (Int, String, String) -> Unit,
-    onIconClick: () -> Unit
+    onIconClick: () -> Unit,
+    onLearningModeClick: () -> Unit
 ){
     val editMode = (uiState.isEditing && uiState.draftSet != null)
 
@@ -301,8 +304,7 @@ private fun SetDetailsScreenBody(
 
                     if (!editMode) {
                         Button( // Кнопка заучивание
-                            onClick = { /* Пока неактивна */ },
-                            enabled = false,
+                            onClick = onLearningModeClick,
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(

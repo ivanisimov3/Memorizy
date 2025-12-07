@@ -15,6 +15,8 @@ import com.example.memorizy.ui.screens.addstudyset.AddStudySetViewModel
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.screens.auth.AuthScreen
 import com.example.memorizy.ui.screens.auth.AuthViewModel
+import com.example.memorizy.ui.screens.learningmode.LearningModeScreen
+import com.example.memorizy.ui.screens.learningmode.LearningModeViewModel
 import com.example.memorizy.ui.screens.setdetails.SetDetailsScreen
 import com.example.memorizy.ui.screens.setdetails.SetDetailsViewModel
 import com.example.memorizy.ui.screens.settings.SettingsScreen
@@ -96,9 +98,13 @@ fun MemorizyApp() {
             val viewModel: SetDetailsViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsState()
 
+            val route: Routes.SetDetails = it.toRoute()
+
             SetDetailsScreen(
+                onLearningModeClick = {
+                    navController.navigate(Routes.LearningMode(setId = route.setId))
+                },
                 onAddCardClick = {
-                    val route: Routes.SetDetails = it.toRoute()
                     navController.navigate(Routes.AddCard(setId = route.setId))
                 },
                 onBackClick = { navController.popBackStack() },
@@ -111,6 +117,21 @@ fun MemorizyApp() {
                 updateDraftCard = viewModel::updateDraftCard,
                 onCancelEditing = viewModel::onCancelEditing,
                 onSaveChanges = viewModel::onSaveChanges
+            )
+        }
+
+        composable<Routes.LearningMode> {
+            val viewModel: LearningModeViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            LearningModeScreen(
+                onBackClick = { navController.popBackStack() },
+                uiState = uiState,
+                restartGame = viewModel::restartLearning,
+                onFlipCard = viewModel::onFlipCard,
+                onSwipeRight = viewModel::onSwipeRight,
+                onSwipeLeft = viewModel::onSwipeLeft,
+                toggleShuffle = viewModel::toggleShuffle
             )
         }
 

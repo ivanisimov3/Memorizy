@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SetDetailsViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle, // аргументы навигации
+    savedStateHandle: SavedStateHandle, // Аргументы навигации
     private val studySetRepository: StudySetRepository,
     private val cardRepository: CardRepository,
     private val syncManager: SyncManager
@@ -33,8 +33,8 @@ class SetDetailsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             studySetRepository.getSet(setId).collect { set ->
-                _uiState.update {
-                    it.copy(
+                _uiState.update { state ->
+                    state.copy(
                         studySet = set,
                         isLoading = (set == null)
                     )
@@ -44,8 +44,8 @@ class SetDetailsViewModel @Inject constructor(
 
         viewModelScope.launch {
             cardRepository.getAllCardsForSet(setId).collect { cards ->
-                _uiState.update {
-                    it.copy(
+                _uiState.update { state ->
+                    state.copy(
                         cards = cards
                     )
                 }
