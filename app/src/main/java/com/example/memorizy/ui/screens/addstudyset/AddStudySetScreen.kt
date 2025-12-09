@@ -1,6 +1,7 @@
 package com.example.memorizy.ui.screens.addstudyset
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,8 +11,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,7 +36,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
+import com.example.memorizy.ui.utils.AppIcon
 import com.example.memorizy.ui.utils.AppIcons
+import com.example.memorizy.ui.utils.GlassContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,16 +64,17 @@ fun AddStudySetScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.new_set_text),
-                        style = MaterialTheme.typography.displayMedium
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 },
                 navigationIcon = {
                     IconButton(
                         onClick = onBackClick
                     ) {
-                        Icon(
+                        AppIcon(
                             painter = painterResource(R.drawable.ic_back),
-                            contentDescription = stringResource(R.string.back_button)
+                            contentDescription = stringResource(R.string.back_button),
                         )
                     }
                 }
@@ -100,6 +108,7 @@ private fun AddStudySetScreenBody(
         modifier = modifier
             .padding(16.dp)
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
         IconSelector(
             selectedIconId = uiState.selectedIconId,
@@ -120,12 +129,14 @@ private fun AddStudySetScreenBody(
             modifier = Modifier.fillMaxWidth(),
             isError = uiState.isNameEmptyError,
             singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            shape = RoundedCornerShape(18.dp)
         )
         if (uiState.isNameEmptyError) {
             Text(
                 text = stringResource(R.string.set_name_warning),
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.error
             )
         }
 
@@ -142,25 +153,42 @@ private fun AddStudySetScreenBody(
             },
             modifier = Modifier.fillMaxWidth(),
             minLines = 5,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            shape = RoundedCornerShape(18.dp)
         )
 
         Spacer(Modifier.weight(1f))
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
             horizontalArrangement = Arrangement.End
         ) {
-            TextButton(onClick = onBackClick) { // Навигация
+            GlassContainer(
+                modifier = Modifier
+                    .clickable(onClick = onBackClick)
+                    .height(40.dp)
+                    .width(120.dp),
+                containerColor = MaterialTheme.colorScheme.onSurface
+            ) { // Навигация
                 Text(
                     text = stringResource(R.string.cancel_text),
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
-            Button(onClick = onCreateButtonClicked) {
+
+            Spacer(Modifier.size(8.dp))
+
+            GlassContainer (
+                modifier = Modifier
+                    .clickable(onClick = onCreateButtonClicked)
+                    .height(40.dp)
+                    .width(100.dp),
+            ) {
                 Text(
                     text = stringResource(R.string.create_set_text),
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         }

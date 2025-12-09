@@ -1,6 +1,5 @@
 package com.example.memorizy.ui.screens.setdetails
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,12 +19,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
@@ -54,7 +49,10 @@ import com.example.memorizy.ui.utils.AppIcons
 import com.example.memorizy.ui.utils.AppIcons.getIconResById
 import kotlin.collections.component2
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.example.memorizy.ui.utils.AppIcon
+import com.example.memorizy.ui.utils.GlassContainer
 
 
 @Composable
@@ -88,10 +86,13 @@ fun SetDetailsScreen(
         },
         floatingActionButton = {
             if (!uiState.isEditing){
-                FloatingActionButton(
-                    onClick = onAddCardClick // Навигация
+                GlassContainer(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier
+                        .clickable(onClick = onAddCardClick)
+                        .size(56.dp),
                 ) {
-                    Icon(
+                    AppIcon(
                         painter = painterResource(R.drawable.ic_add),
                         contentDescription = stringResource(R.string.add_card_button)
                     )
@@ -159,13 +160,14 @@ private fun SetDetailsTopBar(
                         stringResource(R.string.set_edit_mode)
                     else
                         stringResource(R.string.set_detalization_text),
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.secondary
             )
         },
         navigationIcon = {
             if (!isEditing){
                 IconButton(onClick = onBackClick) {
-                    Icon(
+                    AppIcon(
                         painter = painterResource(R.drawable.ic_back),
                         contentDescription = stringResource(R.string.back_button)
                     )
@@ -175,20 +177,20 @@ private fun SetDetailsTopBar(
         actions = {
             if (isEditing) {
                 IconButton(onClick = onCancelEditing) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_cancel),
+                    AppIcon(
+                        painter = painterResource(R.drawable.ic_close),
                         contentDescription = stringResource(R.string.cancel_edit_mode)
                     )
                 }
                 IconButton(onClick = onSaveChanges) {
-                    Icon(
+                    AppIcon(
                         painter = painterResource(R.drawable.ic_confirm),
                         contentDescription = stringResource(R.string.confirm_edit)
                     )
                 }
             } else {
                 IconButton(onClick = onStartEditing) {
-                    Icon(
+                    AppIcon(
                         painter = painterResource(R.drawable.ic_edit),
                         contentDescription = stringResource(R.string.start_edit_mode)
                     )
@@ -244,11 +246,13 @@ private fun SetDetailsScreenBody(
                             contentDescription = stringResource(R.string.set_icon),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier
-                                .then(  // Returns a Modifier representing this modifier followed by other in sequence.
+                                .then(  // Concatenates this modifier with another.
                                     if (editMode) Modifier
                                         .clip(CircleShape)
                                         .clickable { onIconClick() }
+                                        .size(48.dp)
                                     else Modifier
+                                        .size(48.dp)
                                 )
                         )
                         Spacer(Modifier.width(16.dp))
@@ -259,9 +263,10 @@ private fun SetDetailsScreenBody(
                                 label = {
                                     Text(
                                         text = stringResource(R.string.set_name_field),
-                                        style = MaterialTheme.typography.displayMedium
+                                        style = MaterialTheme.typography.labelSmall
                                     )
                                 },
+                                isError = uiState.draftSet.name.isEmpty(),
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
@@ -269,7 +274,7 @@ private fun SetDetailsScreenBody(
                         } else {
                             Text(
                                 text = uiState.studySet.name,
-                                style = MaterialTheme.typography.displayLarge
+                                style = MaterialTheme.typography.displayMedium
                             )
                         }
                     }
@@ -281,7 +286,7 @@ private fun SetDetailsScreenBody(
                             label = {
                                 Text(
                                     text = stringResource(R.string.set_description),
-                                    style = MaterialTheme.typography.displayMedium
+                                    style = MaterialTheme.typography.labelSmall
                                 )
                             },
                             modifier = Modifier.fillMaxWidth(),
@@ -295,25 +300,28 @@ private fun SetDetailsScreenBody(
 
                             Text(
                                 text = uiState.studySet.description,
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
                     }
 
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(8.dp))
 
                     if (!editMode) {
-                        Button( // Кнопка заучивание
-                            onClick = onLearningModeClick,
-                            modifier = Modifier.fillMaxWidth()
+                        GlassContainer ( // Кнопка заучивание
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(onClick = onLearningModeClick)
+                                .height(50.dp),
+                            containerColor = MaterialTheme.colorScheme.secondary
                         ) {
                             Text(
                                 stringResource(R.string.learning_mode),
-                                style = MaterialTheme.typography.displayMedium
+                                style = MaterialTheme.typography.displayLarge,
                             )
                         }
 
-                        Spacer(Modifier.height(4.dp))
+                        Spacer(Modifier.height(8.dp))
                     }
 
                     HorizontalDivider()
@@ -348,7 +356,7 @@ private fun CardItem(
     card: Card,
     onLongClick: () -> Unit
 ){
-    Card(
+    GlassContainer(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
@@ -356,22 +364,21 @@ private fun CardItem(
                 onLongClick = onLongClick
             )
             .padding(vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(5.dp),
-        border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.secondary)
     ) {
         Column (
             modifier = Modifier
-                .padding(8.dp)
+                .padding(12.dp)
         ){
             Text(
                 text = card.term,
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
             )
 
             Spacer(Modifier.height(4.dp))
 
-            HorizontalDivider()
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.inversePrimary
+            )
 
             Spacer(Modifier.height(4.dp))
 
@@ -393,8 +400,6 @@ fun EditCardItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(5.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             OutlinedTextField(
@@ -403,9 +408,10 @@ fun EditCardItem(
                 label = {
                     Text(
                         text = stringResource(R.string.term_text),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.labelSmall,
                     )
                 },
+                isError = draftCard.term.isEmpty(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth()
@@ -419,9 +425,10 @@ fun EditCardItem(
                 label = {
                     Text(
                         text = stringResource(R.string.definition_text),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.labelSmall,
                     )
                 },
+                isError = draftCard.definition.isEmpty(),
                 minLines = 3,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 modifier = Modifier.fillMaxWidth()
@@ -436,21 +443,40 @@ private fun DeleteCardDialog(
     onDismiss: () -> Unit
 ){
     AlertDialog(
+        shape = RoundedCornerShape(18.dp),
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.delete_card_question)) },
-        text = { Text(stringResource(R.string.delete_card_warning))},
+        title = {
+            Text(
+                text = stringResource(R.string.delete_card_question),
+                style = MaterialTheme.typography.displayMedium
+            )
+        },
+        text = {
+            Text(
+                text = stringResource(R.string.delete_card_warning),
+                style = MaterialTheme.typography.bodySmall
+            )
+       },
         confirmButton = {
             TextButton(
                 onClick = onConfirmDelete
             ) {
-                Text(stringResource(R.string.delete_text))
+                Text(
+                    text = stringResource(R.string.delete_text),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss
             ) {
-                Text(stringResource(R.string.cancel_text))
+                Text(
+                    text = stringResource(R.string.cancel_text),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
     )
@@ -464,8 +490,14 @@ fun IconSelectionDialog(
     availableIcons: Map<Int, Int> = AppIcons.allIcons
 ) {
     AlertDialog(
+        shape = RoundedCornerShape(18.dp),
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_ic_text)) },
+        title = {
+            Text(
+                text = stringResource(R.string.select_ic_text),
+                style = MaterialTheme.typography.displayMedium
+            )
+        },
         text = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -474,12 +506,16 @@ fun IconSelectionDialog(
                 availableIcons.forEach { (id, iconResId) ->
                     Icon(
                         painter = painterResource(iconResId),
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.set_icon),
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
                             .clickable { onIconSelected(id) },
-                        tint = if (id == currentIconId) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        tint =
+                            if (id == currentIconId)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
             }
@@ -489,7 +525,11 @@ fun IconSelectionDialog(
             TextButton(
                 onClick = onDismiss
             ) {
-                Text(stringResource(R.string.cancel_text))
+                Text(
+                    text = stringResource(R.string.cancel_text),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
     )

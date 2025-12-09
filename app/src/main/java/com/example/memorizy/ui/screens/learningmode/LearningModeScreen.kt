@@ -48,6 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
+import com.example.memorizy.ui.utils.GlassContainer
 
 @Composable
 fun LearningModeScreen(
@@ -99,7 +100,7 @@ private fun LearningModeTopBar(
         ) {
             Box(
                 modifier = Modifier
-                    .size(12.dp)
+                    .size(18.dp)
                     .clip(CircleShape)
                     .background(Color.Red.copy(alpha = 0.7f))
             )
@@ -109,7 +110,7 @@ private fun LearningModeTopBar(
                     R.string.incorrect_answ_counter,
                     uiState.incorrectCount
                 ),
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.bodyMedium
             )
         }
 
@@ -127,12 +128,12 @@ private fun LearningModeTopBar(
                 text = stringResource(
                     R.string.correct_answ_counter,
                     uiState.correctCount),
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.bodyMedium
             )
             Spacer(Modifier.width(8.dp))
             Box(
                 modifier = Modifier
-                    .size(12.dp)
+                    .size(18.dp)
                     .clip(CircleShape)
                     .background(Color.Green.copy(alpha = 0.7f))
             )
@@ -257,7 +258,7 @@ private fun LearningModeScreenBody(
                                                         == SwipeToDismissBoxValue.StartToEnd)
                                                         R.drawable.ic_confirm
                                                     else
-                                                        R.drawable.ic_cancel
+                                                        R.drawable.ic_close
                                                 ),
                                                 contentDescription =
                                                     stringResource(R.string.ic_swipe_result),
@@ -301,7 +302,8 @@ private fun LearningModeScreenBody(
                                 if (uiState.isShuffleOn)
                                     MaterialTheme.colorScheme.primary
                                 else
-                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
 
@@ -329,7 +331,7 @@ private fun LearningCard(
         label = "cardFlip"
     )
 
-    Card(
+    GlassContainer(
         modifier = modifier
             .fillMaxWidth()
             .graphicsLayer {
@@ -338,10 +340,6 @@ private fun LearningCard(
                     12f * density  // Настройка перспективы, чтобы карточка была будто 3D
             }
             .clickable(onClick = onCardClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        )
     ) {
         if (rotation <= 90f) {
             CardContent(
@@ -407,20 +405,25 @@ private fun EmptyStateMessage(
     ) {
         Text(
             text = stringResource(R.string.empty_learning_mode_warn),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.displayMedium,
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(16.dp))
         Text(
             text = stringResource(R.string.empty_learning_mode_sugg),
-            style = MaterialTheme.typography.displayMedium,
+            style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(24.dp))
-        Button(onClick = onBackClick) {
+        GlassContainer (
+            modifier = Modifier
+                .clickable(onClick = onBackClick)
+                .height(40.dp)
+                .width(90.dp),
+        ) {
             Text(
                 text = stringResource(R.string.back_button),
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.bodySmall
             )
         }
     }
@@ -460,9 +463,8 @@ private fun LearningResultContent(
             CircularProgressIndicator(  // Накладываем диаграмму на пустую в прошлом виджете
                 progress = { progress },
                 modifier = Modifier.size(200.dp),
-                color = if (progress >= 0.75f) Color.Green else MaterialTheme.colorScheme.primary,
+                color = if (progress >= 0.85f) Color.Green else MaterialTheme.colorScheme.primary,
                 strokeWidth = 16.dp,
-                trackColor = Color.Transparent,
             )
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
@@ -503,28 +505,39 @@ private fun LearningResultContent(
 
         Spacer(Modifier.height(48.dp))
 
-        Button(
-            onClick = onRestartClick,
+        GlassContainer(
             modifier = Modifier
+                .clickable(onClick = onRestartClick)
                 .fillMaxWidth()
                 .height(50.dp)
         ) {
-            Icon(painterResource(R.drawable.ic_refresh), contentDescription = null)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(painterResource(R.drawable.ic_refresh), contentDescription = null)
 
-            Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(8.dp))
 
-            Text(stringResource(R.string.learn_again_text))
+                Text(
+                    text = stringResource(R.string.learn_again_text),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
 
         Spacer(Modifier.height(16.dp))
 
-        TextButton(
-            onClick = onBackClick,
+        GlassContainer(
             modifier = Modifier
+                .clickable(onClick = onBackClick)
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(50.dp),
+            containerColor = MaterialTheme.colorScheme.onSurface
         ) {
-            Text(stringResource(R.string.go_back_to_set_text))
+            Text(
+                text = stringResource(R.string.go_back_to_set_text),
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

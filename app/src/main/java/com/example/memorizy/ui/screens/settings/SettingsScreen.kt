@@ -1,5 +1,8 @@
 package com.example.memorizy.ui.screens.settings
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import com.example.memorizy.ui.utils.AppIcon
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,15 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,10 +33,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
+import com.example.memorizy.ui.utils.GlassContainer
 import com.example.memorizy.ui.utils.formatDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,14 +59,15 @@ fun SettingsScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.settings_title),
-                        style = MaterialTheme.typography.displayMedium
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 },
                 navigationIcon = {
                     IconButton(
                         onClick = onBackClick
                     ) {
-                        Icon(
+                        AppIcon(
                             painter = painterResource(R.drawable.ic_back),
                             contentDescription = stringResource(R.string.back_button)
                         )
@@ -112,7 +116,7 @@ private fun SettingsScreenBody(
             .fillMaxSize()
             .padding(16.dp)
             .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ){
         SettingsSection(title = stringResource(R.string.account_text)) {
             if (uiState.isLoggedIn) {
@@ -121,31 +125,43 @@ private fun SettingsScreenBody(
                         R.string.settings_user_warning,
                         uiState.username ?: stringResource(R.string.guest_text)
                     ),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodySmall
                 )
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(12.dp))
 
-                Button(
-                    onClick = { onLogoutButtonClick() },
+                GlassContainer(
+                    modifier = Modifier
+                        .clickable(onClick = onLogoutButtonClick)
+                        .height(40.dp)
+                        .width(90.dp)
                 ) {
                     Text(stringResource(R.string.logout))
                 }
             } else {
                 Text(
                     text = stringResource(R.string.settings_guest_warning),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodySmall
                 )
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(12.dp))
 
-                Button(onClick = onLoginClick) {
-                    Text(stringResource(R.string.login_button_text))
+                GlassContainer(
+                    modifier = Modifier
+                        .clickable(onClick = onLoginClick)
+                        .height(40.dp)
+                        .width(90.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.login_button_text),
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         }
 
-        HorizontalDivider()
+        Spacer(Modifier.height(2.dp))
+        HorizontalDivider(color = MaterialTheme.colorScheme.secondary)
 
         SettingsSection(title = stringResource(R.string.Synchronization_text)) {
             Row(
@@ -156,9 +172,22 @@ private fun SettingsScreenBody(
                 Column(modifier = Modifier.weight(1f)) {
                     Button(
                         onClick = onSyncClick,
-                        enabled = uiState.isLoggedIn
+                        enabled = uiState.isLoggedIn,
+                        shape = RoundedCornerShape(18.dp),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                                )
+                            )
+                        )
                     ) {
-                        Text(stringResource(R.string.synchronize_button_text))
+                        Text(
+                            text = stringResource(R.string.synchronize_button_text),
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
 
                     if (uiState.isLoggedIn && uiState.lastSyncTime != null) {
@@ -170,14 +199,15 @@ private fun SettingsScreenBody(
                                 R.string.sync_last_time,
                                 formatDate(uiState.lastSyncTime)
                             ),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.secondary
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
                 }
             }
 
             if (!uiState.isLoggedIn) {
+                Spacer(Modifier.height(4.dp))
+
                 Text(
                     text = stringResource(R.string.settings_sync_warning),
                     style = MaterialTheme.typography.labelSmall
@@ -185,7 +215,8 @@ private fun SettingsScreenBody(
             }
         }
 
-        HorizontalDivider()
+        Spacer(Modifier.height(2.dp))
+        HorizontalDivider(color = MaterialTheme.colorScheme.secondary)
 
         SettingsSection(title = stringResource(R.string.app_theme_text)) {
             Row(
@@ -207,13 +238,16 @@ private fun SettingsScreenBody(
 }
 
 @Composable
-private fun SettingsSection(title: String, content: @Composable () -> Unit) {
+private fun SettingsSection(
+    title: String,
+    content: @Composable () -> Unit
+) {
     Column {
         Text(
             text = title,
             style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 4.dp)
         )
         content()
     }
@@ -225,21 +259,40 @@ private fun LogoutDialog(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
+        shape = RoundedCornerShape(18.dp),
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.logout_question))},
-        text = { Text(stringResource(R.string.logout_warning))},
+        title = {
+            Text(
+                text = stringResource(R.string.logout_question),
+                style = MaterialTheme.typography.displayMedium
+            )
+        },
+        text = {
+            Text(
+                text = stringResource(R.string.logout_warning),
+                style = MaterialTheme.typography.bodySmall
+            )
+       },
         confirmButton = {
             TextButton(
                 onClick = onConfirmLogout
             ) {
-                Text(stringResource(R.string.logout))
+                Text(
+                    text = stringResource(R.string.logout),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss
             ) {
-                Text(stringResource(R.string.cancel_text))
+                Text(
+                    text = stringResource(R.string.cancel_text),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
     )

@@ -44,7 +44,7 @@
     <string name="Synchronization_text">Синхронизация</string>
     <string name="synchronize_button_text">Синхронизировать</string>
     <string name="settings_sync_warning">Войдите в аккаунт, чтобы сохранять данные в облаке.</string>
-    <string name="sync_last_time">Время последней синхронизации: %1$s</string>
+    <string name="sync_last_time">Дата последней синхронизации: %1$s</string>
     <string name="app_theme_text">Тема приложения</string>
     <string name="settings_dark_theme_text">Темная тема:</string>
     <string name="settings_ic">Иконка настройки</string>
@@ -70,8 +70,8 @@
     <string name="empty_learning_mode_sugg">Добавьте карточки, чтобы начать учить</string>
     <string name="Result_text">Результат</string>
     <string name="learning_percentage_text">%1$d%%</string>
-    <string name="good_result_text">Хорош!</string>
-    <string name="bad_result_text">Слабый!</string>
+    <string name="good_result_text">Отлично!</string>
+    <string name="bad_result_text">Слабо!</string>
     <string name="i_know_text">Знаю</string>
     <string name="i_dont_know_text">Не знаю</string>
     <string name="learn_again_text">Учить снова</string>

@@ -18,7 +18,7 @@ import retrofit2.Retrofit
 object NetworkDataModule {
 
     // The base URL for the computer localhost
-    private const val BASE_URL = "http://192.168.1.64:8080/"
+    private const val BASE_URL = "http://10.102.213.111:8080/"
 
     // Учим создавать OkHttpClient - передатчик Http запросов
     @Provides

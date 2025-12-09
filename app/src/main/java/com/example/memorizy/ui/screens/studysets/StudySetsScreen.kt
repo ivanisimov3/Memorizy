@@ -1,6 +1,6 @@
 package com.example.memorizy.ui.screens.studysets
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,18 +11,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -44,7 +41,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
 import com.example.memorizy.data.source.local.room.entity.StudySet
+import com.example.memorizy.ui.utils.AppIcon
 import com.example.memorizy.ui.utils.AppIcons.getIconResById
+import com.example.memorizy.ui.utils.GlassContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,10 +74,13 @@ fun StudySetsScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddSetClick // Навигация
+            GlassContainer(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier
+                    .clickable(onClick = onAddSetClick)
+                    .size(56.dp),
             ) {
-                Icon(
+                AppIcon(
                     painter = painterResource(R.drawable.ic_add),
                     contentDescription = stringResource(R.string.add_set)
                 )
@@ -129,21 +131,24 @@ private fun StudySetsTopAppBar(
                     value = uiState.searchQuery,
                     onValueChange = onSearchQueryChanged,
                     shape = RoundedCornerShape(50),
-                    textStyle = MaterialTheme.typography.bodyMedium,
+                    textStyle = MaterialTheme.typography.bodySmall,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
                 )
             } else {
                 Text(
                     text = "Memorizy",
-                    style = MaterialTheme.typography.displayMedium
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
         },
         navigationIcon = {
             if (isSearchActive) {
                 IconButton(onClick = onSearchDismissed) {
-                    Icon(
+                    AppIcon(
+                        modifier = Modifier
+                            .size(28.dp),
                         painter = painterResource(R.drawable.ic_back),
                         contentDescription = stringResource(R.string.close_search)
                     )
@@ -153,13 +158,17 @@ private fun StudySetsTopAppBar(
         actions = {
             if (!isSearchActive) {
                 IconButton(onClick = onSearchClicked) {
-                    Icon(
+                    AppIcon(
+                        modifier = Modifier
+                            .size(28.dp),
                         painter = painterResource(R.drawable.ic_search),
                         contentDescription = stringResource(R.string.search)
                     )
                 }
                 IconButton(onClick = onProfileClick) {
-                    Icon(
+                    AppIcon(
+                        modifier = Modifier
+                            .size(28.dp),
                         painter = painterResource(R.drawable.ic_settings),
                         contentDescription = stringResource(R.string.settings_ic)
                     )
@@ -212,16 +221,14 @@ private fun StudySetItem(
     onLongClick: () -> Unit,
     getIconRes: (Int) -> (Int) = { getIconResById(it) }
 ){
-    Card(
+    GlassContainer(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
                 onClick = onSetClick,
                 onLongClick = onLongClick
             )
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(5.dp),
-        border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.secondary),
+            .padding(vertical = 8.dp),
     ) {
         Column (
             modifier = Modifier
@@ -230,7 +237,7 @@ private fun StudySetItem(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
+                AppIcon(
                     painter = painterResource(getIconRes(studySet.iconId)),
                     contentDescription = stringResource(R.string.set_icon),
                     tint = MaterialTheme.colorScheme.primary
@@ -244,7 +251,7 @@ private fun StudySetItem(
                 ) {
                     Text(
                         text = studySet.name.uppercase(),
-                        style = MaterialTheme.typography.displayLarge,
+                        style = MaterialTheme.typography.displayMedium,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -254,12 +261,12 @@ private fun StudySetItem(
                             text = studySet.description,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodySmall,
                         )
                     }else{
                         Text(
-                            text = "нет описания",
-                            style = MaterialTheme.typography.bodyMedium,
+                            text = "Нет описания",
+                            style = MaterialTheme.typography.bodySmall,
                         )
                     }
                 }
@@ -281,6 +288,7 @@ private fun DeleteSetDialog(
     onDismiss: () -> Unit
 ){
     AlertDialog(
+        shape = RoundedCornerShape(18.dp),
         onDismissRequest = onDismiss,
         title = {
             Text(
@@ -290,7 +298,7 @@ private fun DeleteSetDialog(
         text = {
             Text(
                 text = stringResource(R.string.delete_set_warning),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodySmall
             )},
         confirmButton = {
             TextButton(
@@ -298,7 +306,8 @@ private fun DeleteSetDialog(
             ) {
                 Text(
                     text = stringResource(R.string.delete_text),
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         },
@@ -308,7 +317,8 @@ private fun DeleteSetDialog(
             ) {
                 Text(
                     text = stringResource(R.string.cancel_text),
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
