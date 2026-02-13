@@ -73,7 +73,7 @@ class TestingModeViewModel @Inject constructor(
     // Отправка ответа и переход
     fun onSubmitAnswer() {
         _uiState.update { state ->
-            val currentCard = state.currentCard ?: return@update state
+            val currentCard = state.currentCard ?: return@update state  // Вернуть текущее состояние без изменений
 
             val correctAnswer = if (state.isTermChecked)
                 currentCard.term

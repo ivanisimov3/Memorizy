@@ -72,35 +72,27 @@ fun TestingModeScreen(
             onBackClick = onBackClick
         )
     } else {
+        val isQuestionActive = !uiState.isLoading && !uiState.isEmpty
+                && !uiState.isChoosingMode && !uiState.isFinished
+
         Scaffold(
             topBar = {
-                if (!uiState.isLoading && !uiState.isEmpty
-                    && !uiState.isFinished && !uiState.isChoosingMode) {
+                if (isQuestionActive) {
                     TestingModeTopBar(uiState = uiState)
                 }
             }
         ) { paddingValues ->
-            if (!uiState.isLoading && !uiState.isEmpty
-                && !uiState.isChoosingMode && !uiState.isFinished) {
-                QuestionContent(
-                    modifier = Modifier
-                        .padding(paddingValues),
-                    uiState = uiState,
-                    onAnswerChanged = onAnswerChanged,
-                    onSubmitAnswer = onSubmitAnswer
-                )
-            } else {
-                TestingModeScreenBody(
-                    modifier = Modifier
-                        .padding(paddingValues),
-                    uiState = uiState,
-                    onBackClick = onBackClick,
-                    onTermsSelected = onTermsSelected,
-                    onDefinitionsSelected = onDefinitionsSelected,
-                    restartTesting = restartTesting,
-                    showAnswers = showAnswers
-                )
-            }
+            TestingModeScreenBody(
+                modifier = Modifier.padding(paddingValues),
+                uiState = uiState,
+                onBackClick = onBackClick,
+                onTermsSelected = onTermsSelected,
+                onDefinitionsSelected = onDefinitionsSelected,
+                onAnswerChanged = onAnswerChanged,
+                onSubmitAnswer = onSubmitAnswer,
+                restartTesting = restartTesting,
+                showAnswers = showAnswers
+            )
         }
     }
 }
@@ -131,6 +123,8 @@ private fun TestingModeScreenBody(
     onBackClick: () -> Unit,
     onTermsSelected: () -> Unit,
     onDefinitionsSelected: () -> Unit,
+    onAnswerChanged: (String) -> Unit,
+    onSubmitAnswer: () -> Unit,
     restartTesting: () -> Unit,
     showAnswers: () -> Unit
 ) {
@@ -163,6 +157,15 @@ private fun TestingModeScreenBody(
                     onRestartClick = restartTesting,
                     onBackClick = onBackClick,
                     onShowAnswers = showAnswers
+                )
+            }
+
+            else -> {
+                QuestionContent(
+                    modifier = Modifier,
+                    uiState = uiState,
+                    onAnswerChanged = onAnswerChanged,
+                    onSubmitAnswer = onSubmitAnswer
                 )
             }
         }
@@ -340,12 +343,10 @@ private fun QuestionContent(
                 shape = CircleShape,
                 containerColor = MaterialTheme.colorScheme.secondary
             ) {
-                Icon(
+                AppIcon(
                     painter = painterResource(R.drawable.ic_back),
                     contentDescription = stringResource(R.string.testing_next_button),
-                    tint = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier
-                        .size(24.dp)
                         .graphicsLayer { scaleX = -1f }
                 )
             }
