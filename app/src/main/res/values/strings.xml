@@ -66,8 +66,8 @@
     <string name="current_card_counter">%1$d / %2$d</string>
     <string name="ic_swipe_result">Иконка результата свайпа</string>
     <string name="shuffle_button_text">Перемешать</string>
-    <string name="empty_learning_mode_warn">В этом наборе нет карточек</string>
-    <string name="empty_learning_mode_sugg">Добавьте карточки, чтобы начать учить</string>
+    <string name="empty_set_warn">В этом наборе нет карточек</string>
+    <string name="empty_set_sugg">Добавьте карточки, чтобы начать учить</string>
     <string name="Result_text">Результат</string>
     <string name="learning_percentage_text">%1$d%%</string>
     <string name="good_result_text">Отлично!</string>
@@ -77,4 +77,15 @@
     <string name="learn_again_text">Учить снова</string>
     <string name="go_back_to_set_text">Вернуться к набору</string>
     <string name="this_count_text">%1$d</string>
+    <string name="testing_mode">Тестирование</string>
+    <string name="testing_choose_title">Знание чего хотите протестировать?</string>
+    <string name="testing_terms_button">Термины</string>
+    <string name="testing_definitions_button">Определения</string>
+    <string name="testing_answer_hint">Ваш ответ</string>
+    <string name="testing_next_button">Следующий вопрос</string>
+    <string name="testing_restart">Пройти тестирование снова</string>
+    <string name="testing_show_answers">Посмотреть ответы</string>
+    <string name="testing_your_answer_label">Ваш ответ: </string>
+    <string name="testing_correct_answer_label">Правильный ответ: </string>
+    <string name="testing_question_counter">%1$d / %2$d</string>
 </resources>

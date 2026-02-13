@@ -23,6 +23,8 @@ import com.example.memorizy.ui.screens.settings.SettingsScreen
 import com.example.memorizy.ui.screens.settings.SettingsViewModel
 import com.example.memorizy.ui.screens.studysets.StudySetsScreen
 import com.example.memorizy.ui.screens.studysets.StudySetsViewModel
+import com.example.memorizy.ui.screens.testingmode.TestingModeScreen
+import com.example.memorizy.ui.screens.testingmode.TestingModeViewModel
 
 @Composable
 fun MemorizyApp() {
@@ -104,6 +106,9 @@ fun MemorizyApp() {
                 onLearningModeClick = {
                     navController.navigate(Routes.LearningMode(setId = route.setId))
                 },
+                onTestingModeClick = {
+                    navController.navigate(Routes.TestingMode(setId = route.setId))
+                },
                 onAddCardClick = {
                     navController.navigate(Routes.AddCard(setId = route.setId))
                 },
@@ -146,6 +151,22 @@ fun MemorizyApp() {
                 onTermChanged = viewModel::onTermChanged,
                 onDefinitionChanged = viewModel::onDefinitionChanged,
                 onCreateButtonClicked = viewModel::onCreateButtonClicked
+            )
+        }
+
+        composable<Routes.TestingMode> {
+            val viewModel: TestingModeViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            TestingModeScreen(
+                onBackClick = { navController.popBackStack() },
+                uiState = uiState,
+                onTermsSelected = viewModel::onTermsSelected,
+                onDefinitionsSelected = viewModel::onDefinitionsSelected,
+                onAnswerChanged = viewModel::onAnswerChanged,
+                onSubmitAnswer = viewModel::onSubmitAnswer,
+                restartTesting = viewModel::restartTesting,
+                showAnswers = viewModel::showAnswers
             )
         }
     }

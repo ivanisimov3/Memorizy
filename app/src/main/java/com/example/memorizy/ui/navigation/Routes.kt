@@ -28,5 +28,8 @@ object Routes { // Почему имеено object Routes? а не class Routes
     data class LearningMode(val setId: Long)
 
     @Serializable
+    data class TestingMode(val setId: Long)
+
+    @Serializable
     data class AddCard(val setId: Long)
 }

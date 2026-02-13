@@ -153,7 +153,8 @@ private fun AddStudySetScreenBody(
             },
             modifier = Modifier.fillMaxWidth(),
             minLines = 5,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            maxLines = 20,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
             shape = RoundedCornerShape(18.dp)
         )
 

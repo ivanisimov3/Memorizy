@@ -54,7 +54,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import com.example.memorizy.ui.utils.AppIcon
 import com.example.memorizy.ui.utils.GlassContainer
 
-
 @Composable
 fun SetDetailsScreen(
     onAddCardClick: () -> Unit,
@@ -68,7 +67,8 @@ fun SetDetailsScreen(
     updateDraftCard: (Int, String, String) -> Unit,
     onCancelEditing: () -> Unit,
     onSaveChanges: () -> Unit,
-    onLearningModeClick: () -> Unit
+    onLearningModeClick: () -> Unit,
+    onTestingModeClick: () -> Unit
 ){
     // Переменные для логики интерфейса
     var cardToDelete by remember { mutableStateOf<Card?>(null) }
@@ -113,7 +113,8 @@ fun SetDetailsScreen(
             onIconClick = {
                 if (uiState.isEditing) showIconDialog = true
             },
-            onLearningModeClick = onLearningModeClick
+            onLearningModeClick = onLearningModeClick,
+            onTestingModeClick = onTestingModeClick
         )
     }
 
@@ -210,7 +211,8 @@ private fun SetDetailsScreenBody(
     updateDraftDescription: (String) -> Unit,
     updateDraftCard: (Int, String, String) -> Unit,
     onIconClick: () -> Unit,
-    onLearningModeClick: () -> Unit
+    onLearningModeClick: () -> Unit,
+    onTestingModeClick: () -> Unit
 ){
     val editMode = (uiState.isEditing && uiState.draftSet != null)
 
@@ -290,7 +292,8 @@ private fun SetDetailsScreenBody(
                                 )
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            minLines = 3,
+                            minLines = 5,
+                            maxLines = 5,
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
                         )
                     } else {
@@ -317,6 +320,21 @@ private fun SetDetailsScreenBody(
                         ) {
                             Text(
                                 stringResource(R.string.learning_mode),
+                                style = MaterialTheme.typography.displayLarge,
+                            )
+                        }
+
+                        Spacer(Modifier.height(8.dp))
+
+                        GlassContainer ( // Кнопка тестирование
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(onClick = onTestingModeClick)
+                                .height(50.dp),
+                            containerColor = MaterialTheme.colorScheme.secondary
+                        ) {
+                            Text(
+                                stringResource(R.string.testing_mode),
                                 style = MaterialTheme.typography.displayLarge,
                             )
                         }
@@ -412,7 +430,8 @@ fun EditCardItem(
                     )
                 },
                 isError = draftCard.term.isEmpty(),
-                singleLine = true,
+                minLines = 3,
+                maxLines = 5,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -430,6 +449,7 @@ fun EditCardItem(
                 },
                 isError = draftCard.definition.isEmpty(),
                 minLines = 3,
+                maxLines = 5,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 modifier = Modifier.fillMaxWidth()
             )

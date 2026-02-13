@@ -114,8 +114,9 @@ private fun AddCardScreenBody(
             },
             modifier = Modifier.fillMaxWidth(),
             isError = uiState.isTermEmptyError,
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            minLines = 5,
+            maxLines = 13,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
             shape = RoundedCornerShape(18.dp)
         )
         if (uiState.isTermEmptyError) {
@@ -139,8 +140,9 @@ private fun AddCardScreenBody(
             },
             isError = uiState.isDefinitionEmptyError,
             modifier = Modifier.fillMaxWidth(),
-            minLines = 3,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            minLines = 5,
+            maxLines = 13,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
             shape = RoundedCornerShape(18.dp)
         )
         if (uiState.isDefinitionEmptyError) {

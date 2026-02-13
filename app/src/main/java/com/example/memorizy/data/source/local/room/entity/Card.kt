@@ -8,7 +8,8 @@ import androidx.room.PrimaryKey
 /*
 Internal model used to represent a task stored locally in a Room database. This is used inside
 the data layer only.
-*/@Entity(
+*/
+@Entity(
     tableName = "cards",
     foreignKeys = [ForeignKey(
         entity = StudySet::class,
