@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.source.local.room.entity.Card
+import com.example.memorizy.domain.textcomparison.FuzzyTokenComparator
 import com.example.memorizy.ui.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -27,6 +28,7 @@ class TestingModeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TestingModeState())
     val uiState = _uiState.asStateFlow()
 
+    private val textComparator = FuzzyTokenComparator()
     private var originalCards: List<Card> = emptyList()
 
     init {
@@ -80,8 +82,10 @@ class TestingModeViewModel @Inject constructor(
             else
                 currentCard.definition
 
-            val isCorrect = state.userAnswer.trim()
-                .equals(correctAnswer.trim(), ignoreCase = true)
+            val isCorrect = textComparator.compare(
+                expected = correctAnswer,
+                actual = state.userAnswer
+            )
 
             val testAnswer = TestAnswer(
                 card = currentCard,
