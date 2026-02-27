@@ -8,5 +8,7 @@ data class CardDto (
     val term: String,
     val definition: String,
     val studySetId: Long,
-    val createdAt: Long? = null
+    val createdAt: Long? = null,
+    val level: Int = 0,
+    val nextReviewDate: Long? = null
 )

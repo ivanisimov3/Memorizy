@@ -24,7 +24,9 @@ object LocalDataModule { // object используем когда нужно п
             context = context,
             klass = AppDatabase::class.java,
             name = "memorizy_db"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()   // при несовпадении версий удаляет бд
+            .build()
     }
 
     // Учим создавать StudySetDao

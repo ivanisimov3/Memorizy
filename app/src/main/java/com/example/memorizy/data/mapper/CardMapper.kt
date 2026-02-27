@@ -12,7 +12,9 @@ fun Card.toDto(parentRemoteId: Long): CardDto {
         term = this.term,
         definition = this.definition,
         studySetId = parentRemoteId,
-        createdAt = this.createdAt
+        createdAt = this.createdAt,
+        level = this.level,
+        nextReviewDate = this.nextReviewDate
     )
 }
 
@@ -25,5 +27,7 @@ fun CardDto.toEntity(parentLocalId: Long): Card {
         setId = parentLocalId,
         createdAt = this.createdAt ?: System.currentTimeMillis(),
         remoteId = this.id,
+        level = this.level,
+        nextReviewDate = this.nextReviewDate ?: System.currentTimeMillis()
     )
 }

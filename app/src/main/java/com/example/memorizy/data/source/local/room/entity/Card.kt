@@ -29,5 +29,7 @@ data class Card(
     val createdAt: Long = System.currentTimeMillis(),
     val remoteId: Long? = null, // если remoteId == null, тогда набор не синхронизирован
     val isDeleted: Boolean = false,
-    val isEdited: Boolean = false
+    val isEdited: Boolean = false,
+    val level: Int = 0,                                     // Уровень усвоения
+    val nextReviewDate: Long = System.currentTimeMillis()    // Дата следующего показа (Unix ms)
 )

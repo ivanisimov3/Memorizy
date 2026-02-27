@@ -10,7 +10,8 @@ fun StudySet.toDto(): StudySetDto {
         name = this.name,
         description = this.description,
         iconId = this.iconId,
-        createdAt = this.createdAt
+        createdAt = this.createdAt,
+        targetDate = this.targetDate
     )
 }
 
@@ -23,5 +24,6 @@ fun StudySetDto.toEntity(): StudySet {
         iconId = this.iconId,
         createdAt = this.createdAt ?: System.currentTimeMillis(),
         remoteId = this.id,
+        targetDate = this.targetDate
     )
 }
