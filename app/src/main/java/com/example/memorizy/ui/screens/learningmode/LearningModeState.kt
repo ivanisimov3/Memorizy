@@ -12,5 +12,11 @@ data class LearningModeState(
     val isFlipped: Boolean = false,
     val isFinished: Boolean = false,
     val isShuffleOn: Boolean = false,
-    val isEmpty: Boolean = false
+    val isEmpty: Boolean = false,
+
+    // Интервальное повторение
+    val isReviewMode: Boolean = true,    // true = только карточки к повторению, false = все
+    val reviewCardsCount: Int = 0,       // сколько карточек к повторению
+    val totalCardsCount: Int = 0,        // общее кол-во карточек
+    val nextReviewInMs: Long? = null     // мс до следующего повторения (если очередь пуста)
 )

@@ -145,8 +145,24 @@ class SetDetailsViewModel @Inject constructor(
             )
             studySetRepository.updateSet(updatedSet)
 
-            draftCards.forEach { card ->
-                cardRepository.updateCard(card.copy(isEdited = true))
+            val originalCards = state.cards
+            draftCards.forEachIndexed { index, draftCard ->
+                val original = originalCards.getOrNull(index)
+                // Если term или definition изменились — сбрасываем прогресс
+                val contentChanged = original != null &&
+                        (original.term != draftCard.term || original.definition != draftCard.definition)
+
+                val cardToSave = if (contentChanged) {
+                    draftCard.copy(
+                        isEdited = true,
+                        level = 0,
+                        nextReviewDate = System.currentTimeMillis()
+                    )
+                } else {
+                    draftCard.copy(isEdited = true)
+                }
+
+                cardRepository.updateCard(cardToSave)
             }
 
             onCancelEditing()
