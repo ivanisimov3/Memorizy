@@ -328,8 +328,8 @@ private fun QuestionContent(
                     )
                 },
                 modifier = Modifier.weight(1f),
-                minLines = 5,
-                maxLines = 5,
+                minLines = 12,
+                maxLines = 12,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
                 shape = RoundedCornerShape(18.dp)
             )
