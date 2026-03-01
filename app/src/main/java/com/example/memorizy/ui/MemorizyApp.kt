@@ -136,7 +136,8 @@ fun MemorizyApp() {
                 onFlipCard = viewModel::onFlipCard,
                 onSwipeRight = viewModel::onSwipeRight,
                 onSwipeLeft = viewModel::onSwipeLeft,
-                toggleShuffle = viewModel::toggleShuffle
+                toggleShuffle = viewModel::toggleShuffle,
+                toggleReviewMode = viewModel::toggleReviewMode
             )
         }
 

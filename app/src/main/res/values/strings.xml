@@ -88,4 +88,14 @@
     <string name="testing_your_answer_label">Ваш ответ: </string>
     <string name="testing_correct_answer_label">Правильный ответ: </string>
     <string name="testing_question_counter">%1$d / %2$d</string>
+
+    <string name="review_card_count">К повторению: %1$d</string>
+    <string name="review_mode_text">Повторение</string>
+    <string name="all_cards_mode_text">Все карточки</string>
+    <string name="next_review_text">Нет карточек к повторению</string>
+    <string name="next_review_time_text">Ближайшее повторение через %1$s</string>
+    <string name="review_toggle_ic">Переключить режим</string>
+    <string name="time_minutes">%1$d мин</string>
+    <string name="time_hours">%1$d ч</string>
+    <string name="time_days">%1$d д</string>
 </resources>

@@ -96,4 +96,11 @@ interface CardDao {
     */
     @Delete
     suspend fun deleteCard(card: Card)
+
+    /*
+    Выбрать все неудалённые карточки
+    Чтобы подсчитать карточки к повторению на главном экране
+    */
+    @Query("SELECT * FROM cards WHERE isDeleted = 0")
+    fun getAllNonDeletedCards(): Flow<List<Card>>
 }

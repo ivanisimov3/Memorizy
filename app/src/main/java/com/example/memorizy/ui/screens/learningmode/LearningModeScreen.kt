@@ -57,7 +57,8 @@ fun LearningModeScreen(
     onFlipCard: () -> Unit,
     onSwipeRight: () -> Unit,
     onSwipeLeft: () -> Unit,
-    toggleShuffle: () -> Unit
+    toggleShuffle: () -> Unit,
+    toggleReviewMode: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -77,7 +78,8 @@ fun LearningModeScreen(
             onFlipCard = onFlipCard,
             onSwipeRight = onSwipeRight,
             onSwipeLeft = onSwipeLeft,
-            toggleShuffle = toggleShuffle
+            toggleShuffle = toggleShuffle,
+            toggleReviewMode = toggleReviewMode
         )
     }
 }
@@ -148,7 +150,8 @@ private fun LearningModeScreenBody(
     onFlipCard: () -> Unit,
     onSwipeLeft: () -> Unit,
     onSwipeRight: () -> Unit,
-    toggleShuffle: () -> Unit
+    toggleShuffle: () -> Unit,
+    toggleReviewMode: () -> Unit
 ) {
     Box(
         modifier = modifier
@@ -162,7 +165,9 @@ private fun LearningModeScreenBody(
 
             uiState.isEmpty -> {
                 EmptyStateMessage(
-                    onBackClick = onBackClick
+                    uiState = uiState,
+                    onBackClick = onBackClick,
+                    toggleReviewMode = toggleReviewMode
                 )
             }
 
@@ -281,28 +286,47 @@ private fun LearningModeScreenBody(
 
                     Spacer(Modifier.height(24.dp))
 
-                    TextButton(onClick = toggleShuffle) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_shuffle),
-                            contentDescription = stringResource(R.string.shuffle_button),
-                            tint =
-                                if (uiState.isShuffleOn)
-                                    MaterialTheme.colorScheme.primary
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextButton(onClick = toggleShuffle) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_shuffle),
+                                contentDescription = stringResource(R.string.shuffle_button),
+                                tint =
+                                    if (uiState.isShuffleOn)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                            )
+
+                            Spacer(Modifier.width(8.dp))
+
+                            Text(
+                                text = stringResource(R.string.shuffle_button_text),
+                                color =
+                                    if (uiState.isShuffleOn)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+
+                        TextButton(onClick = toggleReviewMode) {
+                            Text(
+                                text = if (uiState.isReviewMode)
+                                    stringResource(R.string.review_mode_text)
                                 else
-                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                        )
-
-                        Spacer(Modifier.width(8.dp))
-
-                        Text(
-                            text = stringResource(R.string.shuffle_button_text),
-                            color =
-                                if (uiState.isShuffleOn)
+                                    stringResource(R.string.all_cards_mode_text),
+                                color = if (uiState.isReviewMode)
                                     MaterialTheme.colorScheme.primary
                                 else
                                     MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
-                            style = MaterialTheme.typography.labelSmall
-                        )
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
                     }
 
                     Spacer(Modifier.height(16.dp))
@@ -395,35 +419,99 @@ private fun CardContent(
 
 @Composable
 private fun EmptyStateMessage(
-    onBackClick: () -> Unit
+    uiState: LearningModeState = LearningModeState(),
+    onBackClick: () -> Unit,
+    toggleReviewMode: () -> Unit = {}
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(32.dp)
     ) {
-        Text(
-            text = stringResource(R.string.empty_set_warn),
-            style = MaterialTheme.typography.displayMedium,
-            textAlign = TextAlign.Center
-        )
-        Spacer(Modifier.height(16.dp))
-        Text(
-            text = stringResource(R.string.empty_set_sugg),
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center
-        )
-        Spacer(Modifier.height(24.dp))
-        GlassContainer (
-            modifier = Modifier
-                .clickable(onClick = onBackClick)
-                .height(40.dp)
-                .width(90.dp),
-        ) {
+        if (uiState.isReviewMode && uiState.totalCardsCount > 0) {
+            // Режим повторения, но карточек к повторению нет
             Text(
-                text = stringResource(R.string.back_button),
-                style = MaterialTheme.typography.bodySmall
+                text = stringResource(R.string.next_review_text),
+                style = MaterialTheme.typography.displayMedium,
+                textAlign = TextAlign.Center
             )
+            Spacer(Modifier.height(16.dp))
+
+            if (uiState.nextReviewInMs != null) {
+                Text(
+                    text = stringResource(
+                        R.string.next_review_time_text,
+                        formatTimeUntil(uiState.nextReviewInMs)
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(Modifier.height(24.dp))
+            }
+
+            GlassContainer(
+                modifier = Modifier
+                    .clickable(onClick = toggleReviewMode)
+                    .height(40.dp)
+                    .width(160.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.all_cards_mode_text),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            GlassContainer(
+                modifier = Modifier
+                    .clickable(onClick = onBackClick)
+                    .height(40.dp)
+                    .width(160.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.back_button),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        } else {
+            // Набор пустой
+            Text(
+                text = stringResource(R.string.empty_set_warn),
+                style = MaterialTheme.typography.displayMedium,
+                textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.empty_set_sugg),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.height(24.dp))
+            GlassContainer(
+                modifier = Modifier
+                    .clickable(onClick = onBackClick)
+                    .height(40.dp)
+                    .width(90.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.back_button),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
+    }
+}
+
+// Форматирование времени до следующего повторения
+private fun formatTimeUntil(ms: Long): String {
+    val minutes = ms / 60_000
+    val hours = minutes / 60
+    val days = hours / 24
+
+    return when {
+        days > 0 -> "$days д"
+        hours > 0 -> "$hours ч"
+        else -> "$minutes мин"
     }
 }
 

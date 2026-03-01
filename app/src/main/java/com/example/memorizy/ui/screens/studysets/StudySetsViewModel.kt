@@ -3,6 +3,7 @@ package com.example.memorizy.ui.screens.studysets
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.memorizy.data.source.local.room.entity.StudySet
+import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.repository.StudySetRepository
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore
 import com.example.memorizy.data.sync.SyncManager
@@ -23,6 +24,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class StudySetsViewModel @Inject constructor(
     private val studySetRepository: StudySetRepository,
+    private val cardRepository: CardRepository,
     private val settingsDataStore: SettingsDataStore,
     private val syncManager: SyncManager
 ) : ViewModel(){
@@ -33,9 +35,19 @@ class StudySetsViewModel @Inject constructor(
 
     private val _allSets = studySetRepository.getAllSetsWithCardNumber()    // уже Flow
 
+    private val _allCards = cardRepository.getAllNonDeletedCards()           // для подсчёта повторений
+
     val uiState: StateFlow<StudySetsState> =
-        // три Flow влияют на этот экран, наблюдаем за ними
-        combine(_searchQuery, _allSets, _isLoggedIn) { query, sets, loggedIn ->
+        // четыре Flow влияют на этот экран, наблюдаем за ними
+        combine(_searchQuery, _allSets, _isLoggedIn, _allCards) { query, sets, loggedIn, cards ->
+
+            val now = System.currentTimeMillis()
+
+            // Подсчёт карточек к повторению для каждого набора
+            val reviewCountBySet = cards
+                .filter { it.nextReviewDate <= now }
+                .groupBy { it.setId }
+                .mapValues { it.value.size.toLong() }
 
             val filteredSets = if (query.isBlank()) {   // если пустой то берем все
                 sets
@@ -49,7 +61,8 @@ class StudySetsViewModel @Inject constructor(
                 isLoading = false,
                 studySetsWithCardNumber = filteredSets,
                 searchQuery = query,
-                isLoggedIn = loggedIn
+                isLoggedIn = loggedIn,
+                reviewCountBySet = reviewCountBySet
             )
         }.stateIn(  // Аналог .asStateFlow
             scope = viewModelScope, // Пока живет ViewModel

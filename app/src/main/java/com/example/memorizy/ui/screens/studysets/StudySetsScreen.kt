@@ -2,6 +2,7 @@ package com.example.memorizy.ui.screens.studysets
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -199,14 +200,13 @@ private fun StudySetsScreenBody(
             modifier = modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp)
         ) {
-            // используем перебор с ключем, так как в случае удаления набора LazyColumn поймет
-            // какой именно элемент пропал и что именно нужно перерисовать
             items(items = uiState.studySetsWithCardNumber, key = { it.studySet.id} ) { studySetWithCardNumber ->
                 StudySetItem(
                     studySet = studySetWithCardNumber.studySet,
                     cardNumber = studySetWithCardNumber.cardNumber,
-                    onSetClick = { onSetClick(studySetWithCardNumber.studySet.id) },    // переместиться к этому набору
-                    onLongClick = { onSetToDelete(studySetWithCardNumber.studySet) }  // обозначить этот набор для удаления
+                    reviewCardNumber = uiState.reviewCountBySet[studySetWithCardNumber.studySet.id] ?: 0,
+                    onSetClick = { onSetClick(studySetWithCardNumber.studySet.id) },
+                    onLongClick = { onSetToDelete(studySetWithCardNumber.studySet) }
                 )
             }
         }
@@ -217,6 +217,7 @@ private fun StudySetsScreenBody(
 private fun StudySetItem(
     studySet: StudySet,
     cardNumber: Long,
+    reviewCardNumber: Long = 0,
     onSetClick: () -> Unit,
     onLongClick: () -> Unit,
     getIconRes: (Int) -> (Int) = { getIconResById(it) }
@@ -273,10 +274,25 @@ private fun StudySetItem(
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = stringResource(R.string.number_of_cards, cardNumber),
-                style = MaterialTheme.typography.labelSmall
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.number_of_cards, cardNumber),
+                    style = MaterialTheme.typography.labelSmall
+                )
+
+                Text(
+                    text = stringResource(R.string.review_card_count, reviewCardNumber),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (reviewCardNumber > 0)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                )
+            }
         }
     }
 }

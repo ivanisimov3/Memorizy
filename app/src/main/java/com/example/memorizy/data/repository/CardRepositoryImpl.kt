@@ -38,6 +38,10 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
         return dao.getAllCardsForSet(setId)
     }
 
+    override fun getAllNonDeletedCards(): Flow<List<Card>> {
+        return dao.getAllNonDeletedCards()
+    }
+
     override suspend fun syncLocalChanges() {
         val tokenString = settingsDataStore.token.first() ?: return
         val authHeader = "Bearer $tokenString"
