@@ -86,7 +86,7 @@ class LearningModeViewModel @Inject constructor(
                 isCorrect = isCorrect,
                 now = now,
                 targetDate = targetDate
-            )
+            ).copy(isEdited = true) // Пометить как изменённый, чтобы синхронизация отправила на сервер
 
             viewModelScope.launch {
                 cardRepository.updateCard(updatedCard)
@@ -114,13 +114,20 @@ class LearningModeViewModel @Inject constructor(
     fun toggleReviewMode() {
         val newMode = !_uiState.value.isReviewMode
         _uiState.update { it.copy(isReviewMode = newMode) }
-        startLearningSession(withShuffle = _uiState.value.isShuffleOn)
+        viewModelScope.launch {
+            allCards = cardRepository.getAllCardsForSet(setId).first()
+            startLearningSession(withShuffle = _uiState.value.isShuffleOn)
+        }
     }
 
     // Обработчик переключения режима перемешивания
     fun toggleShuffle() {
         val currentShuffle = _uiState.value.isShuffleOn
-        startLearningSession(withShuffle = !currentShuffle)
+        // Перезагружаем карточки из БД для актуального состояния (свайпнутые уже имеют новый nextReviewDate)
+        viewModelScope.launch {
+            allCards = cardRepository.getAllCardsForSet(setId).first()
+            startLearningSession(withShuffle = !currentShuffle)
+        }
     }
 
     // Обработчик нажатия перезапуска режима заучивания

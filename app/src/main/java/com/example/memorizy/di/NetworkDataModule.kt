@@ -37,11 +37,16 @@ object NetworkDataModule {
     fun provideMemorizyApiService(client: OkHttpClient): MemorizyApiService {
         val contentType = "application/json".toMediaType()  // Общаемся используя именно JSON
 
+        val json = Json {
+            ignoreUnknownKeys = true  // Безопасно игнорировать неизвестные поля от сервера
+            encodeDefaults = true      // Всегда отправлять все поля, даже если равны default
+        }
+
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)
             // Подключаем Kotlin Serialization
-            .addConverterFactory(Json.asConverterFactory(contentType))
+            .addConverterFactory(json.asConverterFactory(contentType))
             .build()
             .create(MemorizyApiService::class.java) // Генерация кода для HTTP запросов
     }
