@@ -105,14 +105,15 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
 
                 if (localSet == null) { // Если такого набора нет локально (с таким remoteId) - добавляем
                     dao.insertSet(dto.toEntity())
-                } else {    // Если такой набор есть локально (с таким remoteId) - обновляем данными из сети
+                } else if (!localSet.isEdited) {    // Обновляем только если нет pending изменений
                     val updatedSet = localSet.copy(
                         name = dto.name,
                         description = dto.description,
                         iconId = dto.iconId,
                         createdAt = dto.createdAt ?: localSet.createdAt,
                         remoteId = dto.id,
-                        isEdited = false
+                        isEdited = false,
+                        targetDate = dto.targetDate
                     )
                     dao.updateSet(updatedSet)
                 }

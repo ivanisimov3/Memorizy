@@ -92,6 +92,7 @@ fun MemorizyApp() {
                 onIconSelected = viewModel::onIconSelected,
                 onNameChanged = viewModel::onNameChanged,
                 onDescriptionChanged = viewModel::onDescriptionChanged,
+                onTargetDateChanged = viewModel::onTargetDateChanged,
                 onCreateButtonClicked = viewModel::onCreateButtonClicked
             )
         }
@@ -119,6 +120,7 @@ fun MemorizyApp() {
                 updateDraftName = viewModel::updateDraftName,
                 updateDraftDescription = viewModel::updateDraftDescription,
                 updateDraftIcon = viewModel::updateDraftIcon,
+                updateDraftTargetDate = viewModel::updateDraftTargetDate,
                 updateDraftCard = viewModel::updateDraftCard,
                 onCancelEditing = viewModel::onCancelEditing,
                 onSaveChanges = viewModel::onSaveChanges

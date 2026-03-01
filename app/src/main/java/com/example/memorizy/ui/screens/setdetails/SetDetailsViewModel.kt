@@ -8,11 +8,13 @@ import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.repository.StudySetRepository
 import com.example.memorizy.data.sync.SyncManager
+import com.example.memorizy.domain.spacedrepetition.SpacedRepetitionScheduler
 import com.example.memorizy.ui.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -108,6 +110,15 @@ class SetDetailsViewModel @Inject constructor(
         }
     }
 
+    // Меняем дедлайн набора
+    fun updateDraftTargetDate(targetDate: Long?) {
+        _uiState.update { state ->
+            state.copy(
+                draftSet = state.draftSet?.copy(targetDate = targetDate)
+            )
+        }
+    }
+
     // Меняем данные карточки
     fun updateDraftCard(index: Int, term: String, definition: String) {
         _uiState.update { state ->
@@ -166,6 +177,24 @@ class SetDetailsViewModel @Inject constructor(
             }
 
             onCancelEditing()
+
+            // Если дедлайн изменился — пересчитываем интервалы для всех карточек с level > 0
+            val targetDateChanged = draftSet.targetDate != state.studySet?.targetDate
+            if (targetDateChanged) {
+                val now = System.currentTimeMillis()
+                val freshCards = cardRepository.getAllCardsForSet(setId).first()
+                freshCards.filter { it.level > 0 }.forEach { card ->
+                    val interval = SpacedRepetitionScheduler.calculateInterval(
+                        level = card.level, now = now, targetDate = updatedSet.targetDate
+                    )
+                    val recalculated = card.copy(
+                        nextReviewDate = now + interval,
+                        isEdited = true
+                    )
+                    cardRepository.updateCard(recalculated)
+                }
+            }
+
             syncManager.scheduleOneTimeSync()
         }
     }

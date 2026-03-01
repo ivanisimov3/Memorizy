@@ -39,6 +39,19 @@ import com.example.memorizy.R
 import com.example.memorizy.ui.utils.AppIcon
 import com.example.memorizy.ui.utils.AppIcons
 import com.example.memorizy.ui.utils.GlassContainer
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +62,7 @@ fun AddStudySetScreen(
     onNameChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
     onIconSelected: (Int) -> Unit,
+    onTargetDateChanged: (Long?) -> Unit,
     onCreateButtonClicked: () -> Unit
 ){
 
@@ -89,8 +103,84 @@ fun AddStudySetScreen(
             onNameChanged = onNameChanged,
             onDescriptionChanged = onDescriptionChanged,
             onIconSelected = onIconSelected,
+            onTargetDateChanged = onTargetDateChanged,
             onCreateButtonClicked = onCreateButtonClicked
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TargetDateEditorForCreate(
+    currentTargetDate: Long?,
+    onTargetDateChanged: (Long?) -> Unit
+) {
+    var showDatePicker by remember { mutableStateOf(false) }
+    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        if (currentTargetDate != null) {
+            Text(
+                text = stringResource(R.string.target_date_display, dateFormat.format(Date(currentTargetDate))),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { showDatePicker = true }
+            )
+            TextButton(onClick = { onTargetDateChanged(null) }) {
+                Text(
+                    text = stringResource(R.string.target_date_clear),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        } else {
+            TextButton(onClick = { showDatePicker = true }) {
+                Text(
+                    text = stringResource(R.string.target_date_set),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = currentTargetDate ?: (System.currentTimeMillis() + 7 * 86_400_000L)
+        )
+
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { onTargetDateChanged(it) }
+                    showDatePicker = false
+                }) {
+                    Text(
+                        text = stringResource(R.string.create_set_text),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(
+                        text = stringResource(R.string.cancel_text),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
     }
 }
 
@@ -102,6 +192,7 @@ private fun AddStudySetScreenBody(
     onNameChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
     onIconSelected: (Int) -> Unit,
+    onTargetDateChanged: (Long?) -> Unit,
     onCreateButtonClicked: () -> Unit
 ) {
     Column(
@@ -156,6 +247,14 @@ private fun AddStudySetScreenBody(
             maxLines = 20,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
             shape = RoundedCornerShape(18.dp)
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        // Дедлайн
+        TargetDateEditorForCreate(
+            currentTargetDate = uiState.targetDate,
+            onTargetDateChanged = onTargetDateChanged
         )
 
         Spacer(Modifier.weight(1f))

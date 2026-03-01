@@ -113,7 +113,8 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
 
                     if (localCard == null){
                         dao.insertCard(dto.toEntity(localSet.id))
-                    } else{
+                    } else if (!localCard.isEdited) {
+                        // Обновляем только если локальная карточка НЕ имеет pending изменений
                         val updatedCard = localCard.copy(
                             term = dto.term,
                             definition = dto.definition,
@@ -125,6 +126,7 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
                         )
                         dao.updateCard(updatedCard)
                     }
+                    // Если isEdited = true → пропускаем, локальные изменения важнее
                 }
 
                 // Множество всех Id карточек на сервере

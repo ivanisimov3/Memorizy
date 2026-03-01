@@ -47,6 +47,13 @@ class AddStudySetViewModel  @Inject constructor(
         }
     }
 
+    // Изменение дедлайна
+    fun onTargetDateChanged(targetDate: Long?) {
+        _uiState.update { currentState ->
+            currentState.copy(targetDate = targetDate)
+        }
+    }
+
     // Нажали кнопку создать
     fun onCreateButtonClicked() {
         val currentState = _uiState.value
@@ -59,7 +66,8 @@ class AddStudySetViewModel  @Inject constructor(
         val newSet = StudySet(
             name = currentState.name,
             description = currentState.description,
-            iconId = currentState.selectedIconId
+            iconId = currentState.selectedIconId,
+            targetDate = currentState.targetDate
         )
 
         viewModelScope.launch { // Обращаемся к БД поэтому корутина

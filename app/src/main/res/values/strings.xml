@@ -98,4 +98,10 @@
     <string name="time_minutes">%1$d мин</string>
     <string name="time_hours">%1$d ч</string>
     <string name="time_days">%1$d д</string>
+
+    <string name="target_date_label">Дедлайн</string>
+    <string name="target_date_set">Установить дедлайн</string>
+    <string name="target_date_clear">Убрать дедлайн</string>
+    <string name="target_date_display">Выучить до: %1$s</string>
+    <string name="target_time_title">Выберите время</string>
 </resources>

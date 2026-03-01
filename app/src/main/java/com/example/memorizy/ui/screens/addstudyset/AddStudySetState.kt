@@ -5,5 +5,6 @@ data class AddStudySetState(
     val description: String = "",
     val selectedIconId: Int = 1,
     val isNameEmptyError: Boolean = false,
-    val isSetCreated: Boolean = false
+    val isSetCreated: Boolean = false,
+    val targetDate: Long? = null
 )

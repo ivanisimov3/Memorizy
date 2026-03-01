@@ -21,6 +21,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -31,6 +33,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +58,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.example.memorizy.ui.utils.AppIcon
 import com.example.memorizy.ui.utils.GlassContainer
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun SetDetailsScreen(
@@ -64,6 +72,7 @@ fun SetDetailsScreen(
     updateDraftName: (String) -> Unit,
     updateDraftDescription: (String) -> Unit,
     updateDraftIcon: (Int) -> Unit,
+    updateDraftTargetDate: (Long?) -> Unit,
     updateDraftCard: (Int, String, String) -> Unit,
     onCancelEditing: () -> Unit,
     onSaveChanges: () -> Unit,
@@ -109,6 +118,7 @@ fun SetDetailsScreen(
             },
             updateDraftName = updateDraftName,
             updateDraftDescription = updateDraftDescription,
+            updateDraftTargetDate = updateDraftTargetDate,
             updateDraftCard = updateDraftCard,
             onIconClick = {
                 if (uiState.isEditing) showIconDialog = true
@@ -201,6 +211,7 @@ private fun SetDetailsTopBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SetDetailsScreenBody(
     modifier: Modifier,
@@ -209,6 +220,7 @@ private fun SetDetailsScreenBody(
     getIconRes: (Int) -> (Int) = { getIconResById(it) },
     updateDraftName: (String) -> Unit,
     updateDraftDescription: (String) -> Unit,
+    updateDraftTargetDate: (Long?) -> Unit,
     updateDraftCard: (Int, String, String) -> Unit,
     onIconClick: () -> Unit,
     onLearningModeClick: () -> Unit,
@@ -304,6 +316,27 @@ private fun SetDetailsScreenBody(
                             Text(
                                 text = uiState.studySet.description,
                                 style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+
+                    // Дедлайн
+                    if (editMode) {
+                        Spacer(Modifier.height(8.dp))
+                        TargetDateEditor(
+                            currentTargetDate = uiState.draftSet!!.targetDate,
+                            onTargetDateChanged = updateDraftTargetDate
+                        )
+                    } else {
+                        val targetDate = uiState.studySet.targetDate
+                        if (targetDate != null) {
+                            Spacer(Modifier.height(8.dp))
+                            val dateStr = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                                .format(Date(targetDate))
+                            Text(
+                                text = stringResource(R.string.target_date_display, dateStr),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -553,4 +586,79 @@ fun IconSelectionDialog(
             }
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TargetDateEditor(
+    currentTargetDate: Long?,
+    onTargetDateChanged: (Long?) -> Unit
+) {
+    var showDatePicker by remember { mutableStateOf(false) }
+    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        if (currentTargetDate != null) {
+            Text(
+                text = stringResource(R.string.target_date_display, dateFormat.format(Date(currentTargetDate))),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { showDatePicker = true }
+            )
+            TextButton(onClick = { onTargetDateChanged(null) }) {
+                Text(
+                    text = stringResource(R.string.target_date_clear),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        } else {
+            TextButton(onClick = { showDatePicker = true }) {
+                Text(
+                    text = stringResource(R.string.target_date_set),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = currentTargetDate ?: (System.currentTimeMillis() + 7 * 86_400_000L)
+        )
+
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { onTargetDateChanged(it) }
+                    showDatePicker = false
+                }) {
+                    Text(
+                        text = stringResource(R.string.create_set_text),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(
+                        text = stringResource(R.string.cancel_text),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
 }
