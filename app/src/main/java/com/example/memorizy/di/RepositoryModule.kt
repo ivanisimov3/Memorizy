@@ -12,6 +12,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+// Связывание интерфейсов репозиториев с их реализациями
+
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {   // abstract class используем когда связываем

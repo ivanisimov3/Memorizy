@@ -13,11 +13,13 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 
+// DI для Retrofit
+
 @Module // Инструкция как создавать объекты
 @InstallIn(SingletonComponent::class)
 object NetworkDataModule {
 
-    // The base URL for the computer localhost
+    // URL сервера
     private const val BASE_URL = "http://192.168.1.73:8080/"
 
     // Учим создавать OkHttpClient - передатчик Http запросов
@@ -35,11 +37,11 @@ object NetworkDataModule {
     @Provides
     @Singleton
     fun provideMemorizyApiService(client: OkHttpClient): MemorizyApiService {
-        val contentType = "application/json".toMediaType()  // Общаемся используя именно JSON
+        val contentType = "application/json".toMediaType()  // Общаемся используя JSON
 
         val json = Json {
-            ignoreUnknownKeys = true  // Безопасно игнорировать неизвестные поля от сервера
-            encodeDefaults = true      // Всегда отправлять все поля, даже если равны default
+            ignoreUnknownKeys = true    // Игнорируем неизвестные поля от сервера
+            encodeDefaults = true   // Отправляем все поля, даже если равны default
         }
 
         return Retrofit.Builder()

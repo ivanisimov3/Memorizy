@@ -2,12 +2,10 @@ package com.example.memorizy.ui.navigation
 
 import kotlinx.serialization.Serializable
 
-// Built-in type safe APIs to provide compile-time type safety for your navigation graph
-// Use the following rules to decide what type to use for your route:
-// - Object: Use an object for routes without arguments.
-// - Class: Use a class or data class for routes with arguments.
+// Карта всех экранов в приложении
+
 @Serializable
-object Routes { // Почему имеено object Routes? а не class Routes и тд
+object Routes {
 
     @Serializable
     object Settings

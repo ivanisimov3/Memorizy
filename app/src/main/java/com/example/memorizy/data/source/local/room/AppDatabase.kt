@@ -7,7 +7,8 @@ import com.example.memorizy.data.source.local.room.dao.StudySetDao
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.source.local.room.entity.StudySet
 
-// The Room Database that contains the Cards and Study_set table.
+// Конфигурация локальной БД Room
+
 @Database(entities = [StudySet::class, Card::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun studySetDao(): StudySetDao

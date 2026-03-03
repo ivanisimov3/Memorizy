@@ -3,10 +3,11 @@ package com.example.memorizy.data.source.local.room
 import androidx.room.Embedded
 import com.example.memorizy.data.source.local.room.entity.StudySet
 
-// Custom data class to connect entities
+// Класс для объедененных SQL операций
+
 data class StudySetWithCardNumber(
     @Embedded
-    val studySet: StudySet, // встраиваем столбцы StudySet
+    val studySet: StudySet, // Встраиваем все столбцы из StudySet
 
-    val cardNumber: Long
+    val cardNumber: Long    // Добавляем поле количество карточек в наборе
 )

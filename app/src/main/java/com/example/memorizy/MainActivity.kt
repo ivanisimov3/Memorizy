@@ -19,6 +19,8 @@ import com.example.memorizy.ui.theme.MemorizyTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jakarta.inject.Inject
 
+// Единственная Activity
+
 @AndroidEntryPoint  // Говорим Hilt где вклиниться в приложение
 class MainActivity : ComponentActivity() {
     @Inject
@@ -29,11 +31,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val viewModel: MainViewModel = hiltViewModel()
-            val isDarkTheme by viewModel.isDarkTheme.collectAsState()
+            val isDarkTheme by viewModel.isDarkTheme.collectAsState()   // Подписываемся на StateFlow
 
-            LaunchedEffect(isDarkTheme) {
+            LaunchedEffect(isDarkTheme) {   // Подписываемся на изменение isDarkTheme
                 val insetsController = WindowCompat.getInsetsController(window, window.decorView)
-                insetsController.isAppearanceLightStatusBars = !isDarkTheme
+                insetsController.isAppearanceLightStatusBars = !isDarkTheme // Перекрашиваем statusBar при изменении темы
             }
 
             MemorizyTheme(darkTheme = isDarkTheme) {

@@ -3,7 +3,8 @@ package com.example.memorizy.data.repository
 import com.example.memorizy.data.source.local.room.entity.Card
 import kotlinx.coroutines.flow.Flow
 
-// Interface to the data layer (card).
+// Интерфейс репозитория карточка
+
 interface CardRepository {
 
     suspend fun insertCard(card: Card)

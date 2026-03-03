@@ -7,16 +7,16 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.memorizy.data.source.local.room.entity.Card
-import com.example.memorizy.data.source.local.room.entity.StudySet
 import kotlinx.coroutines.flow.Flow
 
-// Data Access Object for the Cards table.
+// Запросы в БД к карточкам
+
 @Dao
 interface CardDao {
 
     /*
-    Добавить карточку в Room (если уже существует, заменить последним добавленным)
-    Нажали кнопку добавить карточку ИЛИ на сервере есть, а в клиенте нет
+    Добавить карточку локально (если уже существует, заменить последним добавленным)
+    ИЛИ когда на сервере есть, а в клиенте нет
     */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCard(card: Card)
@@ -53,9 +53,15 @@ interface CardDao {
     fun getAllCardsForSet(setId: Long): Flow<List<Card>>
 
     /*
+    Выбрать все неудалённые карточки
+    Чтобы подсчитать карточки к повторению на главном экране
+    */
+    @Query("SELECT * FROM cards WHERE isDeleted = 0")
+    fun getAllNonDeletedCards(): Flow<List<Card>>
+
+    /*
     Найти локально карточку с id с сервера
-    Чтобы либо обновить его данными с сервера
-    ИЛИ чтобы добавить полностью карточку (если функция вернет null)
+    Чтобы работать с данными карточки
     */
     @Query("SELECT * FROM cards WHERE remoteId = :remoteId LIMIT 1")
     suspend fun getCardByRemoteId(remoteId: Long): Card?
@@ -68,16 +74,17 @@ interface CardDao {
     suspend fun getEditedCards(): List<Card>
 
     /*
-    Выбрать (все помеченные для удаления и синхронизированные) карточки
+    Выбрать все помеченные для удаления и синхронизированные карточки
     Чтобы потом попытаться их удалить на сервере + локально
     */
     @Query("SELECT * FROM cards WHERE isDeleted = 1 AND remoteId IS NOT NULL")
     suspend fun getCardsToDelete(): List<Card>
 
     /*
-    Обновить существующую карточку
-    Синхронизируем локальные с сервером (добавляем remoteId у несинхронизированных)
-    ИЛИ скачиваем обновляем данные в соответствии с данными сервера (если карточка существует)
+    Обновить карточку локально
+    ИЛИ когда синхронизировались в первый раз и надо занести поле remoteId
+    ИЛИ отредактировали + синхронизировались, следовательно надо сделать isEdited = 0
+    ИЛИ если данные на сервере у синхронизированной карточки прилетили измененные
     */
     @Update
     suspend fun updateCard(card: Card)
@@ -90,17 +97,10 @@ interface CardDao {
     suspend fun markAsDeletedCard(id: Long)
 
     /*
-    Удалить карточку из Room
-    Если успешно синхронизировались с сервером, удалили запись там, удалили и локально
-    ИЛИ если на сервере такой карточки не существует, то удаляем локально (СРЕДИ ТЕХ, КОТОРЫЕ ПОМЕЧЕНЫ КАК СИНХРОНИЗИРОВАННЫЕ)
+    Удалить карточку локально
+    ИЛИ когда удалили синхронизированную карточку на сервере
+    ИЛИ если на сервере такой карточки не существует
     */
     @Delete
     suspend fun deleteCard(card: Card)
-
-    /*
-    Выбрать все неудалённые карточки
-    Чтобы подсчитать карточки к повторению на главном экране
-    */
-    @Query("SELECT * FROM cards WHERE isDeleted = 0")
-    fun getAllNonDeletedCards(): Flow<List<Card>>
 }

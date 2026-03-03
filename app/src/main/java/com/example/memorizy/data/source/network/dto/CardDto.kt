@@ -2,9 +2,11 @@ package com.example.memorizy.data.source.network.dto
 
 import kotlinx.serialization.Serializable
 
+// Параметры карточки для передачи данных
+
 @Serializable
 data class CardDto (
-    val id: Long? = null,   // ID может не быть при создании
+    val id: Long? = null,
     val term: String,
     val definition: String,
     val studySetId: Long,

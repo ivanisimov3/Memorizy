@@ -1,11 +1,8 @@
 package com.example.memorizy.domain.textcomparison
 
-/**
- * Русские стоп-слова — служебные слова, не несущие смысловой нагрузки.
- *
- * Источник: stopwords-ru.txt (стандартный список).
- * Исключены: «не», «нет» — они меняют смысл на противоположный.
- */
+// Обработанное множество русских стоп-слов
+// https://github.com/stopwords-iso/stopwords-ru
+
 object RussianStopWords {
 
     val words: Set<String> = setOf(

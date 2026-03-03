@@ -5,31 +5,29 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-/*
-Internal model used to represent a task stored locally in a Room database. This is used inside
-the data layer only.
-*/
+// Модель карточек для Room
+
 @Entity(
     tableName = "cards",
     foreignKeys = [ForeignKey(
         entity = StudySet::class,
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("setId"),
-        onDelete = ForeignKey.Companion.CASCADE  // удаляем все карточки если удалится набор
+        onDelete = ForeignKey.CASCADE // Удаляем все карточки если удалится набор
     )],
-    indices = [Index(value = ["setId"])]    // ускоряем операцию SELECT по столбцу setId
+    indices = [Index(value = ["setId"])]    // Индексируем таблицу по setId для увеличения скорости работы
 )
 data class Card(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
 
-    val setId: Long, // внешний ключ
+    val setId: Long,
     val term: String,
     val definition: String,
     val createdAt: Long = System.currentTimeMillis(),
-    val remoteId: Long? = null, // если remoteId == null, тогда набор не синхронизирован
+    val remoteId: Long? = null,
     val isDeleted: Boolean = false,
     val isEdited: Boolean = false,
-    val level: Int = 0,                                     // Уровень усвоения
-    val nextReviewDate: Long = System.currentTimeMillis()    // Дата следующего показа (Unix ms)
+    val level: Int = 0,
+    val nextReviewDate: Long = System.currentTimeMillis()
 )

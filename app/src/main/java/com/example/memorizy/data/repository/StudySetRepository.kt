@@ -4,7 +4,8 @@ import com.example.memorizy.data.source.local.room.StudySetWithCardNumber
 import com.example.memorizy.data.source.local.room.entity.StudySet
 import kotlinx.coroutines.flow.Flow
 
-// Interface to the data layer (study_set).
+// Интерфейс репозитория набор
+
 interface StudySetRepository {
 
     suspend fun insertSet(studySet: StudySet)

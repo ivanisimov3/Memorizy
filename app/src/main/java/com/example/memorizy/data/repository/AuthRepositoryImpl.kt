@@ -8,7 +8,8 @@ import com.example.memorizy.data.source.network.dto.AuthResponse
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.first
 
-// Конкретная реализация для работы с AuthRequest (Default implementation)
+// Реализация репозитория аутентификации
+
 class AuthRepositoryImpl @Inject constructor(   // Inject coonstructor связывает с MemorizyApiService и SettingsDataStore
     private val api: MemorizyApiService,
     private val settingsDataStore: SettingsDataStore,
@@ -35,7 +36,7 @@ class AuthRepositoryImpl @Inject constructor(   // Inject coonstructor связ�
 
             // Если уже кто то был залогинен и это не он сейчас входит
             if (lastUserId != newUserId) {
-                studySetDao.clearSyncedData()   // Очищаем все наборы, связанные с другим аккаунтом
+                studySetDao.clearSyncedData()
             }
 
             settingsDataStore.saveUserUtilInfo(response.token, newUserId)

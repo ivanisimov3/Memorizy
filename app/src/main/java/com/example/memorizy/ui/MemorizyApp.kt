@@ -26,6 +26,8 @@ import com.example.memorizy.ui.screens.studysets.StudySetsViewModel
 import com.example.memorizy.ui.screens.testingmode.TestingModeScreen
 import com.example.memorizy.ui.screens.testingmode.TestingModeViewModel
 
+// Главный граф навигации NavHost
+
 @Composable
 fun MemorizyApp() {
     val navController = rememberNavController()
@@ -36,7 +38,7 @@ fun MemorizyApp() {
     ) {
 
         composable<Routes.StudySets> {
-            val viewModel: StudySetsViewModel = hiltViewModel() // Фабрика ViewModel благодаря Hilt
+            val viewModel: StudySetsViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsState()
 
             StudySetsScreen(

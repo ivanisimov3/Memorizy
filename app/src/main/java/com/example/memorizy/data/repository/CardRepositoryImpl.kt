@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-// Конкретная реализация для работы с Card (Default implementation)
+// Реализация репозитория карточка
+
 class CardRepositoryImpl @Inject constructor(   // Inject позволяет связать создание этого репозитория с dao
     private val dao: CardDao,
     private val studySetDao: StudySetDao,
@@ -49,7 +50,7 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
         val unsyncedCards = dao.getUnsyncedCards()
         unsyncedCards.forEach { localCard ->
             val parentSet = studySetDao.getSetByIdSimple(localCard.setId)
-            val parentRemoteId = parentSet?.remoteId ?: return@forEach  // Буквально аналог continue, переходим к следующей карточке
+            val parentRemoteId = parentSet?.remoteId ?: return@forEach  // Буквально аналог continue, переходим к следующей карточке если null
 
             try {
                 val remoteDto = api.createCard(token = authHeader, dto = localCard.toDto(parentRemoteId))
@@ -114,7 +115,6 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
                     if (localCard == null){
                         dao.insertCard(dto.toEntity(localSet.id))
                     } else if (!localCard.isEdited) {
-                        // Обновляем только если локальная карточка НЕ имеет pending изменений
                         val updatedCard = localCard.copy(
                             term = dto.term,
                             definition = dto.definition,
@@ -126,16 +126,14 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
                         )
                         dao.updateCard(updatedCard)
                     }
-                    // Если isEdited = true → пропускаем, локальные изменения важнее
                 }
 
                 // Множество всех Id карточек на сервере
                 val remoteIds = remoteCards.mapNotNull { it.id }.toSet()
                 val localSyncedCards = dao.getSyncedCardsBySet(localSet.id)
 
-                // Смотрим все карточки локально
                 localSyncedCards.forEach { localCard ->
-                    if (localCard.remoteId!! !in remoteIds)  // Если такого Id нет на сервере, то удаляем и локально
+                    if (localCard.remoteId!! !in remoteIds)
                         dao.deleteCard(localCard)
                 }
 

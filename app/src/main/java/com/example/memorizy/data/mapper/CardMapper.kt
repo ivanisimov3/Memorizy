@@ -1,11 +1,9 @@
 package com.example.memorizy.data.mapper
 
 import com.example.memorizy.data.source.local.room.entity.Card
-import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.data.source.network.dto.CardDto
-import com.example.memorizy.data.source.network.dto.StudySetDto
 
-// From local to network
+// Из локально в сеть
 fun Card.toDto(parentRemoteId: Long): CardDto {
     return CardDto(
         id = this.remoteId,
@@ -18,7 +16,7 @@ fun Card.toDto(parentRemoteId: Long): CardDto {
     )
 }
 
-// From network to local
+// Из сети в локально
 fun CardDto.toEntity(parentLocalId: Long): Card {
     return Card(
         id = 0,

@@ -2,21 +2,17 @@ package com.example.memorizy.data.sync
 
 import android.content.Context
 import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.memorizy.workers.SyncWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
-import java.util.concurrent.TimeUnit
 
-// WorkRequest is where you define if the worker needs to be run once or periodically
-
-// Work Manager is a class that actually schedules your WorkRequest and makes it run.
+// В WorkRequest определяем когда worker запускатся (единично или периодично)
+// В Work Manager настраивается расписание и производится запуск воркера
 
 @Singleton
 class SyncManager @Inject constructor(
@@ -24,16 +20,15 @@ class SyncManager @Inject constructor(
 ) {
 
     fun scheduleOneTimeSync() {
-        // A specification of the requirements that need to be met before a WorkRequest can run
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)  // Нужен интернет
+        val constraints = Constraints.Builder() // Требования, чтобы WorkRequest выполнился
+            .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val request = OneTimeWorkRequestBuilder<SyncWorker>()
+        val request = OneTimeWorkRequestBuilder<SyncWorker>()   // WorkRequest
             .setConstraints(constraints)
             .build()
 
-        WorkManager.getInstance(context).enqueueUniqueWork(
+        WorkManager.getInstance(context).enqueueUniqueWork( // WorkManager
             "OneTimeSync",
             ExistingWorkPolicy.REPLACE,
             request

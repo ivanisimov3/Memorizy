@@ -17,13 +17,10 @@ import jakarta.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-/*
-To create a DataStore instance we use the preferencesDataStore delegate,
-with the Context as receiver.
-*/
+// Хранилище данных типа ключ-значение Datastore
+
 private val Context.dataStore by preferencesDataStore(name = "settings")
 
-// SettingsDataStore should get a DataStore instance as a constructor parameter (@inject constructor)
 @Singleton
 class SettingsDataStore @Inject constructor(
     @ApplicationContext private val context: Context
@@ -37,7 +34,7 @@ class SettingsDataStore @Inject constructor(
         val IS_DARK_THEME_KEY = booleanPreferencesKey("is_dark_theme")
     }
 
-    // Reading data from Preferences DataStore
+    // Данные DataStore
     val token: Flow<String?> = context.dataStore.data
         .map { preferences ->
             preferences[TOKEN_KEY]
@@ -63,7 +60,7 @@ class SettingsDataStore @Inject constructor(
             preferences[IS_DARK_THEME_KEY] ?: false
         }
 
-    // Writing data to Preferences DataStore
+    // Методы для операций над данными DataStore
     suspend fun saveUserUtilInfo(token: String, userId: Long) {
         context.dataStore.edit { preferences ->
             preferences[TOKEN_KEY] = token
@@ -89,7 +86,6 @@ class SettingsDataStore @Inject constructor(
         }
     }
 
-    // Deleting data from Preferences DataStore
     suspend fun deleteToken() {
         context.dataStore.edit { preferences ->
             preferences.remove(TOKEN_KEY)

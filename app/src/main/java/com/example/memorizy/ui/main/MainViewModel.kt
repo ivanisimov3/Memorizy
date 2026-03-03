@@ -17,7 +17,7 @@ class MainViewModel @Inject constructor(
 
     val isDarkTheme: StateFlow<Boolean> = settingsDataStore.isDarkTheme
         .map { it }
-        .stateIn(
+        .stateIn(   // Превращаем поток в поток состояния
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = false

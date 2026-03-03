@@ -3,7 +3,7 @@ package com.example.memorizy.data.mapper
 import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.data.source.network.dto.StudySetDto
 
-// From local to network
+// Из локально в сеть
 fun StudySet.toDto(): StudySetDto {
     return StudySetDto(
         id = this.remoteId,
@@ -15,7 +15,7 @@ fun StudySet.toDto(): StudySetDto {
     )
 }
 
-// From network to local
+// Из сети в локально
 fun StudySetDto.toEntity(): StudySet {
     return StudySet(
         id = 0,

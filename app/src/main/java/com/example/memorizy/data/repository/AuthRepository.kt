@@ -2,7 +2,8 @@ package com.example.memorizy.data.repository
 
 import com.example.memorizy.data.source.network.dto.AuthRequest
 
-// Interface to the data layer (AuthRequest).
+// Интерфейс репозитория аутентификации
+
 interface AuthRepository {
 
     // Result<Unit> - стандартный класс Kotlin, который хранит либо успех, либо ошибку.

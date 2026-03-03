@@ -11,7 +11,8 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
-// Конкретная реализация для работы с StudySetDao (Default implementation)
+// Реализация репозитория набор
+
 class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет связать создание этого репозитория с dao
     private val dao: StudySetDao,
     private val api: MemorizyApiService,
@@ -103,9 +104,9 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
             remoteSets.forEach { dto ->
                 val localSet = dao.getSetByRemoteId(dto.id!!)
 
-                if (localSet == null) { // Если такого набора нет локально (с таким remoteId) - добавляем
+                if (localSet == null) {
                     dao.insertSet(dto.toEntity())
-                } else if (!localSet.isEdited) {    // Обновляем только если нет pending изменений
+                } else if (!localSet.isEdited) {
                     val updatedSet = localSet.copy(
                         name = dto.name,
                         description = dto.description,
@@ -125,7 +126,7 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
 
             // Смотрим все наборы локально
             localSyncedSets.forEach { localSet ->
-                if (localSet.remoteId!! !in remoteIds)  // Если такого Id нет на сервере, то удаляем и локально
+                if (localSet.remoteId!! !in remoteIds)
                     dao.deleteSet(localSet)
             }
 

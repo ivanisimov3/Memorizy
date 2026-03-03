@@ -12,6 +12,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import jakarta.inject.Singleton
 
+// DI для Room
+
 @Module // Инструкция как создавать объекты
 @InstallIn(SingletonComponent::class) // Зависимости живут, пока живо приложение
 object LocalDataModule { // object используем когда нужно произвести объекты (фабрика)
@@ -25,7 +27,7 @@ object LocalDataModule { // object используем когда нужно п
             klass = AppDatabase::class.java,
             name = "memorizy_db"
         )
-            .fallbackToDestructiveMigration()   // при несовпадении версий удаляет бд
+            .fallbackToDestructiveMigration(true)   // при несовпадении версий удаляет бд
             .build()
     }
 

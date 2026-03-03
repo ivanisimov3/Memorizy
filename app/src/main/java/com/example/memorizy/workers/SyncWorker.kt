@@ -27,10 +27,9 @@ class SyncWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val studySetRepository: StudySetRepository,
     private val cardRepository: CardRepository
-    // private val cardRepository: CardRepository
 ) : CoroutineWorker(ctx , params) {
 
-    // This method is where you put the code for the actual work you want to perform in the background.
+    // Метод, где код работы, воспроизввдимой на заднем плане
     override suspend fun doWork(): Result {
         return try {
             studySetRepository.syncLocalChanges()
@@ -43,7 +42,7 @@ class SyncWorker @AssistedInject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
 
-            Result.retry()  // Indicates that the work needs to be retried
+            Result.retry()  // Должна быть попытка повторить работу
         }
     }
 }

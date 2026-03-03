@@ -1,21 +1,7 @@
 package com.example.memorizy.domain.textcomparison
 
-/**
- * Компаратор с нечётким сопоставлением токенов через расстояние Левенштейна
- * и стемминг Портера для русского языка.
- *
- * 1. Нормализация (lowercase, ё→е, удаление пунктуации, схлопывание пробелов)
- * 2. Токенизация (разбиение на слова)
- * 3. Стемминг каждого токена (приведение к основе слова)
- * 4. Нечёткое сопоставление: два стема считаются совпавшими,
- *    если расстояние Левенштейна между ними ≤ допуска:
- *      - длина ≤ 3:  допуск 0
- *      - длина 4–8:  допуск 1
- *      - длина > 8:  допуск 2
- * 5. Подсчёт коэффициента Сёренсена-Дайса по нечётким совпадениям
- *
- * @param threshold порог коэффициента Сёренсена-Дайса (по умолчанию 0.75)
- */
+// Реализация сравнения текстов
+
 class FuzzyTokenComparator(
     private val threshold: Double = 0.75
 ) : TextComparator {
@@ -49,18 +35,14 @@ class FuzzyTokenComparator(
         return dice >= threshold
     }
 
-    /**
-     * Проверяет, совпадают ли два токена с учётом допуска по Левенштейну.
-     */
+    // Проверка на совпадение текстов
     private fun isFuzzyMatch(a: String, b: String): Boolean {
         if (a == b) return true
         val maxAllowed = maxDistance(minOf(a.length, b.length))
         return levenshtein(a, b) <= maxAllowed
     }
 
-    /**
-     * Максимально допустимое расстояние в зависимости от длины слова.
-     */
+    // Максимально допустимое число опечаток в слове в зависимости от длины
     private fun maxDistance(length: Int): Int {
         return when {
             length <= 3 -> 0
@@ -69,15 +51,14 @@ class FuzzyTokenComparator(
         }
     }
 
-    /**
-     * Расстояние Левенштейна между двумя строками.
-     */
+    // Расстояние Левенштейна
     private fun levenshtein(a: String, b: String): Int {
         val m = a.length
         val n = b.length
 
-        // Быстрая проверка: если разница длин больше максимально возможного допуска — нет смысла считать
-        if (Math.abs(m - n) > maxDistance(minOf(m, n))) return maxDistance(minOf(m, n)) + 1
+        // Если разница длин больше максимально возможного допуска, то нет смысла считать
+        if (Math.abs(m - n) > maxDistance(minOf(m, n)))
+            return maxDistance(minOf(m, n)) + 1
 
         val dp = Array(m + 1) { IntArray(n + 1) }
 
@@ -88,8 +69,8 @@ class FuzzyTokenComparator(
             for (j in 1..n) {
                 val cost = if (a[i - 1] == b[j - 1]) 0 else 1
                 dp[i][j] = minOf(
-                    dp[i - 1][j] + 1,      // удаление
-                    dp[i][j - 1] + 1,      // вставка
+                    dp[i - 1][j] + 1,   // удаление
+                    dp[i][j - 1] + 1,   // вставка
                     dp[i - 1][j - 1] + cost // замена
                 )
             }
@@ -98,6 +79,7 @@ class FuzzyTokenComparator(
         return dp[m][n]
     }
 
+    // Удаление стоп слов и упрощение слов до стемов
     private fun tokenize(text: String): List<String> {
         return normalize(text)
             .split(" ")
@@ -106,6 +88,7 @@ class FuzzyTokenComparator(
             .map { stemmer.stem(it) }
     }
 
+    // Базовые преобразования над текстом
     private fun normalize(text: String): String {
         return text
             .lowercase()
