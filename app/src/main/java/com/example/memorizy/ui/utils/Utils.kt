@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.compose.material3.Icon
-import androidx.compose.ui.draw.shadow
 
 object AppIcons {
     val allIcons = mapOf(
@@ -36,9 +35,29 @@ object AppIcons {
     }
 }
 
-fun formatDate(timestamp: Long): String {
-    val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
-    return formatter.format(Date(timestamp))
+object DateUtils {
+    private val shortDateFormatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+    private val fullDateTimeFormatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
+
+    fun formatShortDate(timestamp: Long): String {
+        return shortDateFormatter.format(Date(timestamp))
+    }
+
+    fun formatFullDateTime(timestamp: Long): String {
+        return fullDateTimeFormatter.format(Date(timestamp))
+    }
+
+    fun formatTimeUntil(ms: Long): String {
+        val minutes = ms / 60_000
+        val hours = minutes / 60
+        val days = hours / 24
+
+        return when {
+            days > 0 -> "$days д"
+            hours > 0 -> "$hours ч"
+            else -> "$minutes мин"
+        }
+    }
 }
 
 @Composable

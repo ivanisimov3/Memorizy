@@ -32,6 +32,7 @@ class SetDetailsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SetDetailsState())
     val uiState = _uiState.asStateFlow()
 
+    // Блок инициализации
     init {
         viewModelScope.launch {
             studySetRepository.getSet(setId).collect { set ->
@@ -55,7 +56,7 @@ class SetDetailsViewModel @Inject constructor(
         }
     }
 
-    // Удержали палец на наборе
+    // Нажали Удалить карточку
     fun onDeleteCard(card: Card){
         viewModelScope.launch {
 
@@ -69,7 +70,7 @@ class SetDetailsViewModel @Inject constructor(
         }
     }
 
-    // Нажали редактировать набор
+    // Нажали Редактировать
     fun onStartEditing() {
         val currentState = _uiState.value
         val currentSet = currentState.studySet ?: return
@@ -83,7 +84,7 @@ class SetDetailsViewModel @Inject constructor(
         }
     }
 
-    // Меняем название набора
+    // Изменили Название
     fun updateDraftName(name: String) {
         _uiState.update { state ->
             state.copy(
@@ -92,7 +93,7 @@ class SetDetailsViewModel @Inject constructor(
         }
     }
 
-    // Меняем описание набора
+    // Изменили Описание
     fun updateDraftDescription(description: String) {
         _uiState.update { state ->
             state.copy(
@@ -101,7 +102,7 @@ class SetDetailsViewModel @Inject constructor(
         }
     }
 
-    // Меняем иконку набора
+    // Изменили Иконку
     fun updateDraftIcon(iconId: Int) {
         _uiState.update { state ->
             state.copy(
@@ -110,7 +111,7 @@ class SetDetailsViewModel @Inject constructor(
         }
     }
 
-    // Меняем дедлайн набора
+    // Изменили Дедлайн
     fun updateDraftTargetDate(targetDate: Long?) {
         _uiState.update { state ->
             state.copy(
@@ -119,7 +120,7 @@ class SetDetailsViewModel @Inject constructor(
         }
     }
 
-    // Меняем данные карточки
+    // Изменили Данные карточки
     fun updateDraftCard(index: Int, term: String, definition: String) {
         _uiState.update { state ->
             val updatedCards = state.draftCards.toMutableList()
@@ -128,7 +129,7 @@ class SetDetailsViewModel @Inject constructor(
         }
     }
 
-    // Нажали отменить редактирование
+    // Нажали Отменить редактирование
     fun onCancelEditing() {
         _uiState.update { state ->
             state.copy(
@@ -139,7 +140,7 @@ class SetDetailsViewModel @Inject constructor(
         }
     }
 
-    // Нажали подтвердить редактирование
+    // Нажали Подтвердить редактирование
     fun onSaveChanges() {
         val state = _uiState.value
         val draftSet = state.draftSet ?: return
@@ -159,7 +160,6 @@ class SetDetailsViewModel @Inject constructor(
             val originalCards = state.cards
             draftCards.forEachIndexed { index, draftCard ->
                 val original = originalCards.getOrNull(index)
-                // Если term или definition изменились — сбрасываем прогресс
                 val contentChanged = original != null &&
                         (original.term != draftCard.term || original.definition != draftCard.definition)
 
@@ -178,7 +178,6 @@ class SetDetailsViewModel @Inject constructor(
 
             onCancelEditing()
 
-            // Если дедлайн изменился — пересчитываем интервалы для всех карточек с level > 0
             val targetDateChanged = draftSet.targetDate != state.studySet?.targetDate
             if (targetDateChanged) {
                 val now = System.currentTimeMillis()

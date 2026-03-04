@@ -39,7 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
 import com.example.memorizy.ui.utils.GlassContainer
-import com.example.memorizy.ui.utils.formatDate
+import com.example.memorizy.ui.utils.DateUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -197,7 +197,7 @@ private fun SettingsScreenBody(
                         Text(
                             text = stringResource(
                                 R.string.sync_last_time,
-                                formatDate(uiState.lastSyncTime)
+                                DateUtils.formatFullDateTime(uiState.lastSyncTime)
                             ),
                             style = MaterialTheme.typography.labelSmall
                         )

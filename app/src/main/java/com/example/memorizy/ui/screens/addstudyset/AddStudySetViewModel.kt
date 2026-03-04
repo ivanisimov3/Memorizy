@@ -23,7 +23,7 @@ class AddStudySetViewModel  @Inject constructor(
 
     val uiState: StateFlow<AddStudySetState> = _uiState.asStateFlow()
 
-    // Изменение в строке имени
+    // Изменили Название
     fun onNameChanged(newName: String){
         _uiState.update { currentState ->
             currentState.copy(
@@ -33,28 +33,28 @@ class AddStudySetViewModel  @Inject constructor(
         }
     }
 
-    // Изменение в строке описания
+    // Изменили Описание
     fun onDescriptionChanged(newDescription: String) {
         _uiState.update { currentState ->
             currentState.copy(description = newDescription)
         }
     }
 
-    // Нажали на иконку
+    // Измененили Иконку
     fun onIconSelected(iconId: Int) {
         _uiState.update { currentState ->
             currentState.copy(selectedIconId = iconId)
         }
     }
 
-    // Изменение дедлайна
+    // Измененили Дедлайн
     fun onTargetDateChanged(targetDate: Long?) {
         _uiState.update { currentState ->
             currentState.copy(targetDate = targetDate)
         }
     }
 
-    // Нажали кнопку создать
+    // Нажали Создать
     fun onCreateButtonClicked() {
         val currentState = _uiState.value
 
@@ -70,7 +70,7 @@ class AddStudySetViewModel  @Inject constructor(
             targetDate = currentState.targetDate
         )
 
-        viewModelScope.launch { // Обращаемся к БД поэтому корутина
+        viewModelScope.launch {
             studySetRepository.insertSet(newSet)
 
             syncManager.scheduleOneTimeSync()

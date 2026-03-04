@@ -42,9 +42,9 @@ fun AuthScreen(
     onLoginClick: () -> Unit,
     onRegisterClick: () -> Unit
 ) {
-    LaunchedEffect(uiState.isAuthenticated) {   // Уходим с экрана только когда аутентификация пройдена
+    LaunchedEffect(uiState.isAuthenticated) {
         if (uiState.isAuthenticated) {
-            onAuthClick() // Навигация
+            onAuthClick()
         }
     }
 

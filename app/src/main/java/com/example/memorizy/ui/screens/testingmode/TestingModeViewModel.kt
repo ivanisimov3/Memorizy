@@ -31,6 +31,7 @@ class TestingModeViewModel @Inject constructor(
     private val textComparator = FuzzyTokenComparator()
     private var originalCards: List<Card> = emptyList()
 
+    // Блок инициализации
     init {
         viewModelScope.launch {
             val cards = cardRepository.getAllCardsForSet(setId).first()
@@ -55,24 +56,24 @@ class TestingModeViewModel @Inject constructor(
         }
     }
 
-    // Выбрали термины - показываем определения
+    // Нажали Термины
     fun onTermsSelected() {
         startTestingSession(isTermChecked = true)
     }
 
-    /// Выбрали определения - показываем термины
+    /// Нажали Определения
     fun onDefinitionsSelected() {
         startTestingSession(isTermChecked = false)
     }
 
-    // Обновление введённого ответа
+    // Изменили Ответ
     fun onAnswerChanged(answer: String) {
         _uiState.update { state ->
             state.copy(userAnswer = answer)
         }
     }
 
-    // Отправка ответа и переход
+    // Нажали к Следующему
     fun onSubmitAnswer() {
         _uiState.update { state ->
             val currentCard = state.currentCard ?: return@update state  // Вернуть текущее состояние без изменений
@@ -93,7 +94,7 @@ class TestingModeViewModel @Inject constructor(
                 isCorrect = isCorrect
             )
 
-            val updatedAnswers = state.userAnswers + testAnswer // userAnswers - List, поэтому + вместо add
+            val updatedAnswers = state.userAnswers + testAnswer
             val nextIndex = state.currentIndex + 1
             val isFinished = (nextIndex >= state.cards.size)
             val nextCard = if (isFinished) null else state.cards[nextIndex]
@@ -110,7 +111,7 @@ class TestingModeViewModel @Inject constructor(
         }
     }
 
-    // Перезапуск тестирования
+    // Нажали Пройти тестирование снова
     fun restartTesting() {
         _uiState.value = TestingModeState(
             isLoading = false,
@@ -118,14 +119,13 @@ class TestingModeViewModel @Inject constructor(
         )
     }
 
-    // Показать ответы
+    // Нажали Посмотреть ответы
     fun showAnswers() {
         _uiState.update { state ->
             state.copy(isShowingAnswers = true)
         }
     }
 
-    // Запуск сессии тестирования
     private fun startTestingSession(isTermChecked: Boolean) {
         val cards = originalCards.shuffled()
 

@@ -17,10 +17,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-// На главном экране пользователь может увидеть процесс:
-// 1. Изменение значения в строке поиска
-// 2. Удаление набора
-// 3. Изменение числа наборов при использовании поиска
 @HiltViewModel
 class StudySetsViewModel @Inject constructor(
     private val studySetRepository: StudySetRepository,
@@ -33,49 +29,51 @@ class StudySetsViewModel @Inject constructor(
 
     private val _searchQuery = MutableStateFlow("")
 
-    private val _allSets = studySetRepository.getAllSetsWithCardNumber()    // уже Flow
+    private val _allSets = studySetRepository.getAllSetsWithCardNumber()
 
-    private val _allCards = cardRepository.getAllNonDeletedCards()           // для подсчёта повторений
+    private val _allCards = cardRepository.getAllNonDeletedCards()
 
     val uiState: StateFlow<StudySetsState> =
-        // четыре Flow влияют на этот экран, наблюдаем за ними
-        combine(_searchQuery, _allSets, _isLoggedIn, _allCards) { query, sets, loggedIn, cards ->
+        // Четыре Flow влияют на этот экран, наблюдаем за ними
+        combine(_searchQuery, _allSets, _isLoggedIn, _allCards)
+            { query, sets, loggedIn, cards ->
 
-            val now = System.currentTimeMillis()
+                val now = System.currentTimeMillis()
 
-            // Подсчёт карточек к повторению для каждого набора
-            val reviewCountBySet = cards
-                .filter { it.nextReviewDate <= now }
-                .groupBy { it.setId }
-                .mapValues { it.value.size.toLong() }
+                val reviewCountBySet = cards
+                    .filter { it.nextReviewDate <= now }
+                    .groupBy { it.setId }
+                    .mapValues { it.value.size.toLong() }   // Трансформация словаря из
+                                                            // { 1 -> [Card_A, Card_B], 2 -> [Card_C] }
+                                                            // в { 1 -> 2L, 2 -> 1L }
 
-            val filteredSets = if (query.isBlank()) {   // если пустой то берем все
-                sets
-            } else{
-                sets.filter {
-                    it.studySet.name.contains(query, ignoreCase = true) // если совпадает то берем только их
+                val filteredSets = if (query.isBlank()) {
+                    sets
+                } else{
+                    sets.filter {
+                        it.studySet.name.contains(query, ignoreCase = true)
+                    }
                 }
-            }
 
-            StudySetsState(
-                isLoading = false,
-                studySetsWithCardNumber = filteredSets,
-                searchQuery = query,
-                isLoggedIn = loggedIn,
-                reviewCountBySet = reviewCountBySet
+                StudySetsState(
+                    isLoading = false,
+                    studySetsWithCardNumber = filteredSets,
+                    searchQuery = query,
+                    isLoggedIn = loggedIn,
+                    reviewCountBySet = reviewCountBySet
+                )
+            }.stateIn(  // В горячий поток
+                scope = viewModelScope, // Пока живет ViewModel
+                started = SharingStarted.WhileSubscribed(5000), // Не отключать StateFlow еще 5 секунд
+                initialValue = StudySetsState()                                 // когда не работает .collectAsState
             )
-        }.stateIn(  // Аналог .asStateFlow
-            scope = viewModelScope, // Пока живет ViewModel
-            started = SharingStarted.WhileSubscribed(5000), // Не отключать StateFlow еще 5 секунд
-            initialValue = StudySetsState()                                 // когда не работает .collectAsState
-        )
 
-    // Два события, которые могут повлиять на этот экран
-
+    // Изменили Текст поиска
     fun onSearchQueryChanged(query: String){
         _searchQuery.value = query
     }
 
+    // Нажали Удалить набор
     fun onDeleteSet(studySet: StudySet){
         viewModelScope.launch {
             if (studySet.remoteId == null) {

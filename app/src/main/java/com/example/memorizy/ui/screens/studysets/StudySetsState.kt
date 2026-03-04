@@ -7,5 +7,5 @@ data class StudySetsState(
     val studySetsWithCardNumber: List<StudySetWithCardNumber> = emptyList(),
     val searchQuery: String = "",
     val isLoggedIn: Boolean = false,
-    val reviewCountBySet: Map<Long, Long> = emptyMap()  // setId → кол-во карточек к повторению
+    val reviewCountBySet: Map<Long, Long> = emptyMap()
 )

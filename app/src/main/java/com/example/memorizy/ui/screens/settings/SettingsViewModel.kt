@@ -38,16 +38,19 @@ class SettingsViewModel @Inject constructor(
         initialValue = SettingsState()
     )
 
+    // Нажали Выйти
     fun onLogout() {
         viewModelScope.launch {
             authRepository.logout()
         }
     }
 
+    // Нажали Синхронизировать
     fun onSyncNow() {
         syncManager.scheduleOneTimeSync()
     }
 
+    // Нажали Переключатель темы
     fun onThemeChanged(isDark: Boolean) {
         viewModelScope.launch {
             settingsDataStore.setDarkTheme(isDark)

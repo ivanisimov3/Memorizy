@@ -35,13 +35,12 @@ class LearningModeViewModel @Inject constructor(
     private var allCards: List<Card> = emptyList()
     private var targetDate: Long? = null
 
+    // Блок инициализации
     init {
         viewModelScope.launch {
-            // Загружаем набор для получения targetDate
             val studySet = studySetRepository.getSet(setId).first()
             targetDate = studySet.targetDate
 
-            // Проверяем: если дедлайн прошёл — сбрасываем в стандартный режим
             val now = System.currentTimeMillis()
             if (targetDate != null && targetDate!! < now) {
                 targetDate = null
@@ -49,36 +48,33 @@ class LearningModeViewModel @Inject constructor(
                 syncManager.scheduleOneTimeSync()
             }
 
-            // Загружаем карточки
             allCards = cardRepository.getAllCardsForSet(setId).first()
 
             startLearningSession(withShuffle = false)
         }
     }
 
-    // Нажали на карточку
+    // Нажали на Карточку
     fun onFlipCard() {
         _uiState.update { state ->
             state.copy(isFlipped = !state.isFlipped)
         }
     }
 
-    // Свайпнули вправо карточку
+    // Свайпнули Вправо
     fun onSwipeRight() {
         processSwipe(isCorrect = true)
     }
 
-    // Свайпнули влево карточку
+    // Свайпнули Влево
     fun onSwipeLeft() {
         processSwipe(isCorrect = false)
     }
 
-    // Обработчик свайпов
     private fun processSwipe(isCorrect: Boolean) {
         val currentState = _uiState.value
         val currentCard = currentState.currentCard ?: return
 
-        // В режиме повторения — обновляем прогресс в БД
         if (currentState.isReviewMode) {
             val now = System.currentTimeMillis()
             val updatedCard = SpacedRepetitionScheduler.processAnswer(
@@ -110,7 +106,7 @@ class LearningModeViewModel @Inject constructor(
         }
     }
 
-    // Переключение режима: повторение <-> все карточки
+    // Нажали Переключатель режима
     fun toggleReviewMode() {
         val newMode = !_uiState.value.isReviewMode
         _uiState.update { it.copy(isReviewMode = newMode) }
@@ -120,31 +116,28 @@ class LearningModeViewModel @Inject constructor(
         }
     }
 
-    // Обработчик переключения режима перемешивания
+    // Нажали Переключатель перемешивания
     fun toggleShuffle() {
         val currentShuffle = _uiState.value.isShuffleOn
-        // Перезагружаем карточки из БД для актуального состояния (свайпнутые уже имеют новый nextReviewDate)
+        // Перезагружаем карточки, чтобы не смотреть на уже повторенные
         viewModelScope.launch {
             allCards = cardRepository.getAllCardsForSet(setId).first()
             startLearningSession(withShuffle = !currentShuffle)
         }
     }
 
-    // Обработчик нажатия перезапуска режима заучивания
+    // Нажали Учить снова
     fun restartLearning() {
-        // Перезагружаем карточки из БД для актуального состояния
         viewModelScope.launch {
             allCards = cardRepository.getAllCardsForSet(setId).first()
             startLearningSession(withShuffle = _uiState.value.isShuffleOn)
         }
     }
 
-    // Обработчик запуска режима
     private fun startLearningSession(withShuffle: Boolean) {
         val now = System.currentTimeMillis()
         val isReviewMode = _uiState.value.isReviewMode
 
-        // Определяем набор карточек
         val reviewCards = SpacedRepetitionScheduler.getCardsForReview(allCards, now)
         val sessionCards = if (isReviewMode) reviewCards else allCards
 
@@ -166,7 +159,6 @@ class LearningModeViewModel @Inject constructor(
             return
         }
 
-        // Перемешивание: в режиме повторения — внутри уровней, иначе — полностью
         val orderedCards = if (withShuffle) {
             if (isReviewMode) {
                 SpacedRepetitionScheduler.shuffleWithinLevels(sessionCards)

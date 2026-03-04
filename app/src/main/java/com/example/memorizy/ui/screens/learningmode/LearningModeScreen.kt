@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
 import com.example.memorizy.ui.utils.GlassContainer
+import com.example.memorizy.ui.utils.DateUtils
 
 @Composable
 fun LearningModeScreen(
@@ -337,87 +338,6 @@ private fun LearningModeScreenBody(
 }
 
 @Composable
-private fun LearningCard(
-    term: String,
-    definition: String,
-    isFlipped: Boolean,
-    onCardClick: () -> Unit,
-    modifier: Modifier
-) {
-    val rotation by animateFloatAsState(    // Плвное изменение значения угла поворота карточки
-        targetValue = if (isFlipped) 180f else 0f,
-        animationSpec = tween(
-            durationMillis = 400,
-            easing = FastOutSlowInEasing
-        ),
-        label = "cardFlip"
-    )
-
-    GlassContainer(
-        modifier = modifier
-            .fillMaxWidth()
-            .graphicsLayer {
-                rotationY = rotation
-                cameraDistance =
-                    12f * density  // Настройка перспективы, чтобы карточка была будто 3D
-            }
-            .clickable(onClick = onCardClick),
-    ) {
-        if (rotation <= 90f) {
-            CardContent(
-                text = term,
-                isBackSide = false
-            )
-        } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        rotationY =
-                            180f    // Отзеркаливаем контент внутри карточки (из-за прошлого поворота он в другую сторону)
-                    }
-            ) {
-                CardContent(
-                    text = definition,
-                    isBackSide = true
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun CardContent(
-    text: String,
-    isBackSide: Boolean
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState()),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = text,
-                style =
-                    if (isBackSide)
-                        MaterialTheme.typography.bodyMedium
-                    else
-                        MaterialTheme.typography.displayMedium,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-    }
-}
-
-@Composable
 private fun EmptyStateMessage(
     uiState: LearningModeState = LearningModeState(),
     onBackClick: () -> Unit,
@@ -428,7 +348,6 @@ private fun EmptyStateMessage(
         modifier = Modifier.padding(32.dp)
     ) {
         if (uiState.isReviewMode && uiState.totalCardsCount > 0) {
-            // Режим повторения, но карточек к повторению нет
             Text(
                 text = stringResource(R.string.next_review_text),
                 style = MaterialTheme.typography.displayMedium,
@@ -440,7 +359,7 @@ private fun EmptyStateMessage(
                 Text(
                     text = stringResource(
                         R.string.next_review_time_text,
-                        formatTimeUntil(uiState.nextReviewInMs)
+                        DateUtils.formatTimeUntil(uiState.nextReviewInMs)
                     ),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
@@ -474,7 +393,6 @@ private fun EmptyStateMessage(
                 )
             }
         } else {
-            // Набор пустой
             Text(
                 text = stringResource(R.string.empty_set_warn),
                 style = MaterialTheme.typography.displayMedium,
@@ -499,19 +417,6 @@ private fun EmptyStateMessage(
                 )
             }
         }
-    }
-}
-
-// Форматирование времени до следующего повторения
-private fun formatTimeUntil(ms: Long): String {
-    val minutes = ms / 60_000
-    val hours = minutes / 60
-    val days = hours / 24
-
-    return when {
-        days > 0 -> "$days д"
-        hours > 0 -> "$hours ч"
-        else -> "$minutes мин"
     }
 }
 
@@ -624,6 +529,87 @@ private fun LearningResultContent(
             Text(
                 text = stringResource(R.string.go_back_to_set_text),
                 style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+private fun LearningCard(
+    term: String,
+    definition: String,
+    isFlipped: Boolean,
+    onCardClick: () -> Unit,
+    modifier: Modifier
+) {
+    val rotation by animateFloatAsState(    // Плавное изменение значения угла поворота карточки
+        targetValue = if (isFlipped) 180f else 0f,
+        animationSpec = tween(
+            durationMillis = 400,
+            easing = FastOutSlowInEasing
+        ),
+        label = "cardFlip"
+    )
+
+    GlassContainer(
+        modifier = modifier
+            .fillMaxWidth()
+            .graphicsLayer {
+                rotationY = rotation
+                cameraDistance =
+                    12f * density  // Настройка перспективы, чтобы карточка была будто 3D
+            }
+            .clickable(onClick = onCardClick),
+    ) {
+        if (rotation <= 90f) {
+            CardContent(
+                text = term,
+                isBackSide = false
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        rotationY =
+                            180f    // Отзеркаливаем контент внутри карточки (из-за прошлого поворота он в другую сторону)
+                    }
+            ) {
+                CardContent(
+                    text = definition,
+                    isBackSide = true
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CardContent(
+    text: String,
+    isBackSide: Boolean
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = text,
+                style =
+                    if (isBackSide)
+                        MaterialTheme.typography.bodyMedium
+                    else
+                        MaterialTheme.typography.displayMedium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }

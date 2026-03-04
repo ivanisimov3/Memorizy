@@ -2,8 +2,8 @@ package com.example.memorizy.ui.screens.testingmode
 
 import com.example.memorizy.data.source.local.room.entity.Card
 
-// UI layer may have its own models tailored specifically for UI state representation.
-data class TestAnswer(  // UI-specific model
+// UI может иметь свои собственные модели, разработанные специально для представления состояния интерфейса.
+data class TestAnswer(  // Модель, зависящая от UI
     val card: Card,
     val userAnswer: String,
     val isCorrect: Boolean

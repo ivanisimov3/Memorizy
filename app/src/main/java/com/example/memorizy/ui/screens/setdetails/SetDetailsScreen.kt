@@ -34,8 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,9 +56,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.example.memorizy.ui.utils.AppIcon
 import com.example.memorizy.ui.utils.GlassContainer
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.example.memorizy.ui.utils.DateUtils
 
 @Composable
 fun SetDetailsScreen(
@@ -79,7 +75,6 @@ fun SetDetailsScreen(
     onLearningModeClick: () -> Unit,
     onTestingModeClick: () -> Unit
 ){
-    // Переменные для логики интерфейса
     var cardToDelete by remember { mutableStateOf<Card?>(null) }
     var showIconDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -162,7 +157,7 @@ private fun SetDetailsTopBar(
     onSaveChanges: () -> Unit,
     onStartEditing: () -> Unit,
     isEditing: Boolean
-) {
+){
     TopAppBar(
         title = {
             Text(
@@ -260,7 +255,7 @@ private fun SetDetailsScreenBody(
                             contentDescription = stringResource(R.string.set_icon),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier
-                                .then(  // Concatenates this modifier with another.
+                                .then(  // Объединяет этот модификатор с другим
                                     if (editMode) Modifier
                                         .clip(CircleShape)
                                         .clickable { onIconClick() }
@@ -320,19 +315,17 @@ private fun SetDetailsScreenBody(
                         }
                     }
 
-                    // Дедлайн
                     if (editMode) {
                         Spacer(Modifier.height(8.dp))
                         TargetDateEditor(
-                            currentTargetDate = uiState.draftSet!!.targetDate,
+                            currentTargetDate = uiState.draftSet.targetDate,
                             onTargetDateChanged = updateDraftTargetDate
                         )
                     } else {
                         val targetDate = uiState.studySet.targetDate
                         if (targetDate != null) {
                             Spacer(Modifier.height(8.dp))
-                            val dateStr = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-                                .format(Date(targetDate))
+                            val dateStr = DateUtils.formatShortDate(targetDate)
                             Text(
                                 text = stringResource(R.string.target_date_display, dateStr),
                                 style = MaterialTheme.typography.bodySmall,
@@ -344,7 +337,7 @@ private fun SetDetailsScreenBody(
                     Spacer(Modifier.height(8.dp))
 
                     if (!editMode) {
-                        GlassContainer ( // Кнопка заучивание
+                        GlassContainer (
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable(onClick = onLearningModeClick)
@@ -359,7 +352,7 @@ private fun SetDetailsScreenBody(
 
                         Spacer(Modifier.height(8.dp))
 
-                        GlassContainer ( // Кнопка тестирование
+                        GlassContainer (
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable(onClick = onTestingModeClick)
@@ -389,15 +382,92 @@ private fun SetDetailsScreenBody(
                     )
                 }
             } else{
-                // используем перебор с ключем, так как в случае удаления карточки LazyColumn поймет
+                // Используем перебор с ключем, так как в случае удаления карточки LazyColumn поймет
                 // какой именно элемент пропал и что именно нужно перерисовать
                 items(items = uiState.cards, key = { it.id } ) { card ->
                     CardItem(
                         card = card,
-                        onLongClick = { onCardToDelete(card) }  // обозначить этот набор для удаления
+                        onLongClick = { onCardToDelete(card) }
                     )
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TargetDateEditor(
+    currentTargetDate: Long?,
+    onTargetDateChanged: (Long?) -> Unit
+){
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        if (currentTargetDate != null) {
+            Text(
+                text = stringResource(
+                    R.string.target_date_display,
+                    DateUtils.formatShortDate(currentTargetDate)
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { showDatePicker = true }
+            )
+            TextButton(onClick = { onTargetDateChanged(null) }) {
+                Text(
+                    text = stringResource(R.string.target_date_clear),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        } else {
+            TextButton(onClick = { showDatePicker = true }) {
+                Text(
+                    text = stringResource(R.string.target_date_set),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = currentTargetDate ?: (System.currentTimeMillis() + 7 * 86_400_000L)
+        )
+
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { onTargetDateChanged(it) }
+                    showDatePicker = false
+                }) {
+                    Text(
+                        text = stringResource(R.string.create_set_text),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(
+                        text = stringResource(R.string.cancel_text),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
         }
     }
 }
@@ -446,7 +516,7 @@ fun EditCardItem(
     onTermChange: (String) -> Unit,
     onDefChange: (String) -> Unit,
     draftCard: Card
-) {
+){
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -541,7 +611,7 @@ fun IconSelectionDialog(
     onIconSelected: (Int) -> Unit,
     onDismiss: () -> Unit,
     availableIcons: Map<Int, Int> = AppIcons.allIcons
-) {
+){
     AlertDialog(
         shape = RoundedCornerShape(18.dp),
         onDismissRequest = onDismiss,
@@ -586,79 +656,4 @@ fun IconSelectionDialog(
             }
         }
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TargetDateEditor(
-    currentTargetDate: Long?,
-    onTargetDateChanged: (Long?) -> Unit
-) {
-    var showDatePicker by remember { mutableStateOf(false) }
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        if (currentTargetDate != null) {
-            Text(
-                text = stringResource(R.string.target_date_display, dateFormat.format(Date(currentTargetDate))),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable { showDatePicker = true }
-            )
-            TextButton(onClick = { onTargetDateChanged(null) }) {
-                Text(
-                    text = stringResource(R.string.target_date_clear),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-        } else {
-            TextButton(onClick = { showDatePicker = true }) {
-                Text(
-                    text = stringResource(R.string.target_date_set),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-    }
-
-    if (showDatePicker) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = currentTargetDate ?: (System.currentTimeMillis() + 7 * 86_400_000L)
-        )
-
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { onTargetDateChanged(it) }
-                    showDatePicker = false
-                }) {
-                    Text(
-                        text = stringResource(R.string.create_set_text),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text(
-                        text = stringResource(R.string.cancel_text),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
 }

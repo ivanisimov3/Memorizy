@@ -25,7 +25,7 @@ class AuthViewModel @Inject constructor(
 
     val uiState = _uiState.asStateFlow()
 
-    // Изменение в строке имени пользователя
+    // Изменили Логин
     fun onUsernameChanged(value: String) {
         _uiState.update { currentState ->
             currentState.copy(
@@ -35,7 +35,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    // Изменение в строке пароля
+    // Изменили Пароль
     fun onPasswordChanged(value: String) {
         _uiState.update { currentState ->
             currentState.copy(
@@ -45,7 +45,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    // Нажали кнопку Логин
+    // Нажали Логин
     fun onLoginClick() {
         val action: suspend (AuthRequest) -> Result<Unit> = { request ->
             repository.login(request)
@@ -53,7 +53,7 @@ class AuthViewModel @Inject constructor(
         performAuthAction(action)
     }
 
-    // Нажали кнопку зарегестироваться
+    // Нажали Зарегестироваться
     fun onRegisterClick() {
         val action: suspend (AuthRequest) -> Result<Unit> = { request ->
             repository.register(request)
@@ -71,7 +71,7 @@ class AuthViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch { // Обращаемся к серверу
+        viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
             val request = AuthRequest(currentState.username, currentState.password)

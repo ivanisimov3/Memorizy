@@ -29,6 +29,7 @@ class AddCardViewModel @Inject constructor(
 
     val uiState: StateFlow<AddCardState> = _uiState.asStateFlow()
 
+    // Изменили Термин
     fun onTermChanged(newTerm: String){
         _uiState.update { currentState ->
             currentState.copy(
@@ -38,6 +39,7 @@ class AddCardViewModel @Inject constructor(
         }
     }
 
+    // Изменили Определение
     fun onDefinitionChanged(newDefinition: String){
         _uiState.update { currentState ->
             currentState.copy(
@@ -47,7 +49,7 @@ class AddCardViewModel @Inject constructor(
         }
     }
 
-    // Нажали кнопку создать
+    // Нажали Создать
     fun onCreateButtonClicked() {
         val currentState = _uiState.value
 
@@ -67,7 +69,7 @@ class AddCardViewModel @Inject constructor(
 
             syncManager.scheduleOneTimeSync()
 
-            _uiState.update { it.copy(isCardCreated = true) }   // обновляем только когда добавим в бд
+            _uiState.update { it.copy(isCardCreated = true) }
         }
     }
 }

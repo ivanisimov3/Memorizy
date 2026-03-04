@@ -56,7 +56,6 @@ fun StudySetsScreen(
     onSearchQueryChanged: (String) -> Unit,
     onDeleteSet: (StudySet) -> Unit
 ){
-    // Переменные для логики интерфейса
     var isSearchActive by remember { mutableStateOf(false) }
     var setToDelete by remember { mutableStateOf<StudySet?>(null) }
 
