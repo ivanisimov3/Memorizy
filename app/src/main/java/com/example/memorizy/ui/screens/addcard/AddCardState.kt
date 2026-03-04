@@ -5,5 +5,6 @@ data class AddCardState (
     val definition: String = "",
     val isTermEmptyError: Boolean = false,
     val isDefinitionEmptyError: Boolean = false,
-    val isCardCreated: Boolean = false
+    val isCardCreated: Boolean = false,
+    val isSaving: Boolean = false
 )

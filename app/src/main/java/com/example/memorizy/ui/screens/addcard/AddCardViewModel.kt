@@ -53,10 +53,14 @@ class AddCardViewModel @Inject constructor(
     fun onCreateButtonClicked() {
         val currentState = _uiState.value
 
+        if (currentState.isSaving) return
+
         if (currentState.term.isBlank() || currentState.definition.isBlank()) {
             _uiState.update { it.copy(isTermEmptyError = true, isDefinitionEmptyError = true) }
             return
         }
+
+        _uiState.update { it.copy(isSaving = true) }
 
         val newCard = Card(
             setId = setId,

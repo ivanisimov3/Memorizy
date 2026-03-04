@@ -58,10 +58,14 @@ class AddStudySetViewModel  @Inject constructor(
     fun onCreateButtonClicked() {
         val currentState = _uiState.value
 
+        if (currentState.isSaving) return
+
         if (currentState.name.isBlank()) {
             _uiState.update { it.copy(isNameEmptyError = true) }
             return
         }
+
+        _uiState.update { it.copy(isSaving = true) }
 
         val newSet = StudySet(
             name = currentState.name,
