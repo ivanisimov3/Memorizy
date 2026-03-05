@@ -8,6 +8,11 @@ class FuzzyTokenComparator(
 
     private val stemmer = RussianStemmer()
 
+    private data class Token(
+        val stem: String,
+        val raw: String
+    )
+
     override fun compare(expected: String, actual: String): Boolean {
         val expectedTokens = tokenize(expected)
         val actualTokens = tokenize(actual)
@@ -15,38 +20,84 @@ class FuzzyTokenComparator(
         if (expectedTokens.isEmpty() && actualTokens.isEmpty()) return true
         if (expectedTokens.isEmpty() || actualTokens.isEmpty()) return false
 
-        val matchedExpected = mutableSetOf<String>()
-        val matchedActual = mutableSetOf<String>()
+        val matchedExpectedIndices = mutableSetOf<Int>()
+        val matchedActualIndices = mutableSetOf<Int>()
 
+        var totalScore = 0.0
+
+        // Ищем идеальные совпадения
         for ((actIdx, act) in actualTokens.withIndex()) {
             for ((expIdx, exp) in expectedTokens.withIndex()) {
-                val expKey = "$expIdx:$exp"
-                if (expKey in matchedExpected) continue
-                if (isFuzzyMatch(exp, act)) {
-                    matchedExpected.add(expKey)
-                    matchedActual.add("$actIdx:$act")
+                if (expIdx in matchedExpectedIndices) continue
+                
+                if (exp.stem == act.stem || exp.raw == act.raw) {
+                    totalScore += 1.0
+                    matchedExpectedIndices.add(expIdx)
+                    matchedActualIndices.add(actIdx)
                     break
                 }
             }
         }
 
-        val matchCount = matchedExpected.size
-        val dice = (2.0 * matchCount) / (expectedTokens.size + actualTokens.size).toDouble()
+        // Ищем частичные совпадения
+        val partialMatches = mutableListOf<Triple<Int, Int, Double>>() // expIdx, actIdx, score
+        
+        for ((actIdx, act) in actualTokens.withIndex()) {
+            if (actIdx in matchedActualIndices) continue
+            
+            for ((expIdx, exp) in expectedTokens.withIndex()) {
+                if (expIdx in matchedExpectedIndices) continue
+                
+                val score = getTokenSimilarity(exp, act)
+                if (score > 0.0) {
+                    partialMatches.add(Triple(expIdx, actIdx, score))
+                }
+            }
+        }
+
+        partialMatches.sortByDescending { it.third }
+
+        for (match in partialMatches) {
+            val (expIdx, actIdx, score) = match
+            if (expIdx !in matchedExpectedIndices && actIdx !in matchedActualIndices) {
+                totalScore += score
+                matchedExpectedIndices.add(expIdx)
+                matchedActualIndices.add(actIdx)
+            }
+        }
+
+        val dice = (2.0 * totalScore) / (expectedTokens.size + actualTokens.size).toDouble()
         return dice >= threshold
     }
 
-    // Проверка на совпадение текстов
-    private fun isFuzzyMatch(a: String, b: String): Boolean {
-        if (a == b) return true
-        val maxAllowed = maxDistance(minOf(a.length, b.length))
-        return levenshtein(a, b) <= maxAllowed
+    // Вычисляет балл похожести двух токенов от 0.0 до 1.0
+    private fun getTokenSimilarity(exp: Token, act: Token): Double {
+        val maxDistStem = maxDistance(minOf(exp.stem.length, act.stem.length))
+        val distStem = levenshtein(exp.stem, act.stem)
+        val scoreStem = when {
+            distStem <= maxDistStem -> 1.0
+            distStem == maxDistStem + 1 -> 0.5
+            else -> 0.0
+        }
+
+        // Оценка по целым словам (raw)
+        val maxDistRaw = maxDistance(minOf(exp.raw.length, act.raw.length))
+        val distRaw = levenshtein(exp.raw, act.raw)
+        val scoreRaw = when {
+            distRaw <= maxDistRaw -> 1.0
+            distRaw == maxDistRaw + 1 -> 0.5
+            else -> 0.0
+        }
+
+        // Возвращаем лучший результат (вдруг стеммер отрезал лишнего из-за опечатки)
+        return maxOf(scoreStem, scoreRaw)
     }
 
     // Максимально допустимое число опечаток в слове в зависимости от длины
     private fun maxDistance(length: Int): Int {
         return when {
             length <= 3 -> 0
-            length <= 8 -> 1
+            length <= 7 -> 1
             else -> 2
         }
     }
@@ -55,10 +106,6 @@ class FuzzyTokenComparator(
     private fun levenshtein(a: String, b: String): Int {
         val m = a.length
         val n = b.length
-
-        // Если разница длин больше максимально возможного допуска, то нет смысла считать
-        if (Math.abs(m - n) > maxDistance(minOf(m, n)))
-            return maxDistance(minOf(m, n)) + 1
 
         val dp = Array(m + 1) { IntArray(n + 1) }
 
@@ -79,13 +126,14 @@ class FuzzyTokenComparator(
         return dp[m][n]
     }
 
-    // Удаление стоп слов и упрощение слов до стемов
-    private fun tokenize(text: String): List<String> {
-        return normalize(text)
+    // Токенизация: нормализация, удаление стоп-слов, стемминг
+    private fun tokenize(text: String): List<Token> {
+        val normalized = normalize(text)
             .split(" ")
             .filter { it.isNotBlank() }
             .filter { !RussianStopWords.isStopWord(it) }
-            .map { stemmer.stem(it) }
+
+        return normalized.map { raw -> Token(stem = stemmer.stem(raw), raw = raw) }
     }
 
     // Базовые преобразования над текстом
