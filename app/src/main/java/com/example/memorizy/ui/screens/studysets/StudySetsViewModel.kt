@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.data.repository.CardRepository
+import com.example.memorizy.data.repository.SettingsRepository
 import com.example.memorizy.data.repository.StudySetRepository
-import com.example.memorizy.data.source.local.datastore.SettingsDataStore
 import com.example.memorizy.data.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -21,11 +21,11 @@ import kotlinx.coroutines.launch
 class StudySetsViewModel @Inject constructor(
     private val studySetRepository: StudySetRepository,
     private val cardRepository: CardRepository,
-    private val settingsDataStore: SettingsDataStore,
+    private val settingsRepository: SettingsRepository,
     private val syncManager: SyncManager
 ) : ViewModel(){
 
-    private val _isLoggedIn = settingsDataStore.token.map { it != null }
+    private val _isLoggedIn = settingsRepository.token.map { it != null }
 
     private val _searchQuery = MutableStateFlow("")
 

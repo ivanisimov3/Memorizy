@@ -2,7 +2,6 @@ package com.example.memorizy.data.repository
 
 import com.example.memorizy.data.mapper.toDto
 import com.example.memorizy.data.mapper.toEntity
-import com.example.memorizy.data.source.local.datastore.SettingsDataStore
 import com.example.memorizy.data.source.local.room.StudySetWithCardNumber
 import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.data.source.local.room.dao.StudySetDao
@@ -16,7 +15,7 @@ import kotlinx.coroutines.flow.first
 class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет связать создание этого репозитория с dao
     private val dao: StudySetDao,
     private val api: MemorizyApiService,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsRepository: SettingsRepository
 ) : StudySetRepository {
 
     override suspend fun insertSet(studySet: StudySet) {
@@ -43,8 +42,12 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
         return dao.getAllSetsWithCardNumber()
     }
 
+    override suspend fun getSetName(setId: Long): String? {
+        return dao.getSetName(setId)
+    }
+
     override suspend fun syncLocalChanges() {
-        val tokenString = settingsDataStore.token.first() ?: return
+        val tokenString = settingsRepository.token.first() ?: return
         val authHeader = "Bearer $tokenString"
 
         val unsyncedSets = dao.getUnsyncedSets()
@@ -94,7 +97,7 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
     }
 
     override suspend fun fetchRemoteChanges() {
-        val tokenString = settingsDataStore.token.first() ?: return
+        val tokenString = settingsRepository.token.first() ?: return
         val authHeader = "Bearer $tokenString"
 
         try {
@@ -130,7 +133,7 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
                     dao.deleteSet(localSet)
             }
 
-            settingsDataStore.updateLastSyncTime()
+            settingsRepository.updateLastSyncTime()
         } catch (e: Exception) {
             e.printStackTrace()
         }

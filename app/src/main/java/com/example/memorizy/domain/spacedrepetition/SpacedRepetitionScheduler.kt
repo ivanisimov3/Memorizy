@@ -85,7 +85,7 @@ object SpacedRepetitionScheduler {
             .flatMap { (_, cardsInLevel) -> cardsInLevel.shuffled() }   // _ - игнорируем ключ сортировки (уровень)
     }
 
-    // Вычисляем время до ближайшего повторени
+    // Вычисляем время до ближайшего повторения
     fun getTimeUntilNextReview(allCards: List<Card>, now: Long): Long? {
         val nextReviewDate = allCards
             .map { it.nextReviewDate }  // Вытаскиваем из каждой сущности Card параметр nextReviewDate

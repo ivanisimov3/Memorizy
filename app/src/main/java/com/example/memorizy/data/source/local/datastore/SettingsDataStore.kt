@@ -7,7 +7,9 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.IS_DARK_THEME_KEY
+import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.LAST_NOTIFICATION_TIME_KEY
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.LAST_SYNC_KEY
+import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.NOTIFICATIONS_ENABLED_KEY
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.TOKEN_KEY
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.USERNAME_KEY
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.USER_ID_KEY
@@ -15,6 +17,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 // Хранилище данных типа ключ-значение Datastore
@@ -32,6 +35,8 @@ class SettingsDataStore @Inject constructor(
         val USERNAME_KEY = stringPreferencesKey("username")
         val LAST_SYNC_KEY = longPreferencesKey("last_sync_time")
         val IS_DARK_THEME_KEY = booleanPreferencesKey("is_dark_theme")
+        val NOTIFICATIONS_ENABLED_KEY = booleanPreferencesKey("notifications_enabled")
+        val LAST_NOTIFICATION_TIME_KEY = longPreferencesKey("last_notification_time")
     }
 
     // Данные DataStore
@@ -60,6 +65,11 @@ class SettingsDataStore @Inject constructor(
             preferences[IS_DARK_THEME_KEY] ?: false
         }
 
+    val notificationsEnabled: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[NOTIFICATIONS_ENABLED_KEY] ?: false
+        }
+
     // Методы для операций над данными DataStore
     suspend fun saveUserUtilInfo(token: String, userId: Long) {
         context.dataStore.edit { preferences ->
@@ -84,6 +94,24 @@ class SettingsDataStore @Inject constructor(
         context.dataStore.edit { preferences ->
             preferences[IS_DARK_THEME_KEY] = isDarkTheme
         }
+    }
+
+    suspend fun setNotificationsEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[NOTIFICATIONS_ENABLED_KEY] = enabled
+        }
+    }
+
+    suspend fun setLastNotificationTime(time: Long) {
+        context.dataStore.edit { preferences ->
+            preferences[LAST_NOTIFICATION_TIME_KEY] = time
+        }
+    }
+
+    suspend fun getLastNotificationTime(): Long {
+        return context.dataStore.data
+            .map { it[LAST_NOTIFICATION_TIME_KEY] ?: 0L }
+            .first()
     }
 
     suspend fun deleteToken() {

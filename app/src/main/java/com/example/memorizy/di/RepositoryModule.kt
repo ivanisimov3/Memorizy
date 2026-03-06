@@ -6,6 +6,8 @@ import com.example.memorizy.data.repository.CardRepositoryImpl
 import com.example.memorizy.data.repository.StudySetRepositoryImpl
 import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.repository.StudySetRepository
+import com.example.memorizy.data.repository.SettingsRepository
+import com.example.memorizy.data.repository.SettingsRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -35,4 +37,10 @@ abstract class RepositoryModule {   // abstract class используем ко�
     abstract fun bingAuthRepository(
         impl: AuthRepositoryImpl
     ) : AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(
+        impl: SettingsRepositoryImpl
+    ) : SettingsRepository
 }

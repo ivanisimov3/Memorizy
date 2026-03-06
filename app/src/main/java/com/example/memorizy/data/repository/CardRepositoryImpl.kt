@@ -2,7 +2,6 @@ package com.example.memorizy.data.repository
 
 import com.example.memorizy.data.mapper.toDto
 import com.example.memorizy.data.mapper.toEntity
-import com.example.memorizy.data.source.local.datastore.SettingsDataStore
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.source.local.room.dao.CardDao
 import com.example.memorizy.data.source.local.room.dao.StudySetDao
@@ -17,7 +16,7 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
     private val dao: CardDao,
     private val studySetDao: StudySetDao,
     private val api: MemorizyApiService,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsRepository: SettingsRepository
 ) : CardRepository {
     override suspend fun insertCard(card: Card) {
         return dao.insertCard(card)
@@ -43,8 +42,12 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
         return dao.getAllNonDeletedCards()
     }
 
+    override suspend fun getAllNonDeletedCardsSuspend(): List<Card> {
+        return dao.getAllNonDeletedCardsSuspend()
+    }
+
     override suspend fun syncLocalChanges() {
-        val tokenString = settingsDataStore.token.first() ?: return
+        val tokenString = settingsRepository.token.first() ?: return
         val authHeader = "Bearer $tokenString"
 
         val unsyncedCards = dao.getUnsyncedCards()
@@ -100,7 +103,7 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
     }
 
     override suspend fun fetchRemoteChanges() {
-        val tokenString = settingsDataStore.token.first() ?: return
+        val tokenString = settingsRepository.token.first() ?: return
         val authHeader = "Bearer $tokenString"
 
         val syncedSets = studySetDao.getSyncedSets()

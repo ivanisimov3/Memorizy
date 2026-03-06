@@ -19,6 +19,8 @@ interface CardRepository {
 
     fun getAllNonDeletedCards(): Flow<List<Card>>
 
+    suspend fun getAllNonDeletedCardsSuspend(): List<Card>
+
     suspend fun syncLocalChanges()
 
     suspend fun fetchRemoteChanges()

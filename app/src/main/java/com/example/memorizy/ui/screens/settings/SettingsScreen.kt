@@ -49,7 +49,8 @@ fun SettingsScreen(
     onBackClick: () -> Unit,
     uiState: SettingsState,
     onSyncClick: () -> Unit,
-    onThemeChange: (Boolean) -> Unit
+    onThemeChange: (Boolean) -> Unit,
+    onNotificationsChange: (Boolean) -> Unit
 ){
     var showLogoutDialog by remember { mutableStateOf(false) }
 
@@ -83,7 +84,8 @@ fun SettingsScreen(
             onLoginClick = onLoginClick,
             onSyncClick = onSyncClick,
             onThemeChange = onThemeChange,
-            onLogoutButtonClick = {showLogoutDialog = true}
+            onNotificationsChange = onNotificationsChange,
+            onLogoutButtonClick = { showLogoutDialog = true }
         )
     }
 
@@ -107,6 +109,7 @@ private fun SettingsScreenBody(
     onLoginClick: () -> Unit,
     onSyncClick: () -> Unit,
     onThemeChange: (Boolean) -> Unit,
+    onNotificationsChange: (Boolean) -> Unit,
     onLogoutButtonClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -231,6 +234,26 @@ private fun SettingsScreenBody(
                 Switch(
                     checked = uiState.isDarkTheme,
                     onCheckedChange = onThemeChange
+                )
+            }
+        }
+
+        Spacer(Modifier.height(2.dp))
+        HorizontalDivider(color = MaterialTheme.colorScheme.secondary)
+
+        SettingsSection(title = stringResource(R.string.notifications_text)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.settings_notifications_text),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Switch(
+                    checked = uiState.notificationsEnabled,
+                    onCheckedChange = onNotificationsChange
                 )
             }
         }

@@ -63,7 +63,8 @@ fun MemorizyApp() {
                 onBackClick = { navController.popBackStack() },
                 uiState = uiState,
                 onSyncClick = viewModel::onSyncNow,
-                onThemeChange = viewModel::onThemeChanged
+                onThemeChange = viewModel::onThemeChanged,
+                onNotificationsChange = viewModel::onNotificationsChanged
             )
         }
 

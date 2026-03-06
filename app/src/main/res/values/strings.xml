@@ -47,6 +47,8 @@
     <string name="sync_last_time">Дата последней синхронизации: %1$s</string>
     <string name="app_theme_text">Тема приложения</string>
     <string name="settings_dark_theme_text">Темная тема:</string>
+    <string name="notifications_text">Уведомления</string>
+    <string name="settings_notifications_text">Напоминать о повторении:</string>
     <string name="settings_ic">Иконка настройки</string>
     <string name="guest_text">Гость</string>
     <string name="error_unknown">Неизвестная ошибка</string>

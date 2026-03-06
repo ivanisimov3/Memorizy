@@ -1,8 +1,12 @@
 package com.example.memorizy
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
@@ -31,14 +35,34 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val viewModel: MainViewModel = hiltViewModel()
-            val isDarkTheme by viewModel.isDarkTheme.collectAsState()   // Подписываемся на StateFlow
+            val uiState by viewModel.uiState.collectAsState()   // Подписываемся на StateFlow
 
-            LaunchedEffect(isDarkTheme) {   // Подписываемся на изменение isDarkTheme
-                val insetsController = WindowCompat.getInsetsController(window, window.decorView)
-                insetsController.isAppearanceLightStatusBars = !isDarkTheme // Перекрашиваем statusBar при изменении темы
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val launcher = rememberLauncherForActivityResult(
+                    ActivityResultContracts.RequestPermission()
+                ) { isGranted ->
+                    viewModel.onNotificationPermissionResult(isGranted)
+                }
+
+                LaunchedEffect(uiState.shouldRequestNotificationPermission) {
+                    if (uiState.shouldRequestNotificationPermission) {
+                        launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            } else {
+                LaunchedEffect(uiState.shouldRequestNotificationPermission) {
+                    if (uiState.shouldRequestNotificationPermission) {
+                        viewModel.onNotificationPermissionResult(true)
+                    }
+                }
             }
 
-            MemorizyTheme(darkTheme = isDarkTheme) {
+            LaunchedEffect(uiState.isDarkTheme) {   // Подписываемся на изменение isDarkTheme
+                val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+                insetsController.isAppearanceLightStatusBars = !uiState.isDarkTheme // Перекрашиваем statusBar при изменении темы
+            }
+
+            MemorizyTheme(darkTheme = uiState.isDarkTheme) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
