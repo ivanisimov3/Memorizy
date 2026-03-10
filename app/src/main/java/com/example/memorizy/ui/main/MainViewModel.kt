@@ -24,8 +24,8 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val notificationsEnabled = settingsRepository.notificationsEnabled.first()
-            if (!notificationsEnabled) {
+            val hasPrompted = settingsRepository.hasPromptedForNotifications.first()
+            if (!hasPrompted) {
                 _shouldRequestPermission.value = true
             }
         }
@@ -48,10 +48,14 @@ class MainViewModel @Inject constructor(
     // Обработка результата запроса разрешения на уведомления
     fun onNotificationPermissionResult(granted: Boolean) {
         _shouldRequestPermission.value = false
-        if (granted) {
-            viewModelScope.launch {
+        viewModelScope.launch {
+            settingsRepository.setHasPromptedForNotifications(true)
+            
+            if (granted) {
                 settingsRepository.setNotificationsEnabled(true)
                 notificationScheduler.startPeriodicReminders()
+            } else {
+                settingsRepository.setNotificationsEnabled(false)
             }
         }
     }

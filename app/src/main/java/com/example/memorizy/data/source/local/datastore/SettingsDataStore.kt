@@ -10,6 +10,7 @@ import com.example.memorizy.data.source.local.datastore.SettingsDataStore.Prefer
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.LAST_NOTIFICATION_TIME_KEY
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.LAST_SYNC_KEY
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.NOTIFICATIONS_ENABLED_KEY
+import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.HAS_PROMPTED_FOR_NOTIFICATIONS_KEY
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.TOKEN_KEY
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.USERNAME_KEY
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore.PreferencesKeys.USER_ID_KEY
@@ -36,6 +37,7 @@ class SettingsDataStore @Inject constructor(
         val LAST_SYNC_KEY = longPreferencesKey("last_sync_time")
         val IS_DARK_THEME_KEY = booleanPreferencesKey("is_dark_theme")
         val NOTIFICATIONS_ENABLED_KEY = booleanPreferencesKey("notifications_enabled")
+        val HAS_PROMPTED_FOR_NOTIFICATIONS_KEY = booleanPreferencesKey("has_prompted_for_notifications")
         val LAST_NOTIFICATION_TIME_KEY = longPreferencesKey("last_notification_time")
     }
 
@@ -70,6 +72,11 @@ class SettingsDataStore @Inject constructor(
             preferences[NOTIFICATIONS_ENABLED_KEY] ?: false
         }
 
+    val hasPromptedForNotifications: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[HAS_PROMPTED_FOR_NOTIFICATIONS_KEY] ?: false
+        }
+
     // Методы для операций над данными DataStore
     suspend fun saveUserUtilInfo(token: String, userId: Long) {
         context.dataStore.edit { preferences ->
@@ -99,6 +106,12 @@ class SettingsDataStore @Inject constructor(
     suspend fun setNotificationsEnabled(enabled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[NOTIFICATIONS_ENABLED_KEY] = enabled
+        }
+    }
+
+    suspend fun setHasPromptedForNotifications(prompted: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[HAS_PROMPTED_FOR_NOTIFICATIONS_KEY] = prompted
         }
     }
 

@@ -16,6 +16,7 @@ class SettingsRepositoryImpl @Inject constructor(
     override val lastSyncTime: Flow<Long?> = settingsDataStore.lastSyncTime
     override val isDarkTheme: Flow<Boolean> = settingsDataStore.isDarkTheme
     override val notificationsEnabled: Flow<Boolean> = settingsDataStore.notificationsEnabled
+    override val hasPromptedForNotifications: Flow<Boolean> = settingsDataStore.hasPromptedForNotifications
 
     override suspend fun saveUserUtilInfo(token: String, userId: Long) {
         settingsDataStore.saveUserUtilInfo(token, userId)
@@ -35,6 +36,10 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setNotificationsEnabled(enabled: Boolean) {
         settingsDataStore.setNotificationsEnabled(enabled)
+    }
+
+    override suspend fun setHasPromptedForNotifications(prompted: Boolean) {
+        settingsDataStore.setHasPromptedForNotifications(prompted)
     }
 
     override suspend fun setLastNotificationTime(time: Long) {
