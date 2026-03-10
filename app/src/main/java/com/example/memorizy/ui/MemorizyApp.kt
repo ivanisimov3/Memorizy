@@ -156,7 +156,10 @@ fun MemorizyApp() {
                 uiState = uiState,
                 onTermChanged = viewModel::onTermChanged,
                 onDefinitionChanged = viewModel::onDefinitionChanged,
-                onCreateButtonClicked = viewModel::onCreateButtonClicked
+                onCreateButtonClicked = viewModel::onCreateButtonClicked,
+                onFileSelected = viewModel::onFileSelected,
+                onDismissImportSummary = viewModel::dismissImportSummary,
+                onConfirmImport = viewModel::confirmImport
             )
         }
 

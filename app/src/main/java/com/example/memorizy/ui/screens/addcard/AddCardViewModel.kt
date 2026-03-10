@@ -15,12 +15,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import android.net.Uri
+import com.example.memorizy.domain.importer.usecase.ParseCardsFileUseCase
+import com.example.memorizy.domain.importer.usecase.ImportCardsUseCase
 
 @HiltViewModel
 class AddCardViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val cardRepository: CardRepository,
-    private val syncManager: SyncManager
+    private val syncManager: SyncManager,
+    private val parseCardsFileUseCase: ParseCardsFileUseCase,
+    private val importCardsUseCase: ImportCardsUseCase
 ) : ViewModel(){
     private val route = savedStateHandle.toRoute<Routes.AddCard>()
     private val setId = route.setId
@@ -74,6 +79,55 @@ class AddCardViewModel @Inject constructor(
             syncManager.scheduleOneTimeSync()
 
             _uiState.update { it.copy(isCardCreated = true) }
+        }
+    }
+
+    // Выбрали файл
+    fun onFileSelected(uri: Uri?) {
+        if (uri == null) return
+
+        _uiState.update { it.copy(isImporting = true) }
+        viewModelScope.launch {
+            val result = parseCardsFileUseCase(uri)
+            _uiState.update {
+                it.copy(
+                    isImporting = false,
+                    importSummary = result,
+                    showImportSummaryDialog = true
+                )
+            }
+        }
+    }
+
+    fun dismissImportSummary() {
+        _uiState.update {
+            it.copy(
+                showImportSummaryDialog = false,
+                importSummary = null
+            )
+        }
+    }
+
+    fun confirmImport() {
+        val result = _uiState.value.importSummary ?: return
+        
+        _uiState.update {
+            it.copy(
+                isSaving = true,
+                showImportSummaryDialog = false
+            )
+        }
+        
+        viewModelScope.launch {
+            importCardsUseCase(setId, result.successfulCards)
+            
+            _uiState.update {
+                it.copy(
+                    isSaving = false,
+                    isCardCreated = true,
+                    importSummary = null
+                )
+            }
         }
     }
 }
