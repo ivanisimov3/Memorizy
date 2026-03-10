@@ -9,6 +9,8 @@ interface CardRepository {
 
     suspend fun insertCard(card: Card)
 
+    suspend fun insertCards(cards: List<Card>)
+
     suspend fun updateCard(card: Card)
 
     suspend fun markAsDeleted(id: Long)

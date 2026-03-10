@@ -99,4 +99,7 @@ dependencies {
 
     implementation("androidx.hilt:hilt-work:1.2.0")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
+
+    // Source: https://mvnrepository.com/artifact/com.jsoizo/kotlin-csv
+    implementation("com.jsoizo:kotlin-csv:1.10.0")
 }

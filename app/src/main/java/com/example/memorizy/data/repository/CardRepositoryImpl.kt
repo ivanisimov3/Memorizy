@@ -22,6 +22,10 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
         return dao.insertCard(card)
     }
 
+    override suspend fun insertCards(cards: List<Card>) {
+        dao.insertCards(cards)
+    }
+
     override suspend fun updateCard(card: Card) {
         return dao.updateCard(card)
     }
