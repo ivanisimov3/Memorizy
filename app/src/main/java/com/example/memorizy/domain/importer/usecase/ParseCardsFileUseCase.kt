@@ -11,6 +11,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * Парсер входного файла
+ *
+ * Принцип работы:
+ * - Используется библиотека kotlin-csv
+ * - Отделяем термины и определения с помощью delimiter, quoteChar, escapeChar
+ * - Разбираем каждую строку на карточки или ошибки
+ */
+
 class ParseCardsFileUseCase @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
@@ -37,6 +46,8 @@ class ParseCardsFileUseCase @Inject constructor(
 
                                 if (term.isEmpty()) {
                                     errors.add(CardImportError(lineNumber, "Пустой термин"))
+                                } else if (definition.isEmpty()) {
+                                    errors.add(CardImportError(lineNumber, "Пустое определение"))
                                 } else if (term.length > 500 || definition.length > 500) {
                                      errors.add(CardImportError(lineNumber, "Длина текста превышает 500 символов"))
                                 } else {

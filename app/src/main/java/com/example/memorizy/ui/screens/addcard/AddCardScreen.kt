@@ -129,7 +129,10 @@ private fun ImportSummaryDialog(
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = {
-            Text(text = stringResource(R.string.import_result_title))
+            Text(
+                text = stringResource(R.string.import_result_title),
+                style = MaterialTheme.typography.displayMedium
+            )
         },
         text = {
             Column {
@@ -138,8 +141,7 @@ private fun ImportSummaryDialog(
                         R.string.import_success_count,
                         importSummary.successfulCards.size
                     ),
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 
                 if (importSummary.errors.isNotEmpty()) {
@@ -149,8 +151,7 @@ private fun ImportSummaryDialog(
                             R.string.import_error_count,
                             importSummary.errors.size
                         ),
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.error
+                        style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     LazyColumn(modifier = Modifier.height(150.dp)) {
@@ -160,8 +161,7 @@ private fun ImportSummaryDialog(
                                     stringResource(R.string.import_error_details, error.lineNumber, error.reason)
                                 else
                                     error.reason,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
                     }
@@ -171,13 +171,21 @@ private fun ImportSummaryDialog(
         confirmButton = {
             if (importSummary.successfulCards.isNotEmpty()) {
                 TextButton(onClick = onConfirmImport) {
-                    Text(stringResource(R.string.import_confirm))
+                    Text(
+                        text = stringResource(R.string.import_confirm),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         },
         dismissButton = {
             TextButton(onClick = onDismissRequest) {
-                Text(stringResource(R.string.cancel_text))
+                Text(
+                    text = stringResource(R.string.cancel_text),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
     )

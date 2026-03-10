@@ -17,15 +17,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.net.Uri
 import com.example.memorizy.domain.importer.usecase.ParseCardsFileUseCase
-import com.example.memorizy.domain.importer.usecase.ImportCardsUseCase
 
 @HiltViewModel
 class AddCardViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val cardRepository: CardRepository,
     private val syncManager: SyncManager,
-    private val parseCardsFileUseCase: ParseCardsFileUseCase,
-    private val importCardsUseCase: ImportCardsUseCase
+    private val parseCardsFileUseCase: ParseCardsFileUseCase
 ) : ViewModel(){
     private val route = savedStateHandle.toRoute<Routes.AddCard>()
     private val setId = route.setId
@@ -119,7 +117,18 @@ class AddCardViewModel @Inject constructor(
         }
         
         viewModelScope.launch {
-            importCardsUseCase(setId, result.successfulCards)
+            val cardsToInsert = result.successfulCards.map {
+                Card(
+                    setId = setId,
+                    term = it.term,
+                    definition = it.definition
+                )
+            }
+
+            if (cardsToInsert.isNotEmpty()) {
+                cardRepository.insertCards(cardsToInsert)
+                syncManager.scheduleOneTimeSync()
+            }
             
             _uiState.update {
                 it.copy(

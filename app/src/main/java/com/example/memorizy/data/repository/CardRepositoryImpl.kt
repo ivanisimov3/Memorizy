@@ -18,6 +18,7 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
     private val api: MemorizyApiService,
     private val settingsRepository: SettingsRepository
 ) : CardRepository {
+
     override suspend fun insertCard(card: Card) {
         return dao.insertCard(card)
     }
