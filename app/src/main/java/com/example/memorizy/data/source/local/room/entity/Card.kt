@@ -13,7 +13,7 @@ import androidx.room.PrimaryKey
         entity = StudySet::class,
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("setId"),
-        onDelete = ForeignKey.CASCADE // Удаляем все карточки если удалится набор
+        onDelete = ForeignKey.CASCADE   // Удаляем все карточки если удалится набор
     )],
     indices = [Index(value = ["setId"])]    // Индексируем таблицу по setId для увеличения скорости работы
 )

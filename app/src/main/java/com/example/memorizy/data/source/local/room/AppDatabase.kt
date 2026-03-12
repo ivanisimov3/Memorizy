@@ -3,14 +3,17 @@ package com.example.memorizy.data.source.local.room
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.memorizy.data.source.local.room.dao.CardDao
+import com.example.memorizy.data.source.local.room.dao.SessionRecordDao
 import com.example.memorizy.data.source.local.room.dao.StudySetDao
 import com.example.memorizy.data.source.local.room.entity.Card
+import com.example.memorizy.data.source.local.room.entity.SessionRecord
 import com.example.memorizy.data.source.local.room.entity.StudySet
 
 // Конфигурация локальной БД Room
 
-@Database(entities = [StudySet::class, Card::class], version = 2, exportSchema = false)
+@Database(entities = [StudySet::class, Card::class, SessionRecord::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun studySetDao(): StudySetDao
     abstract fun cardDao(): CardDao
+    abstract fun sessionRecordDao(): SessionRecordDao
 }
