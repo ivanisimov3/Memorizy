@@ -114,4 +114,17 @@
     <string name="import_error_count">Ошибок: %1$d</string>
     <string name="import_error_details">Строка %1$d: %2$s</string>
     <string name="import_confirm">Сохранить</string>
+
+    <string name="statistics_title">Статистика</string>
+    <string name="statistics_ic">Иконка статистики</string>
+    <string name="level_distribution_title">Распределение уровней</string>
+    <string name="session_progress_title">Прогресс по сессиям</string>
+    <string name="overall_progress_title">Общий прогресс</string>
+    <string name="not_enough_sessions">Для построения графика нужно пройти сессии как минимум в два разных дня</string>
+    <string name="learning_label">Заучивание</string>
+    <string name="testing_label">Тестирование</string>
+    <string name="progress_percentage">Прогресс: %1$d%%</string>
+    <string name="level_label">Ур. %1$d</string>
+    <string name="cards_label">%1$d к.</string>
+
 </resources>

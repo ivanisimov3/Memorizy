@@ -102,4 +102,7 @@ dependencies {
 
     // Source: https://mvnrepository.com/artifact/com.jsoizo/kotlin-csv
     implementation("com.jsoizo:kotlin-csv:1.10.0")
+
+    // Source: https://github.com/patrykandpatrick/vico
+    implementation("com.patrykandpatrick.vico:compose-m3:2.1.4")
 }

@@ -20,6 +20,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.compose.material3.Icon
+import java.util.Calendar
+
+const val SESSION_TYPE_LEARNING = "learning"
+const val SESSION_TYPE_TESTING = "testing"
 
 object AppIcons {
     val allIcons = mapOf(
@@ -57,6 +61,16 @@ object DateUtils {
             hours > 0 -> "$hours ч"
             else -> "$minutes мин"
         }
+    }
+
+    fun dayKey(timestamp: Long): Long {
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = timestamp
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        return cal.timeInMillis
     }
 }
 
