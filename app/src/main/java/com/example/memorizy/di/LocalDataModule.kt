@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.memorizy.data.source.local.room.AppDatabase
 import com.example.memorizy.data.source.local.room.dao.CardDao
+import com.example.memorizy.data.source.local.room.dao.SessionRecordDao
 import com.example.memorizy.data.source.local.room.dao.StudySetDao
 import dagger.Module
 import dagger.Provides
@@ -43,5 +44,12 @@ object LocalDataModule { // object используем когда нужно п
     @Singleton
     fun provideCardDao(db: AppDatabase): CardDao {
         return db.cardDao()
+    }
+
+    // Учим создавать SessionRecordDao
+    @Provides
+    @Singleton
+    fun provideSessionRecordDao(db: AppDatabase): SessionRecordDao {
+        return db.sessionRecordDao()
     }
 }

@@ -3,6 +3,8 @@ package com.example.memorizy.di
 import com.example.memorizy.data.repository.AuthRepository
 import com.example.memorizy.data.repository.AuthRepositoryImpl
 import com.example.memorizy.data.repository.CardRepositoryImpl
+import com.example.memorizy.data.repository.SessionRepository
+import com.example.memorizy.data.repository.SessionRepositoryImpl
 import com.example.memorizy.data.repository.StudySetRepositoryImpl
 import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.repository.StudySetRepository
@@ -43,4 +45,10 @@ abstract class RepositoryModule {   // abstract class используем ко�
     abstract fun bindSettingsRepository(
         impl: SettingsRepositoryImpl
     ) : SettingsRepository
-}
+
+    @Binds
+    @Singleton
+    abstract fun bindSessionRepository(
+        impl: SessionRepositoryImpl
+    ) : SessionRepository
+}
