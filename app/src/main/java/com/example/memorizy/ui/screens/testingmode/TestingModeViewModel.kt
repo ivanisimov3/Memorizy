@@ -5,9 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.memorizy.data.repository.CardRepository
+import com.example.memorizy.data.repository.SessionRepository
 import com.example.memorizy.data.source.local.room.entity.Card
+import com.example.memorizy.data.source.local.room.entity.SessionRecord
 import com.example.memorizy.domain.textcomparison.FuzzyTokenComparator
 import com.example.memorizy.ui.navigation.Routes
+import com.example.memorizy.ui.utils.SESSION_TYPE_TESTING
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +22,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class TestingModeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle, // Аргументы навигации
-    private val cardRepository: CardRepository
+    private val cardRepository: CardRepository,
+    private val sessionRepository: SessionRepository
 ) : ViewModel(){
 
     private val route = savedStateHandle.toRoute<Routes.TestingMode>()
@@ -99,9 +103,28 @@ class TestingModeViewModel @Inject constructor(
             val isFinished = (nextIndex >= state.cards.size)
             val nextCard = if (isFinished) null else state.cards[nextIndex]
 
+            val newCorrect = if (isCorrect) state.correctCount + 1 else state.correctCount
+            val newIncorrect = if (!isCorrect) state.incorrectCount + 1 else state.incorrectCount
+
+            if (isFinished) {
+                val total = state.cards.size
+                val percentage = if (total > 0) newCorrect.toFloat() / total * 100f else 0f
+                viewModelScope.launch {
+                    sessionRepository.saveSession(
+                        SessionRecord(
+                            setId = setId,
+                            type = SESSION_TYPE_TESTING,
+                            correctCount = newCorrect,
+                            totalCount = total,
+                            percentage = percentage
+                        )
+                    )
+                }
+            }
+
             state.copy(
-                correctCount = if (isCorrect) state.correctCount + 1 else state.correctCount,
-                incorrectCount = if (!isCorrect) state.incorrectCount + 1 else state.incorrectCount,
+                correctCount = newCorrect,
+                incorrectCount = newIncorrect,
                 currentIndex = nextIndex,
                 currentCard = nextCard,
                 isFinished = isFinished,
