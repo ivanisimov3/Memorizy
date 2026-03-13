@@ -25,6 +25,8 @@ import com.example.memorizy.ui.screens.studysets.StudySetsScreen
 import com.example.memorizy.ui.screens.studysets.StudySetsViewModel
 import com.example.memorizy.ui.screens.testingmode.TestingModeScreen
 import com.example.memorizy.ui.screens.testingmode.TestingModeViewModel
+import com.example.memorizy.ui.screens.statistics.StatisticsScreen
+import com.example.memorizy.ui.screens.statistics.StatisticsViewModel
 
 // Главный граф навигации NavHost
 
@@ -113,6 +115,9 @@ fun MemorizyApp() {
                 onTestingModeClick = {
                     navController.navigate(Routes.TestingMode(setId = route.setId))
                 },
+                onStatisticsClick = {
+                    navController.navigate(Routes.Statistics(setId = route.setId))
+                },
                 onAddCardClick = {
                     navController.navigate(Routes.AddCard(setId = route.setId))
                 },
@@ -176,6 +181,16 @@ fun MemorizyApp() {
                 onSubmitAnswer = viewModel::onSubmitAnswer,
                 restartTesting = viewModel::restartTesting,
                 showAnswers = viewModel::showAnswers
+            )
+        }
+
+        composable<Routes.Statistics> {
+            val viewModel: StatisticsViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            StatisticsScreen(
+                onBackClick = { navController.popBackStack() },
+                uiState = uiState
             )
         }
     }

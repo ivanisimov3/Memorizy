@@ -9,5 +9,6 @@ data class SetDetailsState(
     val cards: List<Card> = emptyList(),
     val isEditing: Boolean = false,
     val draftSet: StudySet? = null,
-    val draftCards: List<Card> = emptyList()
+    val draftCards: List<Card> = emptyList(),
+    val overallProgress: Float = 0f
 )

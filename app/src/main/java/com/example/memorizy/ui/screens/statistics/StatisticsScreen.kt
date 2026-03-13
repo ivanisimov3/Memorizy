@@ -33,10 +33,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
-import com.example.memorizy.data.source.local.room.entity.SessionRecord
 import com.example.memorizy.ui.utils.AppIcon
 import com.example.memorizy.ui.utils.DateUtils
-import com.example.memorizy.ui.utils.DateUtils.dayKey
 import com.example.memorizy.ui.utils.GlassContainer
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
@@ -45,7 +43,6 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
-import java.util.Calendar
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent

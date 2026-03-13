@@ -47,9 +47,17 @@ class SetDetailsViewModel @Inject constructor(
 
         viewModelScope.launch {
             cardRepository.getAllCardsForSet(setId).collect { cards ->
+                val avgLevel =
+                    if (cards.isEmpty())
+                        0f
+                    else
+                        cards.map { it.level }.average().toFloat()
+                val progress = avgLevel / SpacedRepetitionScheduler.MAX_LEVEL   // Рассчитываем процент знания набора
+
                 _uiState.update { state ->
                     state.copy(
-                        cards = cards
+                        cards = cards,
+                        overallProgress = progress
                     )
                 }
             }

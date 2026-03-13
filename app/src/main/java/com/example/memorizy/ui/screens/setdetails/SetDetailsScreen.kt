@@ -27,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -73,7 +74,8 @@ fun SetDetailsScreen(
     onCancelEditing: () -> Unit,
     onSaveChanges: () -> Unit,
     onLearningModeClick: () -> Unit,
-    onTestingModeClick: () -> Unit
+    onTestingModeClick: () -> Unit,
+    onStatisticsClick: () -> Unit
 ){
     var cardToDelete by remember { mutableStateOf<Card?>(null) }
     var showIconDialog by rememberSaveable { mutableStateOf(false) }
@@ -85,7 +87,8 @@ fun SetDetailsScreen(
                 isEditing = uiState.isEditing,
                 onCancelEditing = onCancelEditing,
                 onSaveChanges = onSaveChanges,
-                onStartEditing = onStartEditing
+                onStartEditing = onStartEditing,
+                onStatisticsClick = onStatisticsClick
             )
         },
         floatingActionButton = {
@@ -104,7 +107,7 @@ fun SetDetailsScreen(
             }
         }
     ) { paddingValues ->
-        SetDetailsScreenBody(
+        SetDetailsBody(
             modifier = Modifier
                 .padding(paddingValues),
             uiState = uiState,
@@ -156,6 +159,7 @@ private fun SetDetailsTopBar(
     onCancelEditing: () -> Unit,
     onSaveChanges: () -> Unit,
     onStartEditing: () -> Unit,
+    onStatisticsClick: () -> Unit,
     isEditing: Boolean
 ){
     TopAppBar(
@@ -195,6 +199,12 @@ private fun SetDetailsTopBar(
                     )
                 }
             } else {
+                IconButton(onClick = onStatisticsClick) {
+                    AppIcon(
+                        painter = painterResource(R.drawable.ic_statistics),
+                        contentDescription = stringResource(R.string.statistics_ic)
+                    )
+                }
                 IconButton(onClick = onStartEditing) {
                     AppIcon(
                         painter = painterResource(R.drawable.ic_edit),
@@ -208,7 +218,7 @@ private fun SetDetailsTopBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SetDetailsScreenBody(
+private fun SetDetailsBody(
     modifier: Modifier,
     uiState: SetDetailsState,
     onCardToDelete: (Card) -> Unit,
@@ -231,165 +241,187 @@ private fun SetDetailsScreenBody(
         ){
             CircularProgressIndicator()
         }
+        return
     }
-    else{
-        LazyColumn(
-            modifier = modifier
-                .fillMaxSize(),
-            contentPadding = PaddingValues(16.dp)
-        ) {
-            item {
-                Column{
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(
-                                getIconRes(
-                                    if (editMode)
-                                        uiState.draftSet.iconId
-                                    else
-                                        uiState.studySet.iconId
-                                )
-                            ),
-                            contentDescription = stringResource(R.string.set_icon),
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .then(  // Объединяет этот модификатор с другим
-                                    if (editMode) Modifier
-                                        .clip(CircleShape)
-                                        .clickable { onIconClick() }
-                                        .size(48.dp)
-                                    else Modifier
-                                        .size(48.dp)
-                                )
-                        )
-                        Spacer(Modifier.width(16.dp))
-                        if (editMode) {
-                            OutlinedTextField(
-                                value = uiState.draftSet.name,
-                                onValueChange = updateDraftName,
-                                label = {
-                                    Text(
-                                        text = stringResource(R.string.set_name_field),
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                },
-                                isError = uiState.draftSet.name.isEmpty(),
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-                            )
-                        } else {
-                            Text(
-                                text = uiState.studySet.name,
-                                style = MaterialTheme.typography.displayMedium
-                            )
-                        }
-                    }
 
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize(),
+        contentPadding = PaddingValues(16.dp)
+    ) {
+        if (!editMode) {
+            item {
+                Column {
+                    Text(
+                        text = stringResource(R.string.overall_progress_title),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    LinearProgressIndicator(
+                        progress = { uiState.overallProgress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(5.dp),
+                        gapSize = (-15).dp,
+                        drawStopIndicator = {}
+                    )
+                    Spacer(Modifier.height(12.dp))
+                }
+            }
+        }
+
+        item {
+            Column{
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(
+                            getIconRes(
+                                if (editMode)
+                                    uiState.draftSet.iconId
+                                else
+                                    uiState.studySet.iconId
+                            )
+                        ),
+                        contentDescription = stringResource(R.string.set_icon),
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .then(  // Объединяет этот модификатор с другим
+                                if (editMode) Modifier
+                                    .clip(CircleShape)
+                                    .clickable { onIconClick() }
+                                    .size(48.dp)
+                                else Modifier
+                                    .size(48.dp)
+                            )
+                    )
+                    Spacer(Modifier.width(16.dp))
                     if (editMode) {
                         OutlinedTextField(
-                            value = uiState.draftSet.description ?: "",
-                            onValueChange = updateDraftDescription,
+                            value = uiState.draftSet.name,
+                            onValueChange = updateDraftName,
                             label = {
                                 Text(
-                                    text = stringResource(R.string.set_description),
+                                    text = stringResource(R.string.set_name_field),
                                     style = MaterialTheme.typography.labelSmall
                                 )
                             },
+                            isError = uiState.draftSet.name.isEmpty(),
                             modifier = Modifier.fillMaxWidth(),
-                            minLines = 5,
-                            maxLines = 5,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
                     } else {
-                        if (!uiState.studySet.description.isNullOrBlank()) {
-
-                            Spacer(Modifier.height(8.dp))
-
-                            Text(
-                                text = uiState.studySet.description,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
+                        Text(
+                            text = uiState.studySet.name,
+                            style = MaterialTheme.typography.displayMedium
+                        )
                     }
+                }
 
-                    if (editMode) {
-                        Spacer(Modifier.height(8.dp))
-                        TargetDateEditor(
-                            currentTargetDate = uiState.draftSet.targetDate,
-                            onTargetDateChanged = updateDraftTargetDate
-                        )
-                    } else {
-                        val targetDate = uiState.studySet.targetDate
-                        if (targetDate != null) {
-                            Spacer(Modifier.height(8.dp))
-                            val dateStr = DateUtils.formatShortDate(targetDate)
+                if (editMode) {
+                    OutlinedTextField(
+                        value = uiState.draftSet.description ?: "",
+                        onValueChange = updateDraftDescription,
+                        label = {
                             Text(
-                                text = stringResource(R.string.target_date_display, dateStr),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.primary
+                                text = stringResource(R.string.set_description),
+                                style = MaterialTheme.typography.labelSmall
                             )
-                        }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 5,
+                        maxLines = 5,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                    )
+                } else {
+                    if (!uiState.studySet.description.isNullOrBlank()) {
+
+                        Spacer(Modifier.height(8.dp))
+
+                        Text(
+                            text = uiState.studySet.description,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+                if (editMode) {
+                    Spacer(Modifier.height(8.dp))
+                    TargetDateEditor(
+                        currentTargetDate = uiState.draftSet.targetDate,
+                        onTargetDateChanged = updateDraftTargetDate
+                    )
+                } else {
+                    val targetDate = uiState.studySet.targetDate
+                    if (targetDate != null) {
+                        Spacer(Modifier.height(8.dp))
+                        val dateStr = DateUtils.formatShortDate(targetDate)
+                        Text(
+                            text = stringResource(R.string.target_date_display, dateStr),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                if (!editMode) {
+                    GlassContainer (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(onClick = onLearningModeClick)
+                            .height(50.dp),
+                        containerColor = MaterialTheme.colorScheme.secondary
+                    ) {
+                        Text(
+                            stringResource(R.string.learning_mode),
+                            style = MaterialTheme.typography.displayLarge,
+                        )
                     }
 
                     Spacer(Modifier.height(8.dp))
 
-                    if (!editMode) {
-                        GlassContainer (
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable(onClick = onLearningModeClick)
-                                .height(50.dp),
-                            containerColor = MaterialTheme.colorScheme.secondary
-                        ) {
-                            Text(
-                                stringResource(R.string.learning_mode),
-                                style = MaterialTheme.typography.displayLarge,
-                            )
-                        }
-
-                        Spacer(Modifier.height(8.dp))
-
-                        GlassContainer (
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable(onClick = onTestingModeClick)
-                                .height(50.dp),
-                            containerColor = MaterialTheme.colorScheme.secondary
-                        ) {
-                            Text(
-                                stringResource(R.string.testing_mode),
-                                style = MaterialTheme.typography.displayLarge,
-                            )
-                        }
-
-                        Spacer(Modifier.height(8.dp))
+                    GlassContainer (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(onClick = onTestingModeClick)
+                            .height(50.dp),
+                        containerColor = MaterialTheme.colorScheme.secondary
+                    ) {
+                        Text(
+                            stringResource(R.string.testing_mode),
+                            style = MaterialTheme.typography.displayLarge,
+                        )
                     }
 
-                    HorizontalDivider()
+                    Spacer(Modifier.height(8.dp))
                 }
-            }
 
-            
-            if (editMode){
-                itemsIndexed(items = uiState.draftCards) { index, draftCard ->
-                    EditCardItem(
-                        draftCard = draftCard,
-                        onTermChange = { updateDraftCard(index, it, draftCard.definition) },
-                        onDefChange = { updateDraftCard(index, draftCard.term, it) }
-                    )
-                }
-            } else{
-                // Используем перебор с ключем, так как в случае удаления карточки LazyColumn поймет
-                // какой именно элемент пропал и что именно нужно перерисовать
-                items(items = uiState.cards, key = { it.id } ) { card ->
-                    CardItem(
-                        card = card,
-                        onLongClick = { onCardToDelete(card) }
-                    )
-                }
+                HorizontalDivider()
+            }
+        }
+
+
+        if (editMode){
+            itemsIndexed(items = uiState.draftCards) { index, draftCard ->
+                EditCardItem(
+                    draftCard = draftCard,
+                    onTermChange = { updateDraftCard(index, it, draftCard.definition) },
+                    onDefChange = { updateDraftCard(index, draftCard.term, it) }
+                )
+            }
+        } else{
+            // Используем перебор с ключем, так как в случае удаления карточки LazyColumn поймет
+            // какой именно элемент пропал и что именно нужно перерисовать
+            items(items = uiState.cards, key = { it.id } ) { card ->
+                CardItem(
+                    card = card,
+                    onLongClick = { onCardToDelete(card) }
+                )
             }
         }
     }
