@@ -121,7 +121,8 @@ private fun LearningModeTopBar(
                 uiState.currentIndex + 1,
                 uiState.cards.size
             ),
-            style = MaterialTheme.typography.displayMedium
+            style = MaterialTheme.typography.displayMedium,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -234,9 +235,9 @@ private fun LearningModeScreenBody(
                                 backgroundContent = {
                                     val color = when (dismissState.targetValue) {
                                         SwipeToDismissBoxValue.StartToEnd
-                                            -> Color.Green.copy(alpha = 0.8f)
+                                            -> Color.Green.copy(alpha = 0.6f)
                                         SwipeToDismissBoxValue.EndToStart
-                                            -> Color.Red.copy(alpha = 0.8f)
+                                            -> Color.Red.copy(alpha = 0.6f)
                                         else
                                             -> Color.Transparent
                                     }
@@ -266,7 +267,7 @@ private fun LearningModeScreenBody(
                                                 ),
                                                 contentDescription =
                                                     stringResource(R.string.ic_swipe_result),
-                                                tint = Color.White,
+                                                tint = MaterialTheme.colorScheme.onSurface,
                                                 modifier = Modifier.size(48.dp)
                                             )
                                         }
@@ -299,7 +300,7 @@ private fun LearningModeScreenBody(
                                     if (uiState.isShuffleOn)
                                         MaterialTheme.colorScheme.primary
                                     else
-                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                             )
 
                             Spacer(Modifier.width(8.dp))
@@ -310,7 +311,7 @@ private fun LearningModeScreenBody(
                                     if (uiState.isShuffleOn)
                                         MaterialTheme.colorScheme.primary
                                     else
-                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -324,7 +325,7 @@ private fun LearningModeScreenBody(
                                 color = if (uiState.isReviewMode)
                                     MaterialTheme.colorScheme.primary
                                 else
-                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -351,7 +352,8 @@ private fun EmptyStateMessage(
             Text(
                 text = stringResource(R.string.next_review_text),
                 style = MaterialTheme.typography.displayMedium,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(16.dp))
 
@@ -362,7 +364,8 @@ private fun EmptyStateMessage(
                         DateUtils.formatTimeUntil(uiState.nextReviewInMs)
                     ),
                     style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(24.dp))
             }
@@ -372,10 +375,12 @@ private fun EmptyStateMessage(
                     .clickable(onClick = toggleReviewMode)
                     .height(40.dp)
                     .width(160.dp),
+                containerColor = MaterialTheme.colorScheme.secondary
             ) {
                 Text(
                     text = stringResource(R.string.all_cards_mode_text),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
 
@@ -386,23 +391,27 @@ private fun EmptyStateMessage(
                     .clickable(onClick = onBackClick)
                     .height(40.dp)
                     .width(160.dp),
+                containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Text(
                     text = stringResource(R.string.back_button),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         } else {
             Text(
                 text = stringResource(R.string.empty_set_warn),
                 style = MaterialTheme.typography.displayMedium,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.empty_set_sugg),
                 style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(24.dp))
             GlassContainer(
@@ -410,10 +419,12 @@ private fun EmptyStateMessage(
                     .clickable(onClick = onBackClick)
                     .height(40.dp)
                     .width(90.dp),
+                containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Text(
                     text = stringResource(R.string.back_button),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -440,7 +451,8 @@ private fun LearningResultContent(
     ) {
         Text(
             text = stringResource(R.string.Result_text),
-            style = MaterialTheme.typography.displayLarge
+            style = MaterialTheme.typography.displayLarge,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Spacer(Modifier.height(32.dp))
@@ -451,19 +463,22 @@ private fun LearningResultContent(
                 modifier = Modifier.size(200.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 strokeWidth = 16.dp,
+                gapSize = (-15).dp,
             )
             CircularProgressIndicator(  // Накладываем диаграмму на пустую в прошлом виджете
                 progress = { progress },
                 modifier = Modifier.size(200.dp),
-                color = if (progress >= 0.85f) Color.Green else MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.primary,
                 strokeWidth = 16.dp,
+                gapSize = (-15).dp,
             )
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = stringResource(
                         R.string.learning_percentage_text,
                         percentage),
-                    style = MaterialTheme.typography.displayMedium
+                    style = MaterialTheme.typography.displayMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text =
@@ -501,18 +516,23 @@ private fun LearningResultContent(
             modifier = Modifier
                 .clickable(onClick = onRestartClick)
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(50.dp),
+            containerColor = MaterialTheme.colorScheme.primary
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Icon(painterResource(R.drawable.ic_refresh), contentDescription = null)
+                Icon(
+                    painterResource(R.drawable.ic_refresh), contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
 
                 Spacer(Modifier.width(8.dp))
 
                 Text(
                     text = stringResource(R.string.learn_again_text),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -524,11 +544,12 @@ private fun LearningResultContent(
                 .clickable(onClick = onBackClick)
                 .fillMaxWidth()
                 .height(50.dp),
-            containerColor = MaterialTheme.colorScheme.onSurface
+            containerColor = MaterialTheme.colorScheme.secondary
         ) {
             Text(
                 text = stringResource(R.string.go_back_to_set_text),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary
             )
         }
     }
@@ -560,6 +581,7 @@ private fun LearningCard(
                     12f * density  // Настройка перспективы, чтобы карточка была будто 3D
             }
             .clickable(onClick = onCardClick),
+        containerColor = MaterialTheme.colorScheme.primary
     ) {
         if (rotation <= 90f) {
             CardContent(

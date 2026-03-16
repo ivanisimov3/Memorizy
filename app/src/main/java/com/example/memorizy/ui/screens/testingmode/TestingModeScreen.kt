@@ -30,6 +30,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +43,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
-import com.example.memorizy.ui.utils.AppIcon
 import com.example.memorizy.ui.utils.GlassContainer
 
 @Composable
@@ -89,134 +89,6 @@ fun TestingModeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AnswersReviewContent(
-    uiState: TestingModeState,
-    onBackClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        TopAppBar(
-            title = {
-                Text(
-                    text = stringResource(R.string.testing_show_answers),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-        )
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 16.dp, start = 16.dp, end = 16.dp)
-        ) {
-            itemsIndexed(uiState.userAnswers) { index, testAnswer ->
-                val questionText = if (uiState.isTermChecked)
-                    testAnswer.card.definition
-                else
-                    testAnswer.card.term
-
-                val correctAnswer = if (uiState.isTermChecked)
-                    testAnswer.card.term
-                else
-                    testAnswer.card.definition
-
-                GlassContainer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp),
-                    containerColor =
-                        if (testAnswer.isCorrect)
-                            Color.Green
-                        else
-                            Color.Red
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = "${index + 1}. $questionText",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
-                        Spacer(Modifier.height(8.dp))
-
-                        HorizontalDivider(
-                            color = if (testAnswer.isCorrect)
-                                Color.Green.copy(alpha = 0.5f)
-                            else
-                                Color.Red.copy(alpha = 0.5f)
-                        )
-
-                        Spacer(Modifier.height(8.dp))
-
-                        Text(
-                            text = stringResource(R.string.testing_your_answer_label),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        Spacer(Modifier.height(4.dp))
-
-                        Text(
-                            text = testAnswer.userAnswer.ifEmpty { "—" },
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (testAnswer.isCorrect)
-                                Color.Green.copy(alpha = 0.7f)
-                            else
-                                Color.Red.copy(alpha = 0.7f)
-                        )
-
-                        if (!testAnswer.isCorrect) {
-                            Spacer(Modifier.height(8.dp))
-
-                            Text(
-                                text = stringResource(R.string.testing_correct_answer_label),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-
-                            Spacer(Modifier.height(4.dp))
-
-                            Text(
-                                text = correctAnswer,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Green.copy(alpha = 0.7f)
-                            )
-                        }
-                    }
-                }
-            }
-
-            item {
-                Spacer(Modifier.height(24.dp))
-
-                GlassContainer(
-                    modifier = Modifier
-                        .clickable(onClick = onBackClick)
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    containerColor = MaterialTheme.colorScheme.onSurface
-                ) {
-                    Text(
-                        text = stringResource(R.string.go_back_to_set_text),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-
-                Spacer(Modifier.height(16.dp))
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
 private fun TestingModeTopBar(
     uiState: TestingModeState
 ) {
@@ -230,7 +102,10 @@ private fun TestingModeTopBar(
                 ),
                 style = MaterialTheme.typography.displayMedium
             )
-        }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            titleContentColor = MaterialTheme.colorScheme.onSurface
+        )
     )
 }
 
@@ -301,7 +176,8 @@ private fun EmptyStateMessage(
         Text(
             text = stringResource(R.string.empty_set_warn),
             style = MaterialTheme.typography.displayMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Spacer(Modifier.height(16.dp))
@@ -309,7 +185,8 @@ private fun EmptyStateMessage(
         Text(
             text = stringResource(R.string.empty_set_sugg),
             style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(Modifier.height(24.dp))
@@ -319,10 +196,12 @@ private fun EmptyStateMessage(
                 .clickable(onClick = onBackClick)
                 .height(40.dp)
                 .width(90.dp),
+            containerColor = MaterialTheme.colorScheme.primary
         ) {
             Text(
                 text = stringResource(R.string.back_button),
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -343,7 +222,8 @@ private fun ChoosingModeContent(
         Text(
             text = stringResource(R.string.testing_choose_title),
             style = MaterialTheme.typography.displayMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Spacer(Modifier.height(32.dp))
@@ -353,11 +233,12 @@ private fun ChoosingModeContent(
                 .fillMaxWidth()
                 .clickable(onClick = onTermsSelected)
                 .height(50.dp),
-            containerColor = MaterialTheme.colorScheme.secondary
+            containerColor = MaterialTheme.colorScheme.primary
         ) {
             Text(
                 text = stringResource(R.string.testing_terms_button),
-                style = MaterialTheme.typography.displayLarge
+                style = MaterialTheme.typography.displayLarge,
+                color = MaterialTheme.colorScheme.primary
             )
         }
 
@@ -372,136 +253,8 @@ private fun ChoosingModeContent(
         ) {
             Text(
                 text = stringResource(R.string.testing_definitions_button),
-                style = MaterialTheme.typography.displayLarge
-            )
-        }
-    }
-}
-
-@Composable
-private fun TestingResultContent(
-    uiState: TestingModeState,
-    onBackClick: () -> Unit,
-    onRestartClick: () -> Unit,
-    onShowAnswers: () -> Unit
-) {
-    val total = uiState.cards.size
-    val progress = if (total > 0) uiState.correctCount.toFloat() / total else 0f
-    val percentage = (progress * 100).toInt()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = stringResource(R.string.Result_text),
-            style = MaterialTheme.typography.displayLarge
-        )
-
-        Spacer(Modifier.height(32.dp))
-
-        Box(contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(
-                progress = { 1f },
-                modifier = Modifier.size(200.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                strokeWidth = 16.dp,
-            )
-            CircularProgressIndicator(
-                progress = { progress },
-                modifier = Modifier.size(200.dp),
-                color = if (progress >= 0.85f) Color.Green else MaterialTheme.colorScheme.primary,
-                strokeWidth = 16.dp,
-            )
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = stringResource(
-                        R.string.learning_percentage_text,
-                        percentage),
-                    style = MaterialTheme.typography.displayMedium
-                )
-                Text(
-                    text =
-                        if (percentage >= 75)
-                            stringResource(R.string.good_result_text)
-                        else
-                            stringResource(R.string.bad_result_text),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-
-        Spacer(Modifier.height(32.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            StatItem(
-                count = uiState.correctCount,
-                label = stringResource(R.string.i_know_text),
-                color = Color.Green
-            )
-            StatItem(
-                count = uiState.incorrectCount,
-                label = stringResource(R.string.i_dont_know_text),
-                color = Color.Red
-            )
-        }
-
-        Spacer(Modifier.height(48.dp))
-
-        GlassContainer(
-            modifier = Modifier
-                .clickable(onClick = onRestartClick)
-                .fillMaxWidth()
-                .height(50.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Icon(painterResource(R.drawable.ic_refresh), contentDescription = null)
-
-                Spacer(Modifier.width(8.dp))
-
-                Text(
-                    text = stringResource(R.string.testing_restart),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        GlassContainer(
-            modifier = Modifier
-                .clickable(onClick = onShowAnswers)
-                .fillMaxWidth()
-                .height(50.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.testing_show_answers),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        GlassContainer(
-            modifier = Modifier
-                .clickable(onClick = onBackClick)
-                .fillMaxWidth()
-                .height(50.dp),
-            containerColor = MaterialTheme.colorScheme.onSurface
-        ) {
-            Text(
-                text = stringResource(R.string.go_back_to_set_text),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.displayLarge,
+                color = MaterialTheme.colorScheme.secondary
             )
         }
     }
@@ -546,14 +299,16 @@ private fun QuestionContent(
         )
 
         GlassContainer(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = MaterialTheme.colorScheme.primary
         ) {
             Text(
                 text = questionText,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -594,11 +349,12 @@ private fun QuestionContent(
                 shape = CircleShape,
                 containerColor = MaterialTheme.colorScheme.secondary
             ) {
-                AppIcon(
+                Icon(
                     painter = painterResource(R.drawable.ic_back),
                     contentDescription = stringResource(R.string.testing_next_button),
                     modifier = Modifier
-                        .graphicsLayer { scaleX = -1f }
+                        .graphicsLayer { scaleX = -1f },
+                    tint = MaterialTheme.colorScheme.secondary
                 )
             }
         }
@@ -622,5 +378,278 @@ private fun StatItem(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+@Composable
+private fun TestingResultContent(
+    uiState: TestingModeState,
+    onBackClick: () -> Unit,
+    onRestartClick: () -> Unit,
+    onShowAnswers: () -> Unit
+) {
+    val total = uiState.cards.size
+    val progress = if (total > 0) uiState.correctCount.toFloat() / total else 0f
+    val percentage = (progress * 100).toInt()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = stringResource(R.string.Result_text),
+            style = MaterialTheme.typography.displayLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Spacer(Modifier.height(32.dp))
+
+        Box(contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(
+                progress = { 1f },
+                modifier = Modifier.size(200.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                strokeWidth = 16.dp,
+                gapSize = (-15).dp,
+            )
+            CircularProgressIndicator(
+                progress = { progress },
+                modifier = Modifier.size(200.dp),
+                color = MaterialTheme.colorScheme.primary,
+                strokeWidth = 16.dp,
+                gapSize = (-15).dp,
+            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = stringResource(
+                        R.string.learning_percentage_text,
+                        percentage),
+                    style = MaterialTheme.typography.displayMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text =
+                        if (percentage >= 75)
+                            stringResource(R.string.good_result_text)
+                        else
+                            stringResource(R.string.bad_result_text),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        Spacer(Modifier.height(32.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            StatItem(
+                count = uiState.correctCount,
+                label = stringResource(R.string.i_know_text),
+                color = Color.Green
+            )
+            StatItem(
+                count = uiState.incorrectCount,
+                label = stringResource(R.string.i_dont_know_text),
+                color = Color.Red
+            )
+        }
+
+        Spacer(Modifier.height(48.dp))
+
+        GlassContainer(
+            modifier = Modifier
+                .clickable(onClick = onRestartClick)
+                .fillMaxWidth()
+                .height(50.dp),
+            containerColor = MaterialTheme.colorScheme.primary
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(
+                    painterResource(R.drawable.ic_refresh), contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(Modifier.width(8.dp))
+
+                Text(
+                    text = stringResource(R.string.testing_restart),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        GlassContainer(
+            modifier = Modifier
+                .clickable(onClick = onShowAnswers)
+                .fillMaxWidth()
+                .height(50.dp),
+            containerColor = MaterialTheme.colorScheme.secondary
+        ) {
+            Text(
+                text = stringResource(R.string.testing_show_answers),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        GlassContainer(
+            modifier = Modifier
+                .clickable(onClick = onBackClick)
+                .fillMaxWidth()
+                .height(50.dp),
+            containerColor = MaterialTheme.colorScheme.tertiary
+        ) {
+            Text(
+                text = stringResource(R.string.go_back_to_set_text),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.tertiary
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AnswersReviewContent(
+    uiState: TestingModeState,
+    onBackClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        TopAppBar(
+            title = {
+                Text(
+                    text = stringResource(R.string.testing_show_answers),
+                    style = MaterialTheme.typography.labelMedium
+                )
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                titleContentColor = MaterialTheme.colorScheme.onSurface
+            )
+        )
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 16.dp, start = 16.dp, end = 16.dp)
+        ) {
+            itemsIndexed(uiState.userAnswers) { index, testAnswer ->
+                val questionText = if (uiState.isTermChecked)
+                    testAnswer.card.definition
+                else
+                    testAnswer.card.term
+
+                val correctAnswer = if (uiState.isTermChecked)
+                    testAnswer.card.term
+                else
+                    testAnswer.card.definition
+
+                GlassContainer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp),
+                    containerColor =
+                        if (testAnswer.isCorrect)
+                            Color.Green
+                        else
+                            Color.Red
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Text(
+                            text = "${index + 1}. $questionText",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
+                        HorizontalDivider(
+                            color = if (testAnswer.isCorrect)
+                                Color.Green.copy(alpha = 0.5f)
+                            else
+                                Color.Red.copy(alpha = 0.5f)
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
+                        Text(
+                            text = stringResource(R.string.testing_your_answer_label),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Spacer(Modifier.height(4.dp))
+
+                        Text(
+                            text = testAnswer.userAnswer.ifEmpty { "—" },
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = if (testAnswer.isCorrect)
+                                Color.Green.copy(alpha = 0.7f)
+                            else
+                                Color.Red.copy(alpha = 0.7f)
+                        )
+
+                        if (!testAnswer.isCorrect) {
+                            Spacer(Modifier.height(8.dp))
+
+                            Text(
+                                text = stringResource(R.string.testing_correct_answer_label),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+
+                            Spacer(Modifier.height(4.dp))
+
+                            Text(
+                                text = correctAnswer,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Green.copy(alpha = 0.7f)
+                            )
+                        }
+                    }
+                }
+            }
+
+            item {
+                Spacer(Modifier.height(24.dp))
+
+                GlassContainer(
+                    modifier = Modifier
+                        .clickable(onClick = onBackClick)
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Text(
+                        text = stringResource(R.string.go_back_to_set_text),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                Spacer(Modifier.height(16.dp))
+            }
+        }
     }
 }

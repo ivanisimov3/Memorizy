@@ -13,13 +13,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.compose.material3.Icon
 import java.util.Calendar
 
 const val SESSION_TYPE_LEARNING = "learning"
@@ -40,6 +38,14 @@ object AppIcons {
 }
 
 object DateUtils {
+    private const val ONE_HOUR_MS = 60 * 60_000L
+    private const val ONE_DAY_MS = 24 * ONE_HOUR_MS
+
+    data class DeadlineCountdown(
+        val remainingDays: Long,
+        val remainingHours: Long
+    )
+
     private val shortDateFormatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     private val fullDateTimeFormatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
 
@@ -72,12 +78,37 @@ object DateUtils {
         cal.set(Calendar.MILLISECOND, 0)
         return cal.timeInMillis
     }
+
+    fun endOfDayMillis(timestamp: Long): Long {
+        return Calendar.getInstance().apply {
+            timeInMillis = timestamp
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+    }
+
+    fun buildDeadlineCountdown(
+        targetDate: Long,
+        now: Long
+    ): DeadlineCountdown {
+        val deadlineMoment = endOfDayMillis(targetDate)
+        val remainingMillis = (deadlineMoment - now).coerceAtLeast(0L)
+        val remainingDays = remainingMillis / ONE_DAY_MS
+        val remainingHours = (remainingMillis % ONE_DAY_MS) / ONE_HOUR_MS
+
+        return DeadlineCountdown(
+            remainingDays = remainingDays,
+            remainingHours = remainingHours
+        )
+    }
 }
 
 @Composable
 fun GlassContainer(
     modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(18.dp),
+    shape: Shape = RoundedCornerShape(24.dp),
     containerColor: Color = MaterialTheme.colorScheme.primary,
     content: @Composable BoxScope.() -> Unit
 ) {
@@ -85,34 +116,24 @@ fun GlassContainer(
         modifier = modifier
             .clip(shape)
             .background(
-                color = containerColor.copy(alpha = 0.15f)
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        containerColor.copy(alpha = 0.3f),
+                        containerColor.copy(alpha = 0.15f)
+                    )
+                )
             )
             .border(
                 width = 1.dp,
-                brush = Brush.verticalGradient(
+                brush = Brush.linearGradient(
                     colors = listOf(
-                        containerColor.copy(alpha = 0.6f),
-                        containerColor.copy(alpha = 0.2f)
+                        containerColor.copy(alpha = 0.5f),
+                        containerColor.copy(alpha = 0.35f)
                     )
                 ),
                 shape = shape
             ),
         contentAlignment = Alignment.Center,
         content = content
-    )
-}
-
-@Composable
-fun AppIcon(
-    painter: Painter,
-    contentDescription: String?,
-    modifier: Modifier = Modifier,
-    tint: Color = MaterialTheme.colorScheme.secondary
-) {
-    Icon(
-        painter = painter,
-        contentDescription = contentDescription,
-        modifier = modifier,
-        tint = tint
     )
 }

@@ -21,13 +21,17 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,7 +46,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
 import com.example.memorizy.data.source.local.room.entity.StudySet
-import com.example.memorizy.ui.utils.AppIcon
 import com.example.memorizy.ui.utils.AppIcons.getIconResById
 import com.example.memorizy.ui.utils.GlassContainer
 
@@ -80,12 +83,15 @@ fun StudySetsScreen(
                     .clickable(onClick = onAddSetClick)
                     .size(56.dp),
             ) {
-                AppIcon(
+                Icon(
                     painter = painterResource(R.drawable.ic_add),
-                    contentDescription = stringResource(R.string.add_set)
+                    contentDescription = stringResource(R.string.add_set),
+                    modifier = Modifier,
+                    tint = MaterialTheme.colorScheme.secondary
                 )
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
         StudySetsScreenBody(
             modifier = Modifier
@@ -133,22 +139,23 @@ private fun StudySetsTopAppBar(
                     shape = RoundedCornerShape(50),
                     textStyle = MaterialTheme.typography.bodySmall,
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary
+                    )
                 )
             } else {
                 Text(
                     text = "Memorizy",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.secondary
+                    style = MaterialTheme.typography.labelLarge
                 )
             }
         },
         navigationIcon = {
             if (isSearchActive) {
                 IconButton(onClick = onSearchDismissed) {
-                    AppIcon(
-                        modifier = Modifier
-                            .size(28.dp),
+                    Icon(
                         painter = painterResource(R.drawable.ic_back),
                         contentDescription = stringResource(R.string.close_search)
                     )
@@ -158,7 +165,7 @@ private fun StudySetsTopAppBar(
         actions = {
             if (!isSearchActive) {
                 IconButton(onClick = onSearchClicked) {
-                    AppIcon(
+                    Icon(
                         modifier = Modifier
                             .size(28.dp),
                         painter = painterResource(R.drawable.ic_search),
@@ -166,15 +173,19 @@ private fun StudySetsTopAppBar(
                     )
                 }
                 IconButton(onClick = onProfileClick) {
-                    AppIcon(
-                        modifier = Modifier
-                            .size(28.dp),
+                    Icon(
                         painter = painterResource(R.drawable.ic_settings),
                         contentDescription = stringResource(R.string.settings_ic)
                     )
                 }
             }
-        }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurface,
+        )
     )
 }
 
@@ -229,6 +240,7 @@ private fun StudySetItem(
                 onLongClick = onLongClick
             )
             .padding(vertical = 8.dp),
+        containerColor = MaterialTheme.colorScheme.primary
     ) {
         Column (
             modifier = Modifier
@@ -237,9 +249,10 @@ private fun StudySetItem(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AppIcon(
+                Icon(
                     painter = painterResource(getIconRes(studySet.iconId)),
                     contentDescription = stringResource(R.string.set_icon),
+                    modifier = Modifier,
                     tint = MaterialTheme.colorScheme.primary
                 )
 
@@ -253,7 +266,8 @@ private fun StudySetItem(
                         text = studySet.name.uppercase(),
                         style = MaterialTheme.typography.displayMedium,
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.primary
                     )
 
                     if (!studySet.description.isNullOrEmpty()) {
@@ -262,11 +276,13 @@ private fun StudySetItem(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }else{
                         Text(
                             text = "Нет описания",
                             style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -280,7 +296,8 @@ private fun StudySetItem(
             ) {
                 Text(
                     text = stringResource(R.string.number_of_cards, cardNumber),
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
 
                 Text(
@@ -289,7 +306,7 @@ private fun StudySetItem(
                     color = if (reviewCardNumber > 0)
                         MaterialTheme.colorScheme.primary
                     else
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 )
             }
         }
@@ -303,31 +320,33 @@ private fun DeleteSetDialog(
     onDismiss: () -> Unit
 ){
     AlertDialog(
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(24.dp),
         onDismissRequest = onDismiss,
         title = {
             Text(
                 text = stringResource(R.string.delete_set_question),
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onSurface
             ) },
         text = {
             Text(
                 text = stringResource(R.string.delete_set_warning),
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )},
         confirmButton = {
-            TextButton(
+            OutlinedButton(
                 onClick = onConfirmDelete
             ) {
                 Text(
                     text = stringResource(R.string.delete_text),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.error
                 )
             }
         },
         dismissButton = {
-            TextButton(
+            FilledTonalButton(
                 onClick = onDismiss
             ) {
                 Text(

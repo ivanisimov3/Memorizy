@@ -16,15 +16,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -37,6 +42,7 @@ import com.example.memorizy.ui.utils.GlassContainer
 fun AuthScreen(
     onAuthClick: () -> Unit,
     uiState: AuthState,
+    onBackClick: () -> Unit,
     onUsernameChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
     onLoginClick: () -> Unit,
@@ -54,10 +60,24 @@ fun AuthScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.register_screen_lable),
-                        color = MaterialTheme.colorScheme.secondary,
                         style = MaterialTheme.typography.labelMedium
                     )
-                }
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = onBackClick
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_back),
+                            contentDescription = stringResource(R.string.back_button)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         }
     ) { paddingValues ->
@@ -150,11 +170,12 @@ private fun AuthScreenBody(
                             .clickable(onClick = onRegisterClick)
                             .height(40.dp)
                             .width(220.dp),
-                        containerColor = MaterialTheme.colorScheme.onSurface
+                        containerColor = MaterialTheme.colorScheme.secondary
                     ) {
                         Text(
                             text = stringResource(R.string.register_button_text),
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
 
@@ -164,11 +185,13 @@ private fun AuthScreenBody(
                         modifier = Modifier
                             .clickable(onClick = onLoginClick)
                             .height(40.dp)
-                            .width(90.dp)
+                            .width(90.dp),
+                        containerColor = MaterialTheme.colorScheme.primary
                     ) {
                         Text(
                             text = stringResource(R.string.login_button_text),
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }

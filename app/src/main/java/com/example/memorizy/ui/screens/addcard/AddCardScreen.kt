@@ -22,24 +22,26 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
 import com.example.memorizy.domain.importer.model.ParseResult
-import com.example.memorizy.ui.utils.AppIcon
 import com.example.memorizy.ui.utils.GlassContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,15 +83,14 @@ fun AddCardScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.new_card_text),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.secondary
+                        style = MaterialTheme.typography.labelMedium
                     )
                 },
                 navigationIcon = {
                     IconButton(
                         onClick = onBackClick
                     ) {
-                        AppIcon(
+                        Icon(
                             painter = painterResource(R.drawable.ic_back),
                             contentDescription = stringResource(R.string.back_button)
                         )
@@ -99,12 +100,18 @@ fun AddCardScreen(
                     IconButton(
                         onClick = { launcher.launch("text/comma-separated-values") }
                     ) {
-                        AppIcon(
+                        Icon(
                             painter = painterResource(R.drawable.ic_import_cards),
                             contentDescription = stringResource(R.string.import_csv)
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         },
     ) { paddingValues ->
@@ -131,7 +138,8 @@ private fun ImportSummaryDialog(
         title = {
             Text(
                 text = stringResource(R.string.import_result_title),
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
         },
         text = {
@@ -141,27 +149,29 @@ private fun ImportSummaryDialog(
                         R.string.import_success_count,
                         importSummary.successfulCards.size
                     ),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
                 if (importSummary.errors.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(
                             R.string.import_error_count,
                             importSummary.errors.size
                         ),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
                     )
                     Spacer(modifier = Modifier.height(4.dp))
-                    LazyColumn(modifier = Modifier.height(150.dp)) {
+                    LazyColumn(modifier = Modifier.height(100.dp)) {
                         items(importSummary.errors) { error ->
                             Text(
                                 text = if (error.lineNumber > 0)
                                     stringResource(R.string.import_error_details, error.lineNumber, error.reason)
                                 else
                                     error.reason,
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -170,7 +180,7 @@ private fun ImportSummaryDialog(
         },
         confirmButton = {
             if (importSummary.successfulCards.isNotEmpty()) {
-                TextButton(onClick = onConfirmImport) {
+                FilledTonalButton(onClick = onConfirmImport) {
                     Text(
                         text = stringResource(R.string.import_confirm),
                         style = MaterialTheme.typography.labelSmall,
@@ -180,11 +190,11 @@ private fun ImportSummaryDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            OutlinedButton(onClick = onDismissRequest) {
                 Text(
                     text = stringResource(R.string.cancel_text),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.error
                 )
             }
         }
@@ -269,11 +279,12 @@ private fun AddCardScreenBody(
                     .clickable(onClick = onBackClick)
                     .height(40.dp)
                     .width(120.dp),
-                containerColor = MaterialTheme.colorScheme.onSurface
+                containerColor = MaterialTheme.colorScheme.secondary
             ) { // Навигация
                 Text(
                     text = stringResource(R.string.cancel_text),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
 
@@ -284,10 +295,12 @@ private fun AddCardScreenBody(
                     .clickable(onClick = onCreateButtonClicked)
                     .height(40.dp)
                     .width(100.dp),
+                containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Text(
                     text = stringResource(R.string.create_set_text),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }

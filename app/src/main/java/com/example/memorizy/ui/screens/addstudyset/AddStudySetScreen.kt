@@ -34,12 +34,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
-import com.example.memorizy.ui.utils.AppIcon
 import com.example.memorizy.ui.utils.AppIcons
 import com.example.memorizy.ui.utils.GlassContainer
 import com.example.memorizy.ui.utils.DateUtils
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,19 +74,23 @@ fun AddStudySetScreen(
                     Text(
                         text = stringResource(R.string.new_set_text),
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.secondary
                     )
                 },
                 navigationIcon = {
                     IconButton(
                         onClick = onBackClick
                     ) {
-                        AppIcon(
+                        Icon(
                             painter = painterResource(R.drawable.ic_back),
-                            contentDescription = stringResource(R.string.back_button),
+                            contentDescription = stringResource(R.string.back_button)
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         },
     ) { paddingValues ->
@@ -131,7 +138,7 @@ private fun AddStudySetScreenBody(
             label = {
                 Text(
                     text = stringResource(R.string.set_name_field),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             },
             modifier = Modifier.fillMaxWidth(),
@@ -186,11 +193,12 @@ private fun AddStudySetScreenBody(
                     .clickable(onClick = onBackClick)
                     .height(40.dp)
                     .width(120.dp),
-                containerColor = MaterialTheme.colorScheme.onSurface
+                containerColor = MaterialTheme.colorScheme.secondary
             ) {
                 Text(
                     text = stringResource(R.string.cancel_text),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
 
@@ -201,10 +209,12 @@ private fun AddStudySetScreenBody(
                     .clickable(onClick = onCreateButtonClicked)
                     .height(40.dp)
                     .width(100.dp),
+                containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Text(
                     text = stringResource(R.string.create_set_text),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -231,7 +241,7 @@ private fun TargetDateEditorForCreate(
                     DateUtils.formatShortDate(currentTargetDate)
                 ),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .weight(1f)
                     .clickable { showDatePicker = true }
@@ -248,7 +258,7 @@ private fun TargetDateEditorForCreate(
                 Text(
                     text = stringResource(R.string.target_date_set),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -263,19 +273,19 @@ private fun TargetDateEditorForCreate(
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
-                TextButton(onClick = {
+                FilledTonalButton(onClick = {
                     datePickerState.selectedDateMillis?.let { onTargetDateChanged(it) } // Выполнится, если пользователь выбрал конкретную дату корректно
                     showDatePicker = false
                 }) {
                     Text(
                         text = stringResource(R.string.create_set_text),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
+                OutlinedButton(onClick = { showDatePicker = false }) {
                     Text(
                         text = stringResource(R.string.cancel_text),
                         style = MaterialTheme.typography.labelSmall,
@@ -311,7 +321,7 @@ private fun IconSelector(
                     if (id == selectedIconId)
                         MaterialTheme.colorScheme.primary
                     else
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
             )
         }
     }

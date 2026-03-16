@@ -79,6 +79,7 @@ fun MemorizyApp() {
                     navController.popBackStack()
                 },
                 uiState = uiState,
+                onBackClick = { navController.popBackStack() },
                 onUsernameChanged = viewModel::onUsernameChanged,
                 onPasswordChanged = viewModel::onPasswordChanged,
                 onLoginClick = viewModel::onLoginClick,

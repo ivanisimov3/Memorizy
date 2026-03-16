@@ -16,12 +16,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -33,7 +35,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
-import com.example.memorizy.ui.utils.AppIcon
 import com.example.memorizy.ui.utils.DateUtils
 import com.example.memorizy.ui.utils.GlassContainer
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
@@ -45,10 +46,16 @@ import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
+import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
+import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
+import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
+import com.patrykandpatrick.vico.core.common.shape.CorneredShape
+import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 
 @Composable
 fun StatisticsScreen(
@@ -69,23 +76,29 @@ fun StatisticsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun StatisticsTopBar(onBackClick: () -> Unit) {
+private fun StatisticsTopBar(
+    onBackClick: () -> Unit
+) {
     TopAppBar(
         title = {
             Text(
                 text = stringResource(R.string.statistics_title),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.secondary
+                style = MaterialTheme.typography.labelMedium
             )
         },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
-                AppIcon(
+                Icon(
                     painter = painterResource(R.drawable.ic_back),
                     contentDescription = stringResource(R.string.back_button)
                 )
             }
-        }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface
+        )
     )
 }
 
@@ -175,11 +188,20 @@ private fun LevelDistributionChart(
 
     CartesianChartHost(
         chart = rememberCartesianChart(
-            rememberColumnCartesianLayer(), // Слой столбиков
+            rememberColumnCartesianLayer(
+                columnProvider = ColumnCartesianLayer.ColumnProvider.series(
+                    rememberLineComponent(
+                        fill = fill(MaterialTheme.colorScheme.primary),
+                        thickness = 8.dp,
+                        shape = CorneredShape.rounded(topLeftPercent = 35, topRightPercent = 35)
+                    )
+                )
+            ), // Слой столбиков
             startAxis = VerticalAxis.rememberStart(
                 label = rememberTextComponent(
                     color = MaterialTheme.colorScheme.onSurface
-                )
+                ),
+                guideline = null
             ),
             bottomAxis = HorizontalAxis.rememberBottom(
                 label = rememberTextComponent(
@@ -187,7 +209,8 @@ private fun LevelDistributionChart(
                 ),
                 valueFormatter = CartesianValueFormatter { _, value, _ ->
                     String.format(levelLabelFormat, value.toInt())
-                }
+                },
+                guideline = null
             )
         ),
         modelProducer = modelProducer,
@@ -199,15 +222,14 @@ private fun LevelDistributionChart(
 
 @Composable
 private fun SessionProgressChart(chartData: SessionChartData) {
-
     if (chartData.isEmpty) {
         EmptyState(text = stringResource(R.string.not_enough_sessions))
         return
     }
 
     val modelProducer = remember { CartesianChartModelProducer() }
-    val learningColor = Color(0xFF1D3BA1)
-    val testingColor = Color(0xFF4CAF50)
+    val learningColor = MaterialTheme.colorScheme.primary
+    val testingColor = MaterialTheme.colorScheme.inversePrimary
 
     LaunchedEffect(chartData) {
         modelProducer.runTransaction {
@@ -222,14 +244,31 @@ private fun SessionProgressChart(chartData: SessionChartData) {
         }
     }
 
+    val learningLine = LineCartesianLayer.rememberLine(
+        fill = LineCartesianLayer.LineFill.single(fill(learningColor))
+    )
+    val testingLine = LineCartesianLayer.rememberLine(
+        fill = LineCartesianLayer.LineFill.single(fill(testingColor))
+    )
+
+    val activeLines = buildList {   // Добавляем элементы в список когда надо
+        if (chartData.hasLearning) add(learningLine)
+        if (chartData.hasTesting) add(testingLine)
+    }
+
     Column {
         CartesianChartHost(
             chart = rememberCartesianChart(
-                rememberLineCartesianLayer(),
+                rememberLineCartesianLayer(
+                    lineProvider = LineCartesianLayer.LineProvider.series(
+                        *activeLines.toTypedArray() // Распаковываем список, так как series требует конкретные элементы
+                    )
+                ),
                 startAxis = VerticalAxis.rememberStart(
                     label = rememberTextComponent(
                         color = MaterialTheme.colorScheme.onSurface
-                    )
+                    ),
+                    guideline = null
                 ),
                 bottomAxis = HorizontalAxis.rememberBottom(
                     label = rememberTextComponent(
@@ -238,7 +277,8 @@ private fun SessionProgressChart(chartData: SessionChartData) {
                     valueFormatter = CartesianValueFormatter { _, value, _ ->
                         val dayIndex = value.toInt().coerceIn(0, chartData.dateLabels.lastIndex)
                         DateUtils.formatShortDate(chartData.dateLabels[dayIndex])
-                    }
+                    },
+                    guideline = null
                 )
             ),
             modelProducer = modelProducer,

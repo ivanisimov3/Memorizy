@@ -1,8 +1,6 @@
 package com.example.memorizy.ui.screens.settings
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import com.example.memorizy.ui.utils.AppIcon
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,16 +14,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -60,22 +59,27 @@ fun SettingsScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.settings_title),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.secondary
+                        style = MaterialTheme.typography.labelMedium
                     )
                 },
                 navigationIcon = {
                     IconButton(
                         onClick = onBackClick
                     ) {
-                        AppIcon(
+                        Icon(
                             painter = painterResource(R.drawable.ic_back),
                             contentDescription = stringResource(R.string.back_button)
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
         SettingsScreenBody(
             modifier = Modifier
@@ -128,7 +132,8 @@ private fun SettingsScreenBody(
                         R.string.settings_user_warning,
                         uiState.username ?: stringResource(R.string.guest_text)
                     ),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Spacer(Modifier.height(12.dp))
@@ -137,14 +142,20 @@ private fun SettingsScreenBody(
                     modifier = Modifier
                         .clickable(onClick = onLogoutButtonClick)
                         .height(40.dp)
-                        .width(90.dp)
+                        .width(90.dp),
+                    containerColor = MaterialTheme.colorScheme.primary
                 ) {
-                    Text(stringResource(R.string.logout))
+                    Text(
+                        text = stringResource(R.string.logout),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             } else {
                 Text(
                     text = stringResource(R.string.settings_guest_warning),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Spacer(Modifier.height(12.dp))
@@ -153,59 +164,58 @@ private fun SettingsScreenBody(
                     modifier = Modifier
                         .clickable(onClick = onLoginClick)
                         .height(40.dp)
-                        .width(90.dp)
+                        .width(90.dp),
+                    containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Text(
                         text = stringResource(R.string.login_button_text),
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
         }
 
         Spacer(Modifier.height(2.dp))
-        HorizontalDivider(color = MaterialTheme.colorScheme.secondary)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
         SettingsSection(title = stringResource(R.string.Synchronization_text)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+            val isEnabled = uiState.isLoggedIn
+
+            val currentColor = if (isEnabled) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            }
+
+            GlassContainer(
+                modifier = Modifier
+                    .clickable(
+                        enabled = isEnabled,
+                        onClick = onSyncClick
+                    )
+                    .height(40.dp)
+                    .width(200.dp),
+                containerColor = currentColor
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Button(
-                        onClick = onSyncClick,
-                        enabled = uiState.isLoggedIn,
-                        shape = RoundedCornerShape(18.dp),
-                        border = BorderStroke(
-                            width = 1.dp,
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-                                )
-                            )
-                        )
-                    ) {
-                        Text(
-                            text = stringResource(R.string.synchronize_button_text),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
+                Text(
+                    text = stringResource(R.string.synchronize_button_text),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = currentColor
+                )
+            }
 
-                    if (uiState.isLoggedIn && uiState.lastSyncTime != null) {
+            if (uiState.isLoggedIn && uiState.lastSyncTime != null) {
+                Spacer(Modifier.height(4.dp))
 
-                        Spacer(Modifier.height(4.dp))
-
-                        Text(
-                            text = stringResource(
-                                R.string.sync_last_time,
-                                DateUtils.formatFullDateTime(uiState.lastSyncTime)
-                            ),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-                }
+                Text(
+                    text = stringResource(
+                        R.string.sync_last_time,
+                        DateUtils.formatFullDateTime(uiState.lastSyncTime)
+                    ),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             }
 
             if (!uiState.isLoggedIn) {
@@ -213,13 +223,14 @@ private fun SettingsScreenBody(
 
                 Text(
                     text = stringResource(R.string.settings_sync_warning),
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
 
         Spacer(Modifier.height(2.dp))
-        HorizontalDivider(color = MaterialTheme.colorScheme.secondary)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
         SettingsSection(title = stringResource(R.string.app_theme_text)) {
             Row(
@@ -229,7 +240,8 @@ private fun SettingsScreenBody(
             ) {
                 Text(
                     text = stringResource(R.string.settings_dark_theme_text),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Switch(
                     checked = uiState.isDarkTheme,
@@ -239,7 +251,7 @@ private fun SettingsScreenBody(
         }
 
         Spacer(Modifier.height(2.dp))
-        HorizontalDivider(color = MaterialTheme.colorScheme.secondary)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
         SettingsSection(title = stringResource(R.string.notifications_text)) {
             Row(
@@ -249,7 +261,8 @@ private fun SettingsScreenBody(
             ) {
                 Text(
                     text = stringResource(R.string.settings_notifications_text),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Switch(
                     checked = uiState.notificationsEnabled,
@@ -287,28 +300,30 @@ private fun LogoutDialog(
         title = {
             Text(
                 text = stringResource(R.string.logout_question),
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
         },
         text = {
             Text(
                 text = stringResource(R.string.logout_warning),
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
        },
         confirmButton = {
-            TextButton(
+            OutlinedButton(
                 onClick = onConfirmLogout
             ) {
                 Text(
                     text = stringResource(R.string.logout),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
         },
         dismissButton = {
-            TextButton(
+            FilledTonalButton(
                 onClick = onDismiss
             ) {
                 Text(
