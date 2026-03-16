@@ -10,13 +10,18 @@ import com.example.memorizy.data.repository.StudySetRepository
 import com.example.memorizy.data.sync.SyncManager
 import com.example.memorizy.domain.spacedrepetition.SpacedRepetitionScheduler
 import com.example.memorizy.ui.navigation.Routes
+import com.example.memorizy.ui.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+
+private const val DEADLINE_REFRESH_INTERVAL_MS = 60_000L
 
 @HiltViewModel
 class SetDetailsViewModel @Inject constructor(
@@ -39,7 +44,8 @@ class SetDetailsViewModel @Inject constructor(
                 _uiState.update { state ->
                     state.copy(
                         studySet = set,
-                        isLoading = (set == null)
+                        isLoading = (set == null),
+                        deadline = set?.targetDate?.let(::buildDeadlineUiState)
                     )
                 }
             }
@@ -60,6 +66,13 @@ class SetDetailsViewModel @Inject constructor(
                         overallProgress = progress
                     )
                 }
+            }
+        }
+
+        viewModelScope.launch {
+            while (isActive) {  // Пока корутина работает
+                refreshDeadlineState()
+                delay(DEADLINE_REFRESH_INTERVAL_MS)
             }
         }
     }
@@ -204,5 +217,25 @@ class SetDetailsViewModel @Inject constructor(
 
             syncManager.scheduleOneTimeSync()
         }
+    }
+
+    private fun refreshDeadlineState() {
+        _uiState.update { state ->
+            state.copy(
+                deadline = state.studySet?.targetDate?.let { buildDeadlineUiState(it) }
+            )
+        }
+    }
+
+    private fun buildDeadlineUiState(targetDate: Long): DeadlineUiState {
+        val countdown = DateUtils.buildDeadlineCountdown(
+            targetDate = targetDate,
+            now = System.currentTimeMillis()
+        )
+
+        return DeadlineUiState(
+            remainingDays = countdown.remainingDays,
+            remainingHours = countdown.remainingHours
+        )
     }
 }

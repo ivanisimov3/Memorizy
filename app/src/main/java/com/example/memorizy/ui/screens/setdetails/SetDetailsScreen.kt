@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,11 +39,11 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -51,11 +52,13 @@ import com.example.memorizy.R
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.ui.utils.AppIcons
 import com.example.memorizy.ui.utils.AppIcons.getIconResById
-import kotlin.collections.component2
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import com.example.memorizy.ui.utils.AppIcon
+import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.ui.utils.GlassContainer
 import com.example.memorizy.ui.utils.DateUtils
 
@@ -99,9 +102,11 @@ fun SetDetailsScreen(
                         .clickable(onClick = onAddCardClick)
                         .size(56.dp),
                 ) {
-                    AppIcon(
+                    Icon(
                         painter = painterResource(R.drawable.ic_add),
-                        contentDescription = stringResource(R.string.add_card_button)
+                        contentDescription = stringResource(R.string.add_card_button),
+                        modifier = Modifier,
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -171,13 +176,12 @@ private fun SetDetailsTopBar(
                     else
                         stringResource(R.string.set_detalization_text),
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.secondary
             )
         },
         navigationIcon = {
             if (!isEditing){
                 IconButton(onClick = onBackClick) {
-                    AppIcon(
+                    Icon(
                         painter = painterResource(R.drawable.ic_back),
                         contentDescription = stringResource(R.string.back_button)
                     )
@@ -187,32 +191,38 @@ private fun SetDetailsTopBar(
         actions = {
             if (isEditing) {
                 IconButton(onClick = onCancelEditing) {
-                    AppIcon(
+                    Icon(
                         painter = painterResource(R.drawable.ic_close),
                         contentDescription = stringResource(R.string.cancel_edit_mode)
                     )
                 }
                 IconButton(onClick = onSaveChanges) {
-                    AppIcon(
+                    Icon(
                         painter = painterResource(R.drawable.ic_confirm),
                         contentDescription = stringResource(R.string.confirm_edit)
                     )
                 }
             } else {
                 IconButton(onClick = onStatisticsClick) {
-                    AppIcon(
+                    Icon(
                         painter = painterResource(R.drawable.ic_statistics),
                         contentDescription = stringResource(R.string.statistics_ic)
                     )
                 }
                 IconButton(onClick = onStartEditing) {
-                    AppIcon(
+                    Icon(
                         painter = painterResource(R.drawable.ic_edit),
                         contentDescription = stringResource(R.string.start_edit_mode)
                     )
                 }
             }
-        }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurface,
+        )
     )
 }
 
@@ -250,55 +260,47 @@ private fun SetDetailsBody(
         contentPadding = PaddingValues(16.dp)
     ) {
         if (!editMode) {
-            item {
-                Column {
-                    Text(
-                        text = stringResource(R.string.overall_progress_title),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+            val deadline = uiState.deadline
+            if (deadline != null) {
+                item {
+                    DeadlineHeroCard(
+                        deadline = deadline
                     )
-                    Spacer(Modifier.height(4.dp))
-                    LinearProgressIndicator(
-                        progress = { uiState.overallProgress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(5.dp),
-                        gapSize = (-15).dp,
-                        drawStopIndicator = {}
-                    )
-                    Spacer(Modifier.height(12.dp))
                 }
+            }
+
+            item {
+                SetSummaryCard(
+                    studySet = uiState.studySet,
+                    overallProgress = uiState.overallProgress,
+                    getIconRes = getIconRes
+                )
             }
         }
 
         item {
             Column{
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(
-                            getIconRes(
-                                if (editMode)
-                                    uiState.draftSet.iconId
-                                else
-                                    uiState.studySet.iconId
-                            )
-                        ),
-                        contentDescription = stringResource(R.string.set_icon),
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .then(  // Объединяет этот модификатор с другим
-                                if (editMode) Modifier
-                                    .clip(CircleShape)
-                                    .clickable { onIconClick() }
-                                    .size(48.dp)
-                                else Modifier
-                                    .size(48.dp)
-                            )
+                if (editMode) {
+                    TargetDateEditor(
+                        currentTargetDate = uiState.draftSet.targetDate,
+                        onTargetDateChanged = updateDraftTargetDate
                     )
-                    Spacer(Modifier.width(16.dp))
-                    if (editMode) {
+                }
+
+                if (editMode) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(getIconRes(uiState.draftSet.iconId)),
+                            contentDescription = stringResource(R.string.set_icon),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .clickable { onIconClick() }
+                                .size(48.dp)
+                        )
+                        Spacer(Modifier.width(16.dp))
                         OutlinedTextField(
                             value = uiState.draftSet.name,
                             onValueChange = updateDraftName,
@@ -313,15 +315,8 @@ private fun SetDetailsBody(
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
-                    } else {
-                        Text(
-                            text = uiState.studySet.name,
-                            style = MaterialTheme.typography.displayMedium
-                        )
                     }
-                }
 
-                if (editMode) {
                     OutlinedTextField(
                         value = uiState.draftSet.description ?: "",
                         onValueChange = updateDraftDescription,
@@ -336,38 +331,7 @@ private fun SetDetailsBody(
                         maxLines = 5,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
                     )
-                } else {
-                    if (!uiState.studySet.description.isNullOrBlank()) {
-
-                        Spacer(Modifier.height(8.dp))
-
-                        Text(
-                            text = uiState.studySet.description,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
                 }
-
-                if (editMode) {
-                    Spacer(Modifier.height(8.dp))
-                    TargetDateEditor(
-                        currentTargetDate = uiState.draftSet.targetDate,
-                        onTargetDateChanged = updateDraftTargetDate
-                    )
-                } else {
-                    val targetDate = uiState.studySet.targetDate
-                    if (targetDate != null) {
-                        Spacer(Modifier.height(8.dp))
-                        val dateStr = DateUtils.formatShortDate(targetDate)
-                        Text(
-                            text = stringResource(R.string.target_date_display, dateStr),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(8.dp))
 
                 if (!editMode) {
                     GlassContainer (
@@ -380,6 +344,7 @@ private fun SetDetailsBody(
                         Text(
                             stringResource(R.string.learning_mode),
                             style = MaterialTheme.typography.displayLarge,
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
 
@@ -395,13 +360,14 @@ private fun SetDetailsBody(
                         Text(
                             stringResource(R.string.testing_mode),
                             style = MaterialTheme.typography.displayLarge,
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
 
                     Spacer(Modifier.height(8.dp))
                 }
 
-                HorizontalDivider()
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             }
         }
 
@@ -421,6 +387,159 @@ private fun SetDetailsBody(
                 CardItem(
                     card = card,
                     onLongClick = { onCardToDelete(card) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DeadlineHeroCard(
+    deadline: DeadlineUiState
+) {
+    val accentColor = MaterialTheme.colorScheme.secondary
+
+    GlassContainer(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp),
+        shape = RoundedCornerShape(24.dp),
+        containerColor = accentColor
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(R.string.deadline_countdown_title),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.secondary
+            )
+
+            Spacer(Modifier.height(10.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CountdownUnit(
+                    value = deadline.remainingDays,
+                    label = stringResource(R.string.deadline_days_short),
+                    accentColor = accentColor,
+                    modifier = Modifier.weight(1f)
+                )
+                CountdownUnit(
+                    value = deadline.remainingHours,
+                    label = stringResource(R.string.deadline_hours_short),
+                    accentColor = accentColor,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CountdownUnit(
+    value: Long,
+    label: String,
+    accentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    GlassContainer(
+        modifier = modifier,
+        shape = RoundedCornerShape(20.dp),
+        containerColor = accentColor
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = value.toString().padStart(2, '0'),
+                style = MaterialTheme.typography.displayMedium,
+                color = accentColor
+            )
+
+            Spacer(Modifier.height(2.dp))
+
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun SetSummaryCard(
+    studySet: StudySet,
+    overallProgress: Float,
+    getIconRes: (Int) -> Int
+) {
+    GlassContainer(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp),
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.primary
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.overall_progress_title),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(Modifier.height(4.dp))
+
+            LinearProgressIndicator(
+                progress = { overallProgress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(5.dp),
+                gapSize = (-15).dp,
+                drawStopIndicator = {}
+            )
+
+            Spacer(Modifier.height(14.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(getIconRes(studySet.iconId)),
+                    contentDescription = stringResource(R.string.set_icon),
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(48.dp)
+                )
+
+                Spacer(Modifier.width(16.dp))
+
+                Text(
+                    text = studySet.name,
+                    style = MaterialTheme.typography.displayMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            if (!studySet.description.isNullOrBlank()) {
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = studySet.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -447,7 +566,7 @@ private fun TargetDateEditor(
                     DateUtils.formatShortDate(currentTargetDate)
                 ),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .weight(1f)
                     .clickable { showDatePicker = true }
@@ -464,7 +583,7 @@ private fun TargetDateEditor(
                 Text(
                     text = stringResource(R.string.target_date_set),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -485,7 +604,7 @@ private fun TargetDateEditor(
                     Text(
                         text = stringResource(R.string.create_set_text),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             },
@@ -517,6 +636,7 @@ private fun CardItem(
                 onLongClick = onLongClick
             )
             .padding(vertical = 8.dp),
+        containerColor = MaterialTheme.colorScheme.primary
     ) {
         Column (
             modifier = Modifier
@@ -525,12 +645,13 @@ private fun CardItem(
             Text(
                 text = card.term,
                 style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(Modifier.height(4.dp))
 
             HorizontalDivider(
-                color = MaterialTheme.colorScheme.inversePrimary
+                color = MaterialTheme.colorScheme.outline
             )
 
             Spacer(Modifier.height(4.dp))
@@ -538,6 +659,7 @@ private fun CardItem(
             Text(
                 text = card.definition,
                 style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -561,7 +683,7 @@ fun EditCardItem(
                 label = {
                     Text(
                         text = stringResource(R.string.term_text),
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelSmall
                     )
                 },
                 isError = draftCard.term.isEmpty(),
@@ -579,7 +701,7 @@ fun EditCardItem(
                 label = {
                     Text(
                         text = stringResource(R.string.definition_text),
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelSmall
                     )
                 },
                 isError = draftCard.definition.isEmpty(),
@@ -603,28 +725,30 @@ private fun DeleteCardDialog(
         title = {
             Text(
                 text = stringResource(R.string.delete_card_question),
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
         },
         text = {
             Text(
                 text = stringResource(R.string.delete_card_warning),
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
        },
         confirmButton = {
-            TextButton(
+            OutlinedButton(
                 onClick = onConfirmDelete
             ) {
                 Text(
                     text = stringResource(R.string.delete_text),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.error
                 )
             }
         },
         dismissButton = {
-            TextButton(
+            FilledTonalButton(
                 onClick = onDismiss
             ) {
                 Text(
@@ -650,7 +774,8 @@ fun IconSelectionDialog(
         title = {
             Text(
                 text = stringResource(R.string.select_ic_text),
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
         },
         text = {
@@ -668,9 +793,9 @@ fun IconSelectionDialog(
                             .clickable { onIconSelected(id) },
                         tint =
                             if (id == currentIconId)
-                                MaterialTheme.colorScheme.primary
+                                MaterialTheme.colorScheme.onSurfaceVariant
                             else
-                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
                     )
                 }
             }
@@ -683,7 +808,7 @@ fun IconSelectionDialog(
                 Text(
                     text = stringResource(R.string.cancel_text),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

@@ -106,6 +106,9 @@
     <string name="target_date_clear">Убрать дедлайн</string>
     <string name="target_date_display">Выучить до: %1$s</string>
     <string name="target_time_title">Выберите время</string>
+    <string name="deadline_countdown_title">Осталось до дедлайна</string>
+    <string name="deadline_days_short">дней</string>
+    <string name="deadline_hours_short">часов</string>
 
     <string name="import_csv">Импорт CSV</string>
     <string name="import_csv_desc">Загрузить карточки из файла</string>
