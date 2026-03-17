@@ -1,7 +1,5 @@
 package com.example.memorizy.ui.screens.studysets
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -80,8 +79,8 @@ fun StudySetsScreen(
             GlassContainer(
                 containerColor = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
-                    .clickable(onClick = onAddSetClick)
                     .size(56.dp),
+                onClick = onAddSetClick
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_add),
@@ -94,8 +93,7 @@ fun StudySetsScreen(
         containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
         StudySetsScreenBody(
-            modifier = Modifier
-                .padding(paddingValues),
+            paddingValues = paddingValues,
             uiState = uiState,
             onSetClick = onSetClick,
             onSetToDelete = { studySet ->
@@ -128,6 +126,8 @@ private fun StudySetsTopAppBar(
     onSearchQueryChanged: (String) -> Unit
 ){
     TopAppBar(
+        modifier = Modifier
+            .shadow(elevation = 8.dp),
         title = {
             if (isSearchActive) {
                 OutlinedTextField(
@@ -191,14 +191,14 @@ private fun StudySetsTopAppBar(
 
 @Composable
 private fun StudySetsScreenBody(
-    modifier: Modifier,
+    paddingValues: PaddingValues,
     uiState: StudySetsState,
     onSetClick: (Long) -> Unit,
     onSetToDelete: (StudySet) -> Unit
 ){
     if (uiState.isLoading){
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ){
@@ -207,8 +207,14 @@ private fun StudySetsScreenBody(
     }
     else{
         LazyColumn(
-            modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp)
+            modifier = Modifier
+                .fillMaxSize(),
+            contentPadding = PaddingValues(
+                top = paddingValues.calculateTopPadding() + 16.dp,
+                bottom = paddingValues.calculateBottomPadding(),
+                start = 16.dp,
+                end = 16.dp
+            )
         ) {
             items(items = uiState.studySetsWithCardNumber, key = { it.studySet.id} ) { studySetWithCardNumber ->
                 StudySetItem(
@@ -235,12 +241,10 @@ private fun StudySetItem(
     GlassContainer(
         modifier = Modifier
             .fillMaxWidth()
-            .combinedClickable(
-                onClick = onSetClick,
-                onLongClick = onLongClick
-            )
-            .padding(vertical = 8.dp),
-        containerColor = MaterialTheme.colorScheme.primary
+            .padding(bottom = 8.dp),
+        containerColor = MaterialTheme.colorScheme.primary,
+        onClick = onSetClick,
+        onLongClick = onLongClick
     ) {
         Column (
             modifier = Modifier

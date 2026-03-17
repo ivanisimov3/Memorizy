@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,12 +31,12 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -80,6 +81,8 @@ fun AddCardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
+                modifier = Modifier
+                    .shadow(elevation = 8.dp),
                 title = {
                     Text(
                         text = stringResource(R.string.new_card_text),
@@ -116,8 +119,7 @@ fun AddCardScreen(
         },
     ) { paddingValues ->
         AddCardScreenBody(
-            modifier = Modifier
-                .padding(paddingValues),
+            paddingValues = paddingValues,
             onBackClick = onBackClick,
             uiState = uiState,
             onTermChanged = onTermChanged,
@@ -203,7 +205,7 @@ private fun ImportSummaryDialog(
 
 @Composable
 private fun AddCardScreenBody(
-    modifier: Modifier,
+    paddingValues: PaddingValues,
     onBackClick: () -> Unit,
     uiState: AddCardState,
     onTermChanged: (String) -> Unit,
@@ -211,10 +213,15 @@ private fun AddCardScreenBody(
     onCreateButtonClicked: () -> Unit
 ) {
     Column(
-        modifier = modifier
-            .padding(16.dp)
+        modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .padding(
+                top = paddingValues.calculateTopPadding() + 16.dp,
+                bottom = paddingValues.calculateBottomPadding(),
+                start = 16.dp,
+                end = 16.dp
+            )
     ) {
         OutlinedTextField(
             value = uiState.term,
@@ -276,9 +283,9 @@ private fun AddCardScreenBody(
         ) {
             GlassContainer(
                 modifier = Modifier
-                    .clickable(onClick = onBackClick)
                     .height(40.dp)
                     .width(120.dp),
+                onClick = onBackClick,
                 containerColor = MaterialTheme.colorScheme.secondary
             ) { // Навигация
                 Text(
@@ -292,9 +299,9 @@ private fun AddCardScreenBody(
 
             GlassContainer(
                 modifier = Modifier
-                    .clickable(onClick = onCreateButtonClicked)
                     .height(40.dp)
                     .width(100.dp),
+                onClick = onCreateButtonClicked,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Text(

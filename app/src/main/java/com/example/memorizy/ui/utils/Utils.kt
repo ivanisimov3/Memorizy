@@ -2,6 +2,7 @@ package com.example.memorizy.ui.utils
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -110,25 +112,37 @@ fun GlassContainer(
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(24.dp),
     containerColor: Color = MaterialTheme.colorScheme.primary,
+    enabled: Boolean = true,
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
         modifier = modifier
             .clip(shape)
+            .then(
+                if (onClick != null || onLongClick != null) {
+                    Modifier.combinedClickable(
+                        enabled = enabled,
+                        onClick = onClick ?: {},    // combinedClickable обязательно требует onClick
+                        onLongClick = onLongClick
+                    )
+                } else Modifier
+            )
             .background(
-                brush = Brush.linearGradient(
+                brush = Brush.verticalGradient(
                     colors = listOf(
-                        containerColor.copy(alpha = 0.3f),
+                        containerColor.copy(alpha = 0.35f),
                         containerColor.copy(alpha = 0.15f)
                     )
                 )
             )
             .border(
-                width = 1.dp,
-                brush = Brush.linearGradient(
+                width = 2.dp,
+                brush = Brush.verticalGradient(
                     colors = listOf(
                         containerColor.copy(alpha = 0.5f),
-                        containerColor.copy(alpha = 0.35f)
+                        containerColor.copy(alpha = 0.25f)
                     )
                 ),
                 shape = shape

@@ -1,8 +1,8 @@
 package com.example.memorizy.ui.screens.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -56,6 +57,8 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
+                modifier = Modifier
+                    .shadow(elevation = 8.dp),
                 title = {
                     Text(
                         text = stringResource(R.string.settings_title),
@@ -82,8 +85,7 @@ fun SettingsScreen(
         containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
         SettingsScreenBody(
-            modifier = Modifier
-                .padding(paddingValues),
+            paddingValues = paddingValues,
             uiState = uiState,
             onLoginClick = onLoginClick,
             onSyncClick = onSyncClick,
@@ -108,7 +110,7 @@ fun SettingsScreen(
 
 @Composable
 private fun SettingsScreenBody(
-    modifier: Modifier,
+    paddingValues: PaddingValues,
     uiState: SettingsState,
     onLoginClick: () -> Unit,
     onSyncClick: () -> Unit,
@@ -119,10 +121,15 @@ private fun SettingsScreenBody(
     val scrollState = rememberScrollState()
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(scrollState),
+            .verticalScroll(scrollState)
+            .padding(
+                top = paddingValues.calculateTopPadding() + 16.dp,
+                bottom = paddingValues.calculateBottomPadding(),
+                start = 16.dp,
+                end = 16.dp
+            ),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ){
         SettingsSection(title = stringResource(R.string.account_text)) {
@@ -140,9 +147,9 @@ private fun SettingsScreenBody(
 
                 GlassContainer(
                     modifier = Modifier
-                        .clickable(onClick = onLogoutButtonClick)
                         .height(40.dp)
                         .width(90.dp),
+                    onClick = onLogoutButtonClick,
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Text(
@@ -162,9 +169,9 @@ private fun SettingsScreenBody(
 
                 GlassContainer(
                     modifier = Modifier
-                        .clickable(onClick = onLoginClick)
                         .height(40.dp)
                         .width(90.dp),
+                    onClick = onLoginClick,
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Text(
@@ -190,12 +197,10 @@ private fun SettingsScreenBody(
 
             GlassContainer(
                 modifier = Modifier
-                    .clickable(
-                        enabled = isEnabled,
-                        onClick = onSyncClick
-                    )
                     .height(40.dp)
                     .width(200.dp),
+                enabled = isEnabled,
+                onClick = onSyncClick,
                 containerColor = currentColor
             ) {
                 Text(

@@ -1,7 +1,6 @@
 package com.example.memorizy.ui.screens.setdetails
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,6 +57,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.draw.shadow
 import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.ui.utils.GlassContainer
 import com.example.memorizy.ui.utils.DateUtils
@@ -99,8 +99,8 @@ fun SetDetailsScreen(
                 GlassContainer(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier
-                        .clickable(onClick = onAddCardClick)
                         .size(56.dp),
+                    onClick = onAddCardClick
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_add),
@@ -113,8 +113,7 @@ fun SetDetailsScreen(
         }
     ) { paddingValues ->
         SetDetailsBody(
-            modifier = Modifier
-                .padding(paddingValues),
+            paddingValues = paddingValues,
             uiState = uiState,
             onCardToDelete = { studySet ->
                 cardToDelete = studySet
@@ -168,6 +167,8 @@ private fun SetDetailsTopBar(
     isEditing: Boolean
 ){
     TopAppBar(
+        modifier = Modifier
+            .shadow(elevation = 8.dp),
         title = {
             Text(
                 text =
@@ -229,7 +230,7 @@ private fun SetDetailsTopBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SetDetailsBody(
-    modifier: Modifier,
+    paddingValues: PaddingValues,
     uiState: SetDetailsState,
     onCardToDelete: (Card) -> Unit,
     getIconRes: (Int) -> (Int) = { getIconResById(it) },
@@ -245,7 +246,7 @@ private fun SetDetailsBody(
 
     if (uiState.isLoading || uiState.studySet == null){
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ){
@@ -255,9 +256,14 @@ private fun SetDetailsBody(
     }
 
     LazyColumn(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize(),
-        contentPadding = PaddingValues(16.dp)
+        contentPadding = PaddingValues(
+            top = paddingValues.calculateTopPadding() + 16.dp,
+            bottom = paddingValues.calculateBottomPadding(),
+            start = 16.dp,
+            end = 16.dp
+        )
     ) {
         if (!editMode) {
             val deadline = uiState.deadline
@@ -337,8 +343,8 @@ private fun SetDetailsBody(
                     GlassContainer (
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable(onClick = onLearningModeClick)
                             .height(50.dp),
+                        onClick = onLearningModeClick,
                         containerColor = MaterialTheme.colorScheme.secondary
                     ) {
                         Text(
@@ -353,8 +359,8 @@ private fun SetDetailsBody(
                     GlassContainer (
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable(onClick = onTestingModeClick)
                             .height(50.dp),
+                        onClick = onTestingModeClick,
                         containerColor = MaterialTheme.colorScheme.secondary
                     ) {
                         Text(
@@ -631,11 +637,8 @@ private fun CardItem(
     GlassContainer(
         modifier = Modifier
             .fillMaxWidth()
-            .combinedClickable(
-                onClick = { },
-                onLongClick = onLongClick
-            )
             .padding(vertical = 8.dp),
+        onLongClick = onLongClick,
         containerColor = MaterialTheme.colorScheme.primary
     ) {
         Column (

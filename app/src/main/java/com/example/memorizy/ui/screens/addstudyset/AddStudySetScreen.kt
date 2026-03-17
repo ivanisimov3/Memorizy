@@ -3,6 +3,7 @@ package com.example.memorizy.ui.screens.addstudyset
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,13 +42,13 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.shadow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,6 +71,8 @@ fun AddStudySetScreen(
     Scaffold(
         topBar = {
             TopAppBar(
+                modifier = Modifier
+                    .shadow(elevation = 8.dp),
                 title = {
                     Text(
                         text = stringResource(R.string.new_set_text),
@@ -95,8 +98,7 @@ fun AddStudySetScreen(
         },
     ) { paddingValues ->
         AddStudySetScreenBody(
-            modifier = Modifier
-                .padding(paddingValues),
+            paddingValues = paddingValues,
             onBackClick = onBackClick,
             uiState = uiState,
             onNameChanged = onNameChanged,
@@ -110,7 +112,7 @@ fun AddStudySetScreen(
 
 @Composable
 private fun AddStudySetScreenBody(
-    modifier: Modifier,
+    paddingValues: PaddingValues,
     onBackClick: () -> Unit,
     uiState: AddStudySetState,
     onNameChanged: (String) -> Unit,
@@ -120,10 +122,15 @@ private fun AddStudySetScreenBody(
     onCreateButtonClicked: () -> Unit
 ) {
     Column(
-        modifier = modifier
-            .padding(16.dp)
+        modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .padding(
+                top = paddingValues.calculateTopPadding() + 16.dp,
+                bottom = paddingValues.calculateBottomPadding(),
+                start = 16.dp,
+                end = 16.dp
+            )
     ) {
         IconSelector(
             selectedIconId = uiState.selectedIconId,
@@ -190,9 +197,9 @@ private fun AddStudySetScreenBody(
         ) {
             GlassContainer(
                 modifier = Modifier
-                    .clickable(onClick = onBackClick)
                     .height(40.dp)
                     .width(120.dp),
+                onClick = onBackClick,
                 containerColor = MaterialTheme.colorScheme.secondary
             ) {
                 Text(
@@ -206,9 +213,9 @@ private fun AddStudySetScreenBody(
 
             GlassContainer (
                 modifier = Modifier
-                    .clickable(onClick = onCreateButtonClicked)
                     .height(40.dp)
                     .width(100.dp),
+                onClick = onCreateButtonClicked,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Text(

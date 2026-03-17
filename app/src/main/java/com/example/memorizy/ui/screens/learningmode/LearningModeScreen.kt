@@ -9,10 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -41,6 +41,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -71,8 +72,7 @@ fun LearningModeScreen(
         }
     ) { paddingValues ->
         LearningModeScreenBody(
-            modifier = Modifier
-                .padding(paddingValues),
+            paddingValues = paddingValues,
             uiState = uiState,
             onBackClick = onBackClick,
             restartGame = restartGame,
@@ -92,6 +92,8 @@ private fun LearningModeTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .shadow(elevation = 8.dp)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(WindowInsets.safeContent.asPaddingValues()),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -145,7 +147,7 @@ private fun LearningModeTopBar(
 
 @Composable
 private fun LearningModeScreenBody(
-    modifier: Modifier,
+    paddingValues: PaddingValues,
     uiState: LearningModeState,
     onBackClick: () -> Unit,
     restartGame: () -> Unit,
@@ -156,7 +158,7 @@ private fun LearningModeScreenBody(
     toggleReviewMode: () -> Unit
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
@@ -175,6 +177,7 @@ private fun LearningModeScreenBody(
 
             uiState.isFinished -> {
                 LearningResultContent(
+                    paddingValues = paddingValues,
                     uiState = uiState,
                     onRestartClick = restartGame,
                     onBackClick = onBackClick
@@ -185,7 +188,12 @@ private fun LearningModeScreenBody(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp),
+                        .padding(
+                            top = paddingValues.calculateTopPadding() + 16.dp,
+                            bottom = paddingValues.calculateBottomPadding() + 16.dp,
+                            start = 16.dp,
+                            end = 16.dp
+                        ),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Spacer(Modifier.height(16.dp))
@@ -372,9 +380,9 @@ private fun EmptyStateMessage(
 
             GlassContainer(
                 modifier = Modifier
-                    .clickable(onClick = toggleReviewMode)
                     .height(40.dp)
                     .width(160.dp),
+                onClick = toggleReviewMode,
                 containerColor = MaterialTheme.colorScheme.secondary
             ) {
                 Text(
@@ -388,9 +396,9 @@ private fun EmptyStateMessage(
 
             GlassContainer(
                 modifier = Modifier
-                    .clickable(onClick = onBackClick)
                     .height(40.dp)
                     .width(160.dp),
+                onClick = onBackClick,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Text(
@@ -416,9 +424,9 @@ private fun EmptyStateMessage(
             Spacer(Modifier.height(24.dp))
             GlassContainer(
                 modifier = Modifier
-                    .clickable(onClick = onBackClick)
                     .height(40.dp)
                     .width(90.dp),
+                onClick = onBackClick,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Text(
@@ -433,6 +441,7 @@ private fun EmptyStateMessage(
 
 @Composable
 private fun LearningResultContent(
+    paddingValues: PaddingValues,
     uiState: LearningModeState,
     onBackClick: () -> Unit,
     onRestartClick: () -> Unit,
@@ -444,8 +453,13 @@ private fun LearningResultContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState())
+            .padding(
+                top = paddingValues.calculateTopPadding() + 24.dp,
+                bottom = paddingValues.calculateBottomPadding(),
+                start = 24.dp,
+                end = 24.dp
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -514,9 +528,9 @@ private fun LearningResultContent(
 
         GlassContainer(
             modifier = Modifier
-                .clickable(onClick = onRestartClick)
                 .fillMaxWidth()
                 .height(50.dp),
+            onClick = onRestartClick,
             containerColor = MaterialTheme.colorScheme.primary
         ) {
             Row(
@@ -541,9 +555,9 @@ private fun LearningResultContent(
 
         GlassContainer(
             modifier = Modifier
-                .clickable(onClick = onBackClick)
                 .fillMaxWidth()
                 .height(50.dp),
+            onClick = onBackClick,
             containerColor = MaterialTheme.colorScheme.secondary
         ) {
             Text(
@@ -579,8 +593,8 @@ private fun LearningCard(
                 rotationY = rotation
                 cameraDistance =
                     12f * density  // Настройка перспективы, чтобы карточка была будто 3D
-            }
-            .clickable(onClick = onCardClick),
+            },
+        onClick = onCardClick,
         containerColor = MaterialTheme.colorScheme.primary
     ) {
         if (rotation <= 90f) {

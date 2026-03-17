@@ -20,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -29,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -57,6 +57,8 @@ fun AuthScreen(
     Scaffold(
         topBar = {
             TopAppBar(
+                modifier = Modifier
+                    .shadow(elevation = 8.dp),
                 title = {
                     Text(
                         text = stringResource(R.string.register_screen_lable),
@@ -167,9 +169,9 @@ private fun AuthScreenBody(
                 ){
                     GlassContainer(
                         modifier = Modifier
-                            .clickable(onClick = onRegisterClick)
                             .height(40.dp)
                             .width(220.dp),
+                        onClick = onRegisterClick,
                         containerColor = MaterialTheme.colorScheme.secondary
                     ) {
                         Text(
@@ -183,9 +185,9 @@ private fun AuthScreenBody(
 
                     GlassContainer(
                         modifier = Modifier
-                            .clickable(onClick = onLoginClick)
                             .height(40.dp)
                             .width(90.dp),
+                        onClick = onLoginClick,
                         containerColor = MaterialTheme.colorScheme.primary
                     ) {
                         Text(

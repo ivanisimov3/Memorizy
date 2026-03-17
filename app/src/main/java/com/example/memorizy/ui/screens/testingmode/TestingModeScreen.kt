@@ -1,6 +1,5 @@
 package com.example.memorizy.ui.screens.testingmode
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +33,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
@@ -73,7 +73,7 @@ fun TestingModeScreen(
             }
         ) { paddingValues ->
             TestingModeScreenBody(
-                modifier = Modifier.padding(paddingValues),
+                paddingValues = paddingValues,
                 uiState = uiState,
                 onBackClick = onBackClick,
                 onTermsSelected = onTermsSelected,
@@ -93,6 +93,8 @@ private fun TestingModeTopBar(
     uiState: TestingModeState
 ) {
     CenterAlignedTopAppBar(
+        modifier = Modifier
+            .shadow(elevation = 8.dp),
         title = {
             Text(
                 text = stringResource(
@@ -111,7 +113,7 @@ private fun TestingModeTopBar(
 
 @Composable
 private fun TestingModeScreenBody(
-    modifier: Modifier,
+    paddingValues: PaddingValues,
     uiState: TestingModeState,
     onBackClick: () -> Unit,
     onTermsSelected: () -> Unit,
@@ -122,7 +124,7 @@ private fun TestingModeScreenBody(
     showAnswers: () -> Unit
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
@@ -149,16 +151,17 @@ private fun TestingModeScreenBody(
                     uiState = uiState,
                     onRestartClick = restartTesting,
                     onBackClick = onBackClick,
-                    onShowAnswers = showAnswers
+                    onShowAnswers = showAnswers,
+                    paddingValues = paddingValues
                 )
             }
 
             else -> {
                 QuestionContent(
-                    modifier = Modifier,
                     uiState = uiState,
                     onAnswerChanged = onAnswerChanged,
-                    onSubmitAnswer = onSubmitAnswer
+                    onSubmitAnswer = onSubmitAnswer,
+                    paddingValues = paddingValues
                 )
             }
         }
@@ -193,9 +196,9 @@ private fun EmptyStateMessage(
 
         GlassContainer(
             modifier = Modifier
-                .clickable(onClick = onBackClick)
                 .height(40.dp)
                 .width(90.dp),
+            onClick = onBackClick,
             containerColor = MaterialTheme.colorScheme.primary
         ) {
             Text(
@@ -231,8 +234,8 @@ private fun ChoosingModeContent(
         GlassContainer(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onTermsSelected)
                 .height(50.dp),
+            onClick = onTermsSelected,
             containerColor = MaterialTheme.colorScheme.primary
         ) {
             Text(
@@ -247,8 +250,8 @@ private fun ChoosingModeContent(
         GlassContainer(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onDefinitionsSelected)
                 .height(50.dp),
+            onClick = onDefinitionsSelected,
             containerColor = MaterialTheme.colorScheme.secondary
         ) {
             Text(
@@ -262,10 +265,10 @@ private fun ChoosingModeContent(
 
 @Composable
 private fun QuestionContent(
-    modifier: Modifier,
     uiState: TestingModeState,
     onAnswerChanged: (String) -> Unit,
-    onSubmitAnswer: () -> Unit
+    onSubmitAnswer: () -> Unit,
+    paddingValues: PaddingValues
 ) {
     val currentCard = uiState.currentCard ?: return
 
@@ -286,10 +289,15 @@ private fun QuestionContent(
             stringResource(R.string.definition_text)
 
     Column(
-        modifier = modifier
-            .padding(16.dp)
+        modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .padding(
+                top = paddingValues.calculateTopPadding() + 16.dp,
+                bottom = paddingValues.calculateBottomPadding() + 16.dp,
+                start = 24.dp,
+                end = 24.dp
+            )
     ) {
         Text(
             text = questionLabel,
@@ -344,8 +352,8 @@ private fun QuestionContent(
 
             GlassContainer(
                 modifier = Modifier
-                    .size(56.dp)
-                    .clickable(onClick = onSubmitAnswer),
+                    .size(56.dp),
+                onClick = onSubmitAnswer,
                 shape = CircleShape,
                 containerColor = MaterialTheme.colorScheme.secondary
             ) {
@@ -386,7 +394,8 @@ private fun TestingResultContent(
     uiState: TestingModeState,
     onBackClick: () -> Unit,
     onRestartClick: () -> Unit,
-    onShowAnswers: () -> Unit
+    onShowAnswers: () -> Unit,
+    paddingValues: PaddingValues
 ) {
     val total = uiState.cards.size
     val progress = if (total > 0) uiState.correctCount.toFloat() / total else 0f
@@ -395,8 +404,13 @@ private fun TestingResultContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState())
+            .padding(
+                top = paddingValues.calculateTopPadding() + 24.dp,
+                bottom = paddingValues.calculateBottomPadding(),
+                start = 24.dp,
+                end = 24.dp
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -465,9 +479,9 @@ private fun TestingResultContent(
 
         GlassContainer(
             modifier = Modifier
-                .clickable(onClick = onRestartClick)
                 .fillMaxWidth()
                 .height(50.dp),
+            onClick = onRestartClick,
             containerColor = MaterialTheme.colorScheme.primary
         ) {
             Row(
@@ -492,9 +506,9 @@ private fun TestingResultContent(
 
         GlassContainer(
             modifier = Modifier
-                .clickable(onClick = onShowAnswers)
                 .fillMaxWidth()
                 .height(50.dp),
+            onClick = onShowAnswers,
             containerColor = MaterialTheme.colorScheme.secondary
         ) {
             Text(
@@ -508,9 +522,9 @@ private fun TestingResultContent(
 
         GlassContainer(
             modifier = Modifier
-                .clickable(onClick = onBackClick)
                 .fillMaxWidth()
                 .height(50.dp),
+            onClick = onBackClick,
             containerColor = MaterialTheme.colorScheme.tertiary
         ) {
             Text(
@@ -528,25 +542,32 @@ private fun AnswersReviewContent(
     uiState: TestingModeState,
     onBackClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        TopAppBar(
-            title = {
-                Text(
-                    text = stringResource(R.string.testing_show_answers),
-                    style = MaterialTheme.typography.labelMedium
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                modifier = Modifier
+                    .shadow(elevation = 8.dp),
+                title = {
+                    Text(
+                        text = stringResource(R.string.testing_show_answers),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                titleContentColor = MaterialTheme.colorScheme.onSurface
             )
-        )
-
+        }
+    ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 16.dp, start = 16.dp, end = 16.dp)
+            contentPadding = PaddingValues(
+                top = paddingValues.calculateTopPadding() + 16.dp,
+                bottom = paddingValues.calculateBottomPadding(),
+                start = 16.dp,
+                end = 16.dp
+            )
         ) {
             itemsIndexed(uiState.userAnswers) { index, testAnswer ->
                 val questionText = if (uiState.isTermChecked)
@@ -562,7 +583,7 @@ private fun AnswersReviewContent(
                 GlassContainer(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 6.dp),
+                        .padding(bottom = 6.dp),
                     containerColor =
                         if (testAnswer.isCorrect)
                             Color.Green
@@ -632,13 +653,13 @@ private fun AnswersReviewContent(
             }
 
             item {
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(12.dp))
 
                 GlassContainer(
                     modifier = Modifier
-                        .clickable(onClick = onBackClick)
                         .fillMaxWidth()
                         .height(50.dp),
+                    onClick = onBackClick,
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Text(
@@ -647,8 +668,6 @@ private fun AnswersReviewContent(
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
-
-                Spacer(Modifier.height(16.dp))
             }
         }
     }

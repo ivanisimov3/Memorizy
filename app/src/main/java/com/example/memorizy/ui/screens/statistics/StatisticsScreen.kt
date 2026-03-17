@@ -29,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -68,7 +69,7 @@ fun StatisticsScreen(
         }
     ) { paddingValues ->
         StatisticsBody(
-            modifier = Modifier.padding(paddingValues),
+            paddingValues = paddingValues,
             uiState = uiState
         )
     }
@@ -80,6 +81,8 @@ private fun StatisticsTopBar(
     onBackClick: () -> Unit
 ) {
     TopAppBar(
+        modifier = Modifier
+            .shadow(elevation = 8.dp),
         title = {
             Text(
                 text = stringResource(R.string.statistics_title),
@@ -104,12 +107,12 @@ private fun StatisticsTopBar(
 
 @Composable
 private fun StatisticsBody(
-    modifier: Modifier,
+    paddingValues: PaddingValues,
     uiState: StatisticsState
 ) {
     if (uiState.isLoading) {
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
@@ -119,9 +122,14 @@ private fun StatisticsBody(
     }
 
     LazyColumn(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(
+            top = paddingValues.calculateTopPadding() + 16.dp,
+            bottom = paddingValues.calculateBottomPadding(),
+            start = 16.dp,
+            end = 16.dp
+        ),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
