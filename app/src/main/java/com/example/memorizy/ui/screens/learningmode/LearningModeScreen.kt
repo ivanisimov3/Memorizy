@@ -27,7 +27,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,6 +37,7 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
@@ -85,64 +88,73 @@ fun LearningModeScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LearningModeTopBar(
     uiState: LearningModeState
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(elevation = 8.dp)
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(WindowInsets.safeContent.asPaddingValues()),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(18.dp)
-                    .clip(CircleShape)
-                    .background(Color.Red.copy(alpha = 0.7f))
-            )
-            Spacer(Modifier.width(8.dp))
+){
+    CenterAlignedTopAppBar(
+        modifier = Modifier.shadow(elevation = 8.dp),
+        title = {
             Text(
                 text = stringResource(
-                    R.string.incorrect_answ_counter,
-                    uiState.incorrectCount
+                    R.string.current_card_counter,
+                    uiState.currentIndex + 1,
+                    uiState.cards.size
                 ),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.displayMedium
             )
-        }
-
-        Text(
-            text = stringResource(
-                R.string.current_card_counter,
-                uiState.currentIndex + 1,
-                uiState.cards.size
-            ),
-            style = MaterialTheme.typography.displayMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = stringResource(
-                    R.string.correct_answ_counter,
-                    uiState.correctCount),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(Modifier.width(8.dp))
-            Box(
+        },
+        navigationIcon = {
+            Row(
                 modifier = Modifier
-                    .size(18.dp)
-                    .clip(CircleShape)
-                    .background(Color.Green.copy(alpha = 0.7f))
-            )
-        }
-    }
+                    .padding(start = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clip(CircleShape)
+                        .background(Color.Red.copy(alpha = 0.7f))
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = stringResource(
+                        R.string.incorrect_answ_counter,
+                        uiState.incorrectCount
+                    ),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        },
+        actions = {
+            Row(
+                modifier = Modifier
+                    .padding(end = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(
+                        R.string.correct_answ_counter,
+                        uiState.correctCount),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clip(CircleShape)
+                        .background(Color.Green.copy(alpha = 0.7f))
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurface,
+        )
+    )
 }
 
 @Composable
@@ -190,14 +202,12 @@ private fun LearningModeScreenBody(
                         .fillMaxSize()
                         .padding(
                             top = paddingValues.calculateTopPadding() + 16.dp,
-                            bottom = paddingValues.calculateBottomPadding() + 16.dp,
+                            bottom = paddingValues.calculateBottomPadding(),
                             start = 16.dp,
                             end = 16.dp
                         ),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Spacer(Modifier.height(16.dp))
-
                     Box(
                         modifier = Modifier
                             .weight(1f)
