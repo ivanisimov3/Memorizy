@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -139,11 +140,13 @@ fun GlassContainer(
             )
             .border(
                 width = 2.dp,
-                brush = Brush.verticalGradient(
+                brush = Brush.linearGradient(
                     colors = listOf(
-                        containerColor.copy(alpha = 0.5f),
-                        containerColor.copy(alpha = 0.25f)
-                    )
+                        containerColor.copy(alpha = 0.15f),
+                        containerColor.copy(alpha = 0.6f)
+                    ),
+                    start = Offset.Zero,
+                    end = Offset.Infinite
                 ),
                 shape = shape
             ),
