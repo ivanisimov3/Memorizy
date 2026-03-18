@@ -16,5 +16,6 @@ data class SetDetailsState(
     val draftSet: StudySet? = null,
     val draftCards: List<Card> = emptyList(),
     val overallProgress: Float = 0f,
+    val overallProgressPercentage: String = "0 %",
     val deadline: DeadlineUiState? = null
 )

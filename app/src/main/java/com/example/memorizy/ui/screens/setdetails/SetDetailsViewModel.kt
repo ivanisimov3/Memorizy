@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 private const val DEADLINE_REFRESH_INTERVAL_MS = 60_000L
 
@@ -59,11 +60,13 @@ class SetDetailsViewModel @Inject constructor(
                     else
                         cards.map { it.level }.average().toFloat()
                 val progress = avgLevel / SpacedRepetitionScheduler.MAX_LEVEL   // Рассчитываем процент знания набора
+                val progressPercentage = buildOverallProgressPercentage(progress)
 
                 _uiState.update { state ->
                     state.copy(
                         cards = cards,
-                        overallProgress = progress
+                        overallProgress = progress,
+                        overallProgressPercentage = progressPercentage
                     )
                 }
             }
@@ -237,5 +240,13 @@ class SetDetailsViewModel @Inject constructor(
             remainingDays = countdown.remainingDays,
             remainingHours = countdown.remainingHours
         )
+    }
+
+    private fun buildOverallProgressPercentage(progress: Float): String {
+        val percentageValue = (progress * 100)
+            .roundToInt()
+            .coerceIn(0, 100)
+
+        return "$percentageValue %"
     }
 }

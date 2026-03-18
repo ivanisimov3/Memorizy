@@ -256,7 +256,8 @@ private fun StudySetItem(
                 Icon(
                     painter = painterResource(getIconRes(studySet.iconId)),
                     contentDescription = stringResource(R.string.set_icon),
-                    modifier = Modifier,
+                    modifier = Modifier
+                        .size(48.dp ),
                     tint = MaterialTheme.colorScheme.primary
                 )
 
@@ -267,9 +268,9 @@ private fun StudySetItem(
                         .weight(1f)
                 ) {
                     Text(
-                        text = studySet.name.uppercase(),
+                        text = studySet.name,
                         style = MaterialTheme.typography.displayMedium,
-                        maxLines = 2,
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         color = MaterialTheme.colorScheme.primary
                     )

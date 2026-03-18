@@ -279,6 +279,7 @@ private fun SetDetailsBody(
                 SetSummaryCard(
                     studySet = uiState.studySet,
                     overallProgress = uiState.overallProgress,
+                    overallProgressPercentage = uiState.overallProgressPercentage,
                     getIconRes = getIconRes
                 )
             }
@@ -487,6 +488,7 @@ private fun CountdownUnit(
 private fun SetSummaryCard(
     studySet: StudySet,
     overallProgress: Float,
+    overallProgressPercentage: String,
     getIconRes: (Int) -> Int
 ) {
     GlassContainer(
@@ -501,11 +503,23 @@ private fun SetSummaryCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(
-                text = stringResource(R.string.overall_progress_title),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.overall_progress_title),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Text(
+                    text = overallProgressPercentage,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
 
             Spacer(Modifier.height(4.dp))
 
