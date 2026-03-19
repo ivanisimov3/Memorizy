@@ -24,6 +24,7 @@ data class Card(
     val setId: Long,
     val term: String,
     val definition: String,
+    val definitionVariants: List<String> = emptyList(),
     val createdAt: Long = System.currentTimeMillis(),
     val remoteId: Long? = null,
     val isDeleted: Boolean = false,

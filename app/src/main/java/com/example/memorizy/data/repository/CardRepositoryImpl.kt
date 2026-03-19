@@ -126,6 +126,7 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
                         val updatedCard = localCard.copy(
                             term = dto.term,
                             definition = dto.definition,
+                            definitionVariants = dto.definitionVariants,
                             createdAt = dto.createdAt ?: localCard.createdAt,
                             remoteId = dto.id,
                             isEdited = false,
