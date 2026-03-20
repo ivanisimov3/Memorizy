@@ -52,6 +52,37 @@ class AddCardViewModel @Inject constructor(
         }
     }
 
+    // Нажали Добавить определение
+    fun onDefinitionVariantAdd() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                definitionVariants = currentState.definitionVariants + ""
+            )
+        }
+    }
+
+    // Изменили Дополнительное определение
+    fun onDefinitionVariantChanged(index: Int, newValue: String) {
+        _uiState.update { currentState ->
+            val updatedVariants = currentState.definitionVariants.toMutableList()
+            if (index in updatedVariants.indices) {
+                updatedVariants[index] = newValue
+            }
+            currentState.copy(definitionVariants = updatedVariants)
+        }
+    }
+
+    // Удалили Дополнительное определение
+    fun onDefinitionVariantRemove(index: Int) {
+        _uiState.update { currentState ->
+            val updatedVariants = currentState.definitionVariants.toMutableList()
+            if (index in updatedVariants.indices) {
+                updatedVariants.removeAt(index)
+            }
+            currentState.copy(definitionVariants = updatedVariants)
+        }
+    }
+
     // Нажали Создать
     fun onCreateButtonClicked() {
         val currentState = _uiState.value
@@ -65,10 +96,16 @@ class AddCardViewModel @Inject constructor(
 
         _uiState.update { it.copy(isSaving = true) }
 
+        val normalizedDefinitionVariants = normalizeDefinitionVariants(
+            primaryDefinition = currentState.definition,
+            rawVariants = currentState.definitionVariants
+        )
+
         val newCard = Card(
             setId = setId,
             term = currentState.term,
-            definition = currentState.definition
+            definition = currentState.definition,
+            definitionVariants = normalizedDefinitionVariants
         )
 
         viewModelScope.launch {
@@ -97,6 +134,7 @@ class AddCardViewModel @Inject constructor(
         }
     }
 
+    // Нажали отменить (импорт)
     fun dismissImportSummary() {
         _uiState.update {
             it.copy(
@@ -106,6 +144,7 @@ class AddCardViewModel @Inject constructor(
         }
     }
 
+    // Нажали Сохранить (импорт)
     fun confirmImport() {
         val result = _uiState.value.importSummary ?: return
         
@@ -121,7 +160,8 @@ class AddCardViewModel @Inject constructor(
                 Card(
                     setId = setId,
                     term = it.term,
-                    definition = it.definition
+                    definition = it.definition,
+                    definitionVariants = emptyList()
                 )
             }
 
@@ -138,5 +178,18 @@ class AddCardViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun normalizeDefinitionVariants(
+        primaryDefinition: String,
+        rawVariants: List<String>
+    ): List<String> {
+        val primaryNormalized = primaryDefinition.trim()
+
+        return rawVariants
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .filter { it != primaryNormalized }
+            .distinct() // Убираем дубликаты
     }
 }

@@ -3,7 +3,6 @@ package com.example.memorizy.ui.screens.addcard
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -53,6 +53,9 @@ fun AddCardScreen(
     uiState: AddCardState,
     onTermChanged: (String) -> Unit,
     onDefinitionChanged: (String) -> Unit,
+    onDefinitionVariantAdd: () -> Unit,
+    onDefinitionVariantUpdate: (Int, String) -> Unit,
+    onDefinitionVariantRemove: (Int) -> Unit,
     onCreateButtonClicked: () -> Unit,
     onFileSelected: (Uri?) -> Unit,
     onDismissImportSummary: () -> Unit,
@@ -124,6 +127,9 @@ fun AddCardScreen(
             uiState = uiState,
             onTermChanged = onTermChanged,
             onDefinitionChanged = onDefinitionChanged,
+            onAddDefinitionVariant = onDefinitionVariantAdd,
+            onUpdateDefinitionVariant = onDefinitionVariantUpdate,
+            onRemoveDefinitionVariant = onDefinitionVariantRemove,
             onCreateButtonClicked = onCreateButtonClicked
         )
     }
@@ -210,6 +216,9 @@ private fun AddCardScreenBody(
     uiState: AddCardState,
     onTermChanged: (String) -> Unit,
     onDefinitionChanged: (String) -> Unit,
+    onAddDefinitionVariant: () -> Unit,
+    onUpdateDefinitionVariant: (Int, String) -> Unit,
+    onRemoveDefinitionVariant: (Int) -> Unit,
     onCreateButtonClicked: () -> Unit
 ) {
     Column(
@@ -273,6 +282,15 @@ private fun AddCardScreenBody(
             )
         }
 
+        Spacer(Modifier.height(16.dp))
+
+        AdditionalDefinitionsEditor(
+            definitionVariants = uiState.definitionVariants,
+            onAddDefinitionVariant = onAddDefinitionVariant,
+            onUpdateDefinitionVariant = onUpdateDefinitionVariant,
+            onRemoveDefinitionVariant = onRemoveDefinitionVariant
+        )
+
         Spacer(Modifier.weight(1f))
 
         Row(
@@ -310,6 +328,67 @@ private fun AddCardScreenBody(
                     color = MaterialTheme.colorScheme.primary
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun AdditionalDefinitionsEditor(
+    definitionVariants: List<String>,
+    onAddDefinitionVariant: () -> Unit,
+    onUpdateDefinitionVariant: (Int, String) -> Unit,
+    onRemoveDefinitionVariant: (Int) -> Unit
+) {
+    Text(
+        text = stringResource(R.string.additional_definitions_title),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurface
+    )
+
+    Spacer(Modifier.height(8.dp))
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        definitionVariants.forEachIndexed { index, variant ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = variant,
+                    onValueChange = { onUpdateDefinitionVariant(index, it) },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.definition_variant_label, index + 1),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
+                    modifier = Modifier.weight(1f),
+                    minLines = 3,
+                    maxLines = 3,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
+                    shape = RoundedCornerShape(18.dp)
+                )
+
+                Spacer(Modifier.width(8.dp))
+
+                IconButton(onClick = { onRemoveDefinitionVariant(index) }) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_close),
+                        contentDescription = stringResource(R.string.remove_definition_variant)
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+        }
+
+        OutlinedButton(onClick = onAddDefinitionVariant) {
+            Text(
+                text = stringResource(R.string.add_definition_variant),
+                style = MaterialTheme.typography.labelSmall
+            )
         }
     }
 }

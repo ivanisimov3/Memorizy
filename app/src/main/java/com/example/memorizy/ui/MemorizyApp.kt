@@ -131,6 +131,9 @@ fun MemorizyApp() {
                 updateDraftIcon = viewModel::updateDraftIcon,
                 updateDraftTargetDate = viewModel::updateDraftTargetDate,
                 updateDraftCard = viewModel::updateDraftCard,
+                addDraftDefinitionVariant = viewModel::addDraftDefinitionVariant,
+                updateDraftDefinitionVariant = viewModel::updateDraftDefinitionVariant,
+                removeDraftDefinitionVariant = viewModel::removeDraftDefinitionVariant,
                 onCancelEditing = viewModel::onCancelEditing,
                 onSaveChanges = viewModel::onSaveChanges
             )
@@ -162,6 +165,9 @@ fun MemorizyApp() {
                 uiState = uiState,
                 onTermChanged = viewModel::onTermChanged,
                 onDefinitionChanged = viewModel::onDefinitionChanged,
+                onDefinitionVariantAdd = viewModel::onDefinitionVariantAdd,
+                onDefinitionVariantUpdate = viewModel::onDefinitionVariantChanged,
+                onDefinitionVariantRemove = viewModel::onDefinitionVariantRemove,
                 onCreateButtonClicked = viewModel::onCreateButtonClicked,
                 onFileSelected = viewModel::onFileSelected,
                 onDismissImportSummary = viewModel::dismissImportSummary,

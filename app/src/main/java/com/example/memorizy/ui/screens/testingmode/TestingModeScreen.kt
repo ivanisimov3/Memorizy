@@ -575,10 +575,14 @@ private fun AnswersReviewContent(
                 else
                     testAnswer.card.term
 
-                val correctAnswer = if (uiState.isTermChecked)
+                val correctAnswer = if (uiState.isTermChecked) {
                     testAnswer.card.term
-                else
-                    testAnswer.card.definition
+                } else {
+                    buildList {
+                        add(testAnswer.card.definition)
+                        addAll(testAnswer.card.definitionVariants)
+                    }.joinToString(separator = "\n")
+                }
 
                 GlassContainer(
                     modifier = Modifier
@@ -622,12 +626,8 @@ private fun AnswersReviewContent(
 
                         Text(
                             text = testAnswer.userAnswer.ifEmpty { "—" },
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (testAnswer.isCorrect)
-                                Color.Green.copy(alpha = 0.7f)
-                            else
-                                Color.Red.copy(alpha = 0.7f)
+                            style = MaterialTheme.typography.displayMedium,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
 
                         if (!testAnswer.isCorrect) {
@@ -643,9 +643,8 @@ private fun AnswersReviewContent(
 
                             Text(
                                 text = correctAnswer,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Green.copy(alpha = 0.7f)
+                                style = MaterialTheme.typography.displayMedium,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }

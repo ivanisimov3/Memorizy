@@ -25,6 +25,10 @@
     <string name="term_text_warning">Термин не может быть пустым</string>
     <string name="definition_text">Определение</string>
     <string name="definition_text_warning">Определение не может быть пустым</string>
+    <string name="additional_definitions_title">Дополнительные определения</string>
+    <string name="add_definition_variant">Добавить определение</string>
+    <string name="definition_variant_label">Определение %1$d</string>
+    <string name="remove_definition_variant">Удалить дополнительное определение</string>
     <string name="set_detalization_text">Просмотр набора</string>
     <string name="expand_more_ic">Раскрыть описание</string>
     <string name="register_screen_lable">Вход в личный аккаунт</string>

@@ -82,14 +82,10 @@ class TestingModeViewModel @Inject constructor(
         _uiState.update { state ->
             val currentCard = state.currentCard ?: return@update state  // Вернуть текущее состояние без изменений
 
-            val correctAnswer = if (state.isTermChecked)
-                currentCard.term
-            else
-                currentCard.definition
-
-            val isCorrect = textComparator.compare(
-                expected = correctAnswer,
-                actual = state.userAnswer
+            val isCorrect = matchesExpectedAnswer(
+                currentCard = currentCard,
+                isTermChecked = state.isTermChecked,
+                userAnswer = state.userAnswer
             )
 
             val testAnswer = TestAnswer(
@@ -130,6 +126,31 @@ class TestingModeViewModel @Inject constructor(
                 isFinished = isFinished,
                 userAnswer = "",
                 userAnswers = updatedAnswers
+            )
+        }
+    }
+
+    private fun matchesExpectedAnswer(
+        currentCard: Card,
+        isTermChecked: Boolean,
+        userAnswer: String
+    ): Boolean {
+        if (isTermChecked) {
+            return textComparator.compare(
+                expected = currentCard.term,
+                actual = userAnswer
+            )
+        }
+
+        val acceptedDefinitions = buildList {
+            add(currentCard.definition)
+            addAll(currentCard.definitionVariants)
+        }
+
+        return acceptedDefinitions.any { expectedDefinition ->
+            textComparator.compare(
+                expected = expectedDefinition,
+                actual = userAnswer
             )
         }
     }

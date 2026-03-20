@@ -153,6 +153,46 @@ class SetDetailsViewModel @Inject constructor(
         }
     }
 
+    // Добавили Дополнительное определение
+    fun addDraftDefinitionVariant(cardIndex: Int) {
+        _uiState.update { state ->
+            val updatedCards = state.draftCards.toMutableList()
+            val draftCard = updatedCards.getOrNull(cardIndex) ?: return@update state
+            updatedCards[cardIndex] = draftCard.copy(
+                definitionVariants = draftCard.definitionVariants + ""
+            )
+            state.copy(draftCards = updatedCards)
+        }
+    }
+
+    // Изменили Дополнительное определение
+    fun updateDraftDefinitionVariant(cardIndex: Int, variantIndex: Int, value: String) {
+        _uiState.update { state ->
+            val updatedCards = state.draftCards.toMutableList()
+            val draftCard = updatedCards.getOrNull(cardIndex) ?: return@update state
+            val updatedVariants = draftCard.definitionVariants.toMutableList()
+            if (variantIndex in updatedVariants.indices) {
+                updatedVariants[variantIndex] = value
+            }
+            updatedCards[cardIndex] = draftCard.copy(definitionVariants = updatedVariants)
+            state.copy(draftCards = updatedCards)
+        }
+    }
+
+    // Удалили Дополнительное определение
+    fun removeDraftDefinitionVariant(cardIndex: Int, variantIndex: Int) {
+        _uiState.update { state ->
+            val updatedCards = state.draftCards.toMutableList()
+            val draftCard = updatedCards.getOrNull(cardIndex) ?: return@update state
+            val updatedVariants = draftCard.definitionVariants.toMutableList()
+            if (variantIndex in updatedVariants.indices) {
+                updatedVariants.removeAt(variantIndex)
+            }
+            updatedCards[cardIndex] = draftCard.copy(definitionVariants = updatedVariants)
+            state.copy(draftCards = updatedCards)
+        }
+    }
+
     // Нажали Отменить редактирование
     fun onCancelEditing() {
         _uiState.update { state ->
@@ -184,17 +224,25 @@ class SetDetailsViewModel @Inject constructor(
             val originalCards = state.cards
             draftCards.forEachIndexed { index, draftCard ->
                 val original = originalCards.getOrNull(index)
+                val normalizedDraftCard = draftCard.copy(
+                    definitionVariants = normalizeDefinitionVariants(
+                        primaryDefinition = draftCard.definition,
+                        rawVariants = draftCard.definitionVariants
+                    )
+                )
                 val contentChanged = original != null &&
-                        (original.term != draftCard.term || original.definition != draftCard.definition)
+                        (original.term != normalizedDraftCard.term ||
+                            original.definition != normalizedDraftCard.definition ||
+                            original.definitionVariants != normalizedDraftCard.definitionVariants)
 
                 val cardToSave = if (contentChanged) {
-                    draftCard.copy(
+                    normalizedDraftCard.copy(
                         isEdited = true,
                         level = 0,
                         nextReviewDate = System.currentTimeMillis()
                     )
                 } else {
-                    draftCard.copy(isEdited = true)
+                    normalizedDraftCard.copy(isEdited = true)
                 }
 
                 cardRepository.updateCard(cardToSave)
@@ -248,5 +296,18 @@ class SetDetailsViewModel @Inject constructor(
             .coerceIn(0, 100)
 
         return "$percentageValue %"
+    }
+
+    private fun normalizeDefinitionVariants(
+        primaryDefinition: String,
+        rawVariants: List<String>
+    ): List<String> {
+        val primaryNormalized = primaryDefinition.trim()
+
+        return rawVariants
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .filter { it != primaryNormalized }
+            .distinct() // Убираем дубликаты
     }
 }

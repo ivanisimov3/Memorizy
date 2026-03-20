@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -52,6 +51,7 @@ import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.ui.utils.AppIcons
 import com.example.memorizy.ui.utils.AppIcons.getIconResById
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -74,6 +74,9 @@ fun SetDetailsScreen(
     updateDraftIcon: (Int) -> Unit,
     updateDraftTargetDate: (Long?) -> Unit,
     updateDraftCard: (Int, String, String) -> Unit,
+    addDraftDefinitionVariant: (Int) -> Unit,
+    updateDraftDefinitionVariant: (Int, Int, String) -> Unit,
+    removeDraftDefinitionVariant: (Int, Int) -> Unit,
     onCancelEditing: () -> Unit,
     onSaveChanges: () -> Unit,
     onLearningModeClick: () -> Unit,
@@ -122,6 +125,9 @@ fun SetDetailsScreen(
             updateDraftDescription = updateDraftDescription,
             updateDraftTargetDate = updateDraftTargetDate,
             updateDraftCard = updateDraftCard,
+            addDraftDefinitionVariant = addDraftDefinitionVariant,
+            updateDraftDefinitionVariant = updateDraftDefinitionVariant,
+            removeDraftDefinitionVariant = removeDraftDefinitionVariant,
             onIconClick = {
                 if (uiState.isEditing) showIconDialog = true
             },
@@ -238,6 +244,9 @@ private fun SetDetailsBody(
     updateDraftDescription: (String) -> Unit,
     updateDraftTargetDate: (Long?) -> Unit,
     updateDraftCard: (Int, String, String) -> Unit,
+    addDraftDefinitionVariant: (Int) -> Unit,
+    updateDraftDefinitionVariant: (Int, Int, String) -> Unit,
+    removeDraftDefinitionVariant: (Int, Int) -> Unit,
     onIconClick: () -> Unit,
     onLearningModeClick: () -> Unit,
     onTestingModeClick: () -> Unit
@@ -384,7 +393,14 @@ private fun SetDetailsBody(
                 EditCardItem(
                     draftCard = draftCard,
                     onTermChange = { updateDraftCard(index, it, draftCard.definition) },
-                    onDefChange = { updateDraftCard(index, draftCard.term, it) }
+                    onDefChange = { updateDraftCard(index, draftCard.term, it) },
+                    onDefinitionVariantAdd = { addDraftDefinitionVariant(index) },
+                    onDefinitionVariantUpdate = { variantIndex, value ->
+                        updateDraftDefinitionVariant(index, variantIndex, value)
+                    },
+                    onDefinitionVariantRemove = { variantIndex ->
+                        removeDraftDefinitionVariant(index, variantIndex)
+                    }
                 )
             }
         } else{
@@ -678,6 +694,26 @@ private fun CardItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
+
+            if (card.definitionVariants.isNotEmpty()) {
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = stringResource(R.string.additional_definitions_title),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(Modifier.height(4.dp))
+
+                card.definitionVariants.forEach { definitionVariant ->
+                    Text(
+                        text = "• $definitionVariant",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
         }
     }
 }
@@ -686,6 +722,9 @@ private fun CardItem(
 fun EditCardItem(
     onTermChange: (String) -> Unit,
     onDefChange: (String) -> Unit,
+    onDefinitionVariantAdd: () -> Unit,
+    onDefinitionVariantUpdate: (Int, String) -> Unit,
+    onDefinitionVariantRemove: (Int) -> Unit,
     draftCard: Card
 ){
     Card(
@@ -727,6 +766,56 @@ fun EditCardItem(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(Modifier.height(12.dp))
+
+            Text(
+                text = stringResource(R.string.additional_definitions_title),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            draftCard.definitionVariants.forEachIndexed { index, variant ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = variant,
+                        onValueChange = { onDefinitionVariantUpdate(index, it) },
+                        label = {
+                            Text(
+                                text = stringResource(R.string.definition_variant_label, index + 1),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        },
+                        minLines = 3,
+                        maxLines = 3,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Spacer(Modifier.width(8.dp))
+
+                    IconButton(onClick = { onDefinitionVariantRemove(index) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_close),
+                            contentDescription = stringResource(R.string.remove_definition_variant)
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(8.dp))
+            }
+
+            OutlinedButton(onClick = onDefinitionVariantAdd) {
+                Text(
+                    text = stringResource(R.string.add_definition_variant),
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
         }
     }
 }
