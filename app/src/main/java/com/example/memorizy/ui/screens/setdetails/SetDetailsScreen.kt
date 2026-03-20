@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
@@ -38,7 +40,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -57,6 +58,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.ui.utils.GlassContainer
@@ -664,6 +667,10 @@ private fun CardItem(
     card: Card,
     onLongClick: () -> Unit
 ){
+    var isAdditionalDefinitionsExpanded by rememberSaveable(card.id) {
+        mutableStateOf(false)
+    }
+
     GlassContainer(
         modifier = Modifier
             .fillMaxWidth()
@@ -696,22 +703,52 @@ private fun CardItem(
             )
 
             if (card.definitionVariants.isNotEmpty()) {
-                Spacer(Modifier.height(8.dp))
+                val interactionSource = remember { MutableInteractionSource() }
 
-                Text(
-                    text = stringResource(R.string.additional_definitions_title),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Spacer(Modifier.height(4.dp))
-
-                card.definitionVariants.forEach { definitionVariant ->
+                Row(
+                    modifier = Modifier
+                        .clickable (
+                            interactionSource = interactionSource,
+                            indication = null
+                        ){
+                            isAdditionalDefinitionsExpanded = !isAdditionalDefinitionsExpanded
+                        }
+                        .padding(top = 4.dp, bottom = 2.dp),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.Bottom
+                ) {
                     Text(
-                        text = "• $definitionVariant",
+                        text = stringResource(R.string.additional_definitions_title),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+
+                    Icon(
+                        painter = painterResource(R.drawable.ic_expand),
+                        contentDescription =
+                            if (isAdditionalDefinitionsExpanded)
+                                stringResource(R.string.collapse_additional_definitions)
+                            else
+                                stringResource(R.string.expand_additional_definitions),
+                        modifier = Modifier
+                            .padding(start = 2.dp)
+                            .rotate(if (isAdditionalDefinitionsExpanded) 0f else 270f)
+                            .size(18.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                AnimatedVisibility(visible = isAdditionalDefinitionsExpanded) {
+                    Column {
+                        card.definitionVariants.forEach { definitionVariant ->
+                            Text(
+                                modifier = Modifier.padding(top = 2.dp),
+                                text = "• $definitionVariant",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
                 }
             }
         }
