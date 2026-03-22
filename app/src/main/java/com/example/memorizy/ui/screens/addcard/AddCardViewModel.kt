@@ -161,7 +161,10 @@ class AddCardViewModel @Inject constructor(
                     setId = setId,
                     term = it.term,
                     definition = it.definition,
-                    definitionVariants = emptyList()
+                    definitionVariants = normalizeDefinitionVariants(
+                        primaryDefinition = it.definition,
+                        rawVariants = it.definitionVariants
+                    )
                 )
             }
 
