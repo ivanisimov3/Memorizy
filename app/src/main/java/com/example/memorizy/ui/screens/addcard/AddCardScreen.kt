@@ -35,6 +35,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
@@ -67,18 +71,16 @@ fun AddCardScreen(
         onFileSelected(uri)
     }
 
+    var showImportDialog by remember { mutableStateOf(false) }
+    val launchImportPicker = {
+        showImportDialog = false
+        launcher.launch("*/*")
+    }
+
     LaunchedEffect(uiState.isCardCreated) {
         if (uiState.isCardCreated){
             onCardCreatedClick()
         }
-    }
-
-    if (uiState.showImportSummaryDialog && uiState.importSummary != null) {
-        ImportSummaryDialog(
-            importSummary = uiState.importSummary,
-            onDismissRequest = onDismissImportSummary,
-            onConfirmImport = onConfirmImport
-        )
     }
 
     Scaffold(
@@ -104,7 +106,7 @@ fun AddCardScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { launcher.launch("text/comma-separated-values") }
+                        onClick = { showImportDialog = true }
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_import_cards),
@@ -131,6 +133,22 @@ fun AddCardScreen(
             onUpdateDefinitionVariant = onDefinitionVariantUpdate,
             onRemoveDefinitionVariant = onDefinitionVariantRemove,
             onCreateButtonClicked = onCreateButtonClicked
+        )
+    }
+
+    if (showImportDialog) {
+        ImportInfoDialog(
+            isImporting = uiState.isImporting,
+            onDismissRequest = { showImportDialog = false },
+            onImportClick = launchImportPicker
+        )
+    }
+
+    if (uiState.showImportSummaryDialog && uiState.importSummary != null) {
+        ImportSummaryDialog(
+            importSummary = uiState.importSummary,
+            onDismissRequest = onDismissImportSummary,
+            onConfirmImport = onConfirmImport
         )
     }
 }
@@ -195,6 +213,100 @@ private fun ImportSummaryDialog(
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onDismissRequest) {
+                Text(
+                    text = stringResource(R.string.cancel_text),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+    )
+}
+
+@Composable
+private fun ImportInfoDialog(
+    isImporting: Boolean,
+    onDismissRequest: () -> Unit,
+    onImportClick: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = {
+            Text(
+                text = stringResource(R.string.import_csv),
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        text = {
+            Column {
+                Text(
+                    text = stringResource(R.string.import_dialog_description),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                Text(
+                    text = stringResource(R.string.import_dialog_columns_title),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Spacer(Modifier.height(6.dp))
+
+                Text(
+                    text = stringResource(R.string.import_dialog_columns_description),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                GlassContainer(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ) {
+                    Column(
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.import_dialog_example_title),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                        Spacer(Modifier.height(6.dp))
+
+                        Text(
+                            text = stringResource(R.string.import_dialog_example_line),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            FilledTonalButton(
+                onClick = onImportClick,
+                enabled = !isImporting
+            ) {
+                Text(
+                    text = if (isImporting) {
+                        stringResource(R.string.loading_text)
+                    } else {
+                        stringResource(R.string.import_cards_select_file)
+                    },
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         },
         dismissButton = {

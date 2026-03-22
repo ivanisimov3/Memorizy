@@ -19,7 +19,7 @@
     <string name="add_card_button">Добавить карточку</string>
     <string name="learning_mode">Заучивание</string>
     <string name="delete_card_question">Удалить карточку?</string>
-    <string name="delete_card_warning">Вы уверены что хотите удалить карточку? Это действие нельзя откатить назад.</string>
+    <string name="delete_card_warning">Вы уверены, что хотите удалить карточку? Это действие нельзя откатить назад.</string>
     <string name="new_card_text">Новая карточка</string>
     <string name="term_text">Термин</string>
     <string name="term_text_warning">Термин не может быть пустым</string>
@@ -118,6 +118,12 @@
 
     <string name="import_csv">Импорт CSV</string>
     <string name="import_csv_desc">Загрузить карточки из файла</string>
+    <string name="import_dialog_description">Загрузите файл с разрешением .csv, чтобы добавить сразу несколько карточек.</string>
+    <string name="import_dialog_columns_title">Как заполнять колонки</string>
+    <string name="import_dialog_columns_description">1 колонка - термин, 2 - определение, 3 и дальше - дополнительные определения. Можно использовать разделители ; и , . Первая строка может быть заголовком.</string>
+    <string name="import_dialog_example_title">Пример строки</string>
+    <string name="import_dialog_example_line">Клетка;Базовая единица живого организма;Структурная единица организма;Элементарная живая система</string>
+    <string name="import_cards_select_file">Выбрать файл</string>
     <string name="import_result_title">Результат импорта</string>
     <string name="import_success_count">Успешно распознано: %1$d</string>
     <string name="import_error_count">Ошибок: %1$d</string>
