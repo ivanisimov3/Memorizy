@@ -782,7 +782,7 @@ fun EditCardItem(
                 isError = draftCard.term.isEmpty(),
                 minLines = 3,
                 maxLines = 5,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -800,7 +800,7 @@ fun EditCardItem(
                 isError = draftCard.definition.isEmpty(),
                 minLines = 3,
                 maxLines = 5,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
                 modifier = Modifier.fillMaxWidth()
             )
 
