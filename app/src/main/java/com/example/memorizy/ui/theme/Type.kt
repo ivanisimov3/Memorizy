@@ -24,6 +24,11 @@ val Typography = Typography(
         fontWeight = FontWeight.Bold,
         fontSize = 24.sp
     ),
+    displaySmall = TextStyle(
+        fontFamily = MarmeladRegular,
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp
+    ),
     bodyMedium = TextStyle(
         fontFamily = MarmeladRegular,
         fontSize = 24.sp

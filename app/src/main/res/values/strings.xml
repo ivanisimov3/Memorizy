@@ -126,6 +126,11 @@
     <string name="import_cards_select_file">Выбрать файл</string>
     <string name="import_result_title">Результат импорта</string>
     <string name="import_success_count">Успешно распознано: %1$d</string>
+    <string name="import_preview_title">Предпросмотр</string>
+    <string name="import_preview_term_label">Термин:</string>
+    <string name="import_preview_definition_label">Определение:</string>
+    <string name="import_preview_additional_label">Доп. определения:</string>
+    <string name="import_preview_empty_additional">Нет</string>
     <string name="import_error_count">Ошибок: %1$d</string>
     <string name="import_error_details">Строка %1$d: %2$s</string>
     <string name="import_confirm">Сохранить</string>

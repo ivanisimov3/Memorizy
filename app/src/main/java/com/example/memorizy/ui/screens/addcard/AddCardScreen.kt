@@ -22,6 +22,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -44,9 +46,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
 import com.example.memorizy.domain.importer.model.ParseResult
+import com.example.memorizy.domain.importer.model.ParsedCard
 import com.example.memorizy.ui.utils.GlassContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -154,80 +158,6 @@ fun AddCardScreen(
 }
 
 @Composable
-private fun ImportSummaryDialog(
-    importSummary: ParseResult,
-    onDismissRequest: () -> Unit,
-    onConfirmImport: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = {
-            Text(
-                text = stringResource(R.string.import_result_title),
-                style = MaterialTheme.typography.displayMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        },
-        text = {
-            Column {
-                Text(
-                    text = stringResource(
-                        R.string.import_success_count,
-                        importSummary.successfulCards.size
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                
-                if (importSummary.errors.isNotEmpty()) {
-                    Text(
-                        text = stringResource(
-                            R.string.import_error_count,
-                            importSummary.errors.size
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    LazyColumn(modifier = Modifier.height(100.dp)) {
-                        items(importSummary.errors) { error ->
-                            Text(
-                                text = if (error.lineNumber > 0)
-                                    stringResource(R.string.import_error_details, error.lineNumber, error.reason)
-                                else
-                                    error.reason,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            if (importSummary.successfulCards.isNotEmpty()) {
-                FilledTonalButton(onClick = onConfirmImport) {
-                    Text(
-                        text = stringResource(R.string.import_confirm),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-        },
-        dismissButton = {
-            OutlinedButton(onClick = onDismissRequest) {
-                Text(
-                    text = stringResource(R.string.cancel_text),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-        }
-    )
-}
-
-@Composable
 private fun ImportInfoDialog(
     isImporting: Boolean,
     onDismissRequest: () -> Unit,
@@ -294,7 +224,7 @@ private fun ImportInfoDialog(
             }
         },
         confirmButton = {
-            FilledTonalButton(
+            OutlinedButton(
                 onClick = onImportClick,
                 enabled = !isImporting
             ) {
@@ -310,7 +240,7 @@ private fun ImportInfoDialog(
             }
         },
         dismissButton = {
-            OutlinedButton(onClick = onDismissRequest) {
+            FilledTonalButton(onClick = onDismissRequest) {
                 Text(
                     text = stringResource(R.string.cancel_text),
                     style = MaterialTheme.typography.labelSmall,
@@ -319,6 +249,171 @@ private fun ImportInfoDialog(
             }
         }
     )
+}
+
+@Composable
+private fun ImportSummaryDialog(
+    importSummary: ParseResult,
+    onDismissRequest: () -> Unit,
+    onConfirmImport: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = {
+            Text(
+                text = stringResource(R.string.import_result_title),
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        text = {
+            Column {
+                Text(
+                    text = stringResource(
+                        R.string.import_success_count,
+                        importSummary.successfulCards.size
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                if (importSummary.successfulCards.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Text(
+                        text = stringResource(R.string.import_preview_title),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        importSummary.successfulCards
+                            .take(2)
+                            .forEach { card ->
+                                ImportPreviewCard(card = card)
+                            }
+                    }
+                }
+
+                if (importSummary.errors.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Text(
+                        text = stringResource(
+                            R.string.import_error_count,
+                            importSummary.errors.size
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    LazyColumn(modifier = Modifier.height(100.dp)) {
+                        items(importSummary.errors) { error ->
+                            Text(
+                                text = if (error.lineNumber > 0)
+                                    stringResource(R.string.import_error_details, error.lineNumber, error.reason)
+                                else
+                                    error.reason,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            if (importSummary.successfulCards.isNotEmpty()) {
+                OutlinedButton(onClick = onConfirmImport) {
+                    Text(
+                        text = stringResource(R.string.import_confirm),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        },
+        dismissButton = {
+            FilledTonalButton(onClick = onDismissRequest) {
+                Text(
+                    text = stringResource(R.string.cancel_text),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+    )
+}
+
+@Composable
+private fun ImportPreviewCard(
+    card: ParsedCard
+) {
+    val additionalDefinitionsText = if (card.definitionVariants.isEmpty()) {
+        stringResource(R.string.import_preview_empty_additional)
+    } else {
+        card.definitionVariants.joinToString("; ")
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            ImportPreviewLine(
+                label = stringResource(R.string.import_preview_term_label),
+                value = card.term
+            )
+
+            ImportPreviewLine(
+                label = stringResource(R.string.import_preview_definition_label),
+                value = card.definition
+            )
+
+            ImportPreviewLine(
+                label = stringResource(R.string.import_preview_additional_label),
+                value = additionalDefinitionsText
+            )
+        }
+    }
+}
+
+@Composable
+private fun ImportPreviewLine(
+    label: String,
+    value: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1
+        )
+
+        Spacer(modifier = Modifier.width(6.dp))
+
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
 }
 
 @Composable
