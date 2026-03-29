@@ -61,6 +61,7 @@ import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 @Composable
 fun StatisticsScreen(
     onBackClick: () -> Unit,
+    onCardDetailsClick: () -> Unit,
     uiState: StatisticsState
 ) {
     Scaffold(
@@ -70,6 +71,7 @@ fun StatisticsScreen(
     ) { paddingValues ->
         StatisticsBody(
             paddingValues = paddingValues,
+            onCardDetailsClick = onCardDetailsClick,
             uiState = uiState
         )
     }
@@ -108,6 +110,7 @@ private fun StatisticsTopBar(
 @Composable
 private fun StatisticsBody(
     paddingValues: PaddingValues,
+    onCardDetailsClick: () -> Unit,
     uiState: StatisticsState
 ) {
     if (uiState.isLoading) {
@@ -143,6 +146,23 @@ private fun StatisticsBody(
         item {
             SectionCard(title = stringResource(R.string.session_progress_title)) {
                 SessionProgressChart(chartData = uiState.sessionChartData)
+            }
+        }
+        if (!uiState.isLevelDistributionEmpty) {
+            item {
+                GlassContainer (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp),
+                    onClick = onCardDetailsClick,
+                    containerColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    Text(
+                        text = stringResource(R.string.statistics_card_details_button),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
             }
         }
     }

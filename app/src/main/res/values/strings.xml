@@ -139,6 +139,7 @@
     <string name="statistics_ic">Иконка статистики</string>
     <string name="level_distribution_title">Распределение уровней</string>
     <string name="session_progress_title">Прогресс по сессиям</string>
+    <string name="statistics_card_details_button">Детализация по карточкам</string>
     <string name="overall_progress_title">Общий прогресс</string>
     <string name="not_enough_sessions">Для построения графика нужно пройти сессии как минимум в два разных дня</string>
     <string name="learning_label">Заучивание</string>
@@ -146,5 +147,18 @@
     <string name="progress_percentage">Прогресс: %1$d%%</string>
     <string name="level_label">Ур. %1$d</string>
     <string name="cards_label">%1$d к.</string>
+    <string name="card_details_statistics_title">Карточки набора</string>
+    <string name="card_details_statistics_empty">В этом наборе нет карточек для отображения</string>
+    <string name="card_sort_title">Сортировать по:</string>
+    <string name="card_sort_level">Уровень</string>
+    <string name="card_sort_date">Дата</string>
+    <string name="card_level_value">Уровень: %1$d</string>
+    <string name="card_risk_value">Знание: %1$s</string>
+    <string name="card_next_review_value">Следующее повторение: %1$s</string>
+    <string name="card_knowledge_low">Низкое</string>
+    <string name="card_knowledge_medium">Среднее</string>
+    <string name="card_knowledge_high">Высокое</string>
+    <string name="sort_descending">Сортировать по убыванию</string>
+    <string name="sort_ascending">Сортировать по возрастанию</string>
 
 </resources>

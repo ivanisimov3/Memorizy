@@ -33,4 +33,7 @@ object Routes {
 
     @Serializable
     data class Statistics(val setId: Long)
+
+    @Serializable
+    data class CardDetailsStatistics(val setId: Long)
 }
