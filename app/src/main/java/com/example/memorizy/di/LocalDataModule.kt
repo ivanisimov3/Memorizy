@@ -2,6 +2,7 @@ package com.example.memorizy.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.memorizy.BuildConfig
 import com.example.memorizy.data.source.local.room.AppDatabase
 import com.example.memorizy.data.source.local.room.dao.CardDao
 import com.example.memorizy.data.source.local.room.dao.SessionRecordDao
@@ -23,13 +24,17 @@ object LocalDataModule { // object используем когда нужно п
     @Provides
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase { // контекст всего приложения
-        return Room.databaseBuilder(
+        val builder = Room.databaseBuilder(
             context = context,
             klass = AppDatabase::class.java,
             name = "memorizy_db"
         )
-            .fallbackToDestructiveMigration(true)   // при несовпадении версий удаляет бд
-            .build()
+
+        if (BuildConfig.DEBUG) {
+            builder.fallbackToDestructiveMigration(true)
+        }
+
+        return builder.build()
     }
 
     // Учим создавать StudySetDao
