@@ -1,14 +1,18 @@
 package com.example.memorizy.data.repository
 
+import android.util.Log
 import com.example.memorizy.data.mapper.toDto
 import com.example.memorizy.data.mapper.toEntity
 import com.example.memorizy.data.source.local.room.StudySetWithCardNumber
 import com.example.memorizy.data.source.local.room.entity.StudySet
+import com.example.memorizy.data.sync.SyncAuthException
+import com.example.memorizy.data.sync.SyncRetryException
 import com.example.memorizy.data.source.local.room.dao.StudySetDao
 import com.example.memorizy.data.source.network.MemorizyApiService
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import retrofit2.HttpException
 
 // Реализация репозитория набор
 
@@ -17,6 +21,10 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
     private val api: MemorizyApiService,
     private val settingsRepository: SettingsRepository
 ) : StudySetRepository {
+
+    companion object {
+        private const val TAG = "StudySetRepository"
+    }
 
     override suspend fun insertSet(studySet: StudySet) {
         return dao.insertSet(studySet)
@@ -49,6 +57,7 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
     override suspend fun syncLocalChanges() {
         val tokenString = settingsRepository.token.first() ?: return
         val authHeader = "Bearer $tokenString"
+        var shouldRetry = false
 
         val unsyncedSets = dao.getUnsyncedSets()
         unsyncedSets.forEach { localSet ->
@@ -61,7 +70,11 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
                 )
                 dao.updateSet(syncedSet)
             } catch (e: Exception) {
-                e.printStackTrace()
+                handleSyncException(
+                    exception = e,
+                    contextMessage = "Не удалось синхронизировать новый набор id=${localSet.id}"
+                )
+                shouldRetry = true
             }
         }
 
@@ -80,7 +93,11 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
                 )
                 dao.updateSet(syncedSet)
             } catch (e: Exception) {
-                e.printStackTrace()
+                handleSyncException(
+                    exception = e,
+                    contextMessage = "Не удалось синхронизировать измененный набор id=${localSet.id}"
+                )
+                shouldRetry = true
             }
         }
 
@@ -91,8 +108,16 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
 
                 dao.deleteSet(localSet)
             } catch (e: Exception) {
-                e.printStackTrace()
+                handleSyncException(
+                    exception = e,
+                    contextMessage = "Не удалось удалить набор на сервере id=${localSet.id}"
+                )
+                shouldRetry = true
             }
+        }
+
+        if (shouldRetry) {
+            throw SyncRetryException("Часть операций синхронизации наборов завершилась с ошибкой")
         }
     }
 
@@ -135,8 +160,32 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
 
             settingsRepository.updateLastSyncTime()
         } catch (e: Exception) {
-            e.printStackTrace()
+            handleSyncException(
+                exception = e,
+                contextMessage = "Не удалось получить актуальные наборы с сервера"
+            )
+            throw SyncRetryException("Не удалось получить изменения наборов", e)
         }
 
+    }
+
+    private fun handleSyncException(
+        exception: Exception,
+        contextMessage: String
+    ) {
+        when {
+            exception.isAuthError() -> {
+                Log.w(TAG, contextMessage, exception)
+                throw SyncAuthException(contextMessage, exception)
+            }
+
+            else -> {
+                Log.w(TAG, contextMessage, exception)
+            }
+        }
+    }
+
+    private fun Exception.isAuthError(): Boolean {
+        return this is HttpException && (code() == 401 || code() == 403)
     }
 }

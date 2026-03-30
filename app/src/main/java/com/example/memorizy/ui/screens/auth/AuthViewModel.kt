@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
@@ -98,7 +100,9 @@ class AuthViewModel @Inject constructor(
                     else -> R.string.error_unknown
                 }
             }
-            is ConnectException -> R.string.error_no_internet
+            is ConnectException,
+            is UnknownHostException,
+            is SocketTimeoutException -> R.string.error_no_internet
             else -> R.string.error_unknown
         }
     }

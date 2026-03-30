@@ -1,5 +1,6 @@
 package com.example.memorizy.data.repository
 
+import android.util.Log
 import com.example.memorizy.data.source.local.datastore.SettingsDataStore
 import com.example.memorizy.data.source.local.room.dao.StudySetDao
 import com.example.memorizy.data.source.network.MemorizyApiService
@@ -15,6 +16,10 @@ class AuthRepositoryImpl @Inject constructor(   // Inject coonstructor связ�
     private val settingsDataStore: SettingsDataStore,
     private val studySetDao: StudySetDao,
 ) : AuthRepository {
+
+    companion object {
+        private const val TAG = "AuthRepository"
+    }
 
     override suspend fun register(request: AuthRequest): Result<Unit> {
         return authAction(request) { api.register(it) }
@@ -44,7 +49,7 @@ class AuthRepositoryImpl @Inject constructor(   // Inject coonstructor связ�
 
             Result.success(Unit)
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.w(TAG, "Ошибка авторизации пользователя ${request.username}", e)
 
             Result.failure(e)
         }

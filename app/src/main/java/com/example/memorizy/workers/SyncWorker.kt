@@ -1,11 +1,14 @@
 package com.example.memorizy.workers
 
+import android.util.Log
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.repository.StudySetRepository
+import com.example.memorizy.data.sync.SyncAuthException
+import com.example.memorizy.data.sync.SyncRetryException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -29,6 +32,10 @@ class SyncWorker @AssistedInject constructor(
     private val cardRepository: CardRepository
 ) : CoroutineWorker(ctx , params) {
 
+    companion object {
+        private const val TAG = "SyncWorker"
+    }
+
     // Метод, где код работы, воспроизввдимой на заднем плане
     override suspend fun doWork(): Result {
         return try {
@@ -39,8 +46,14 @@ class SyncWorker @AssistedInject constructor(
             cardRepository.fetchRemoteChanges()
 
             Result.success()
+        } catch (e: SyncAuthException) {
+            Log.w(TAG, "Синхронизация остановлена: требуется повторная авторизация", e)
+            Result.failure()
+        } catch (e: SyncRetryException) {
+            Log.w(TAG, "Синхронизация завершилась частично, будет повторена", e)
+            Result.retry()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Неожиданная ошибка синхронизации", e)
 
             Result.retry()  // Должна быть попытка повторить работу
         }
