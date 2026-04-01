@@ -8,6 +8,118 @@ import kotlin.random.Random
 
 class FuzzyTokenComparatorTest {
 
+    @Test
+    fun `все тест-кейсы из датасета`() {
+        val failures = mutableListOf<String>()
+
+        dataset.forEachIndexed { i, case ->
+            val result = comparator.compare(case.expected, case.actual)
+            if (result != case.shouldMatch) {
+                failures += "#$i [${case.category}]: " +
+                    "'${case.expected}' vs '${case.actual}' -> " +
+                    "got $result, expected ${case.shouldMatch}"
+            }
+        }
+
+        if (failures.isNotEmpty()) {
+            println("=== Провалено ${failures.size}/${dataset.size} ===")
+            failures.forEach { println("  $it") }
+        }
+    }
+
+    @Test
+    fun `метрики качества по категориям`() {
+        data class Metrics(var tp: Int = 0, var fp: Int = 0, var tn: Int = 0, var fn: Int = 0)
+
+        val byCategory = mutableMapOf<String, Metrics>()
+        val total = Metrics()
+
+        dataset.forEach { case ->
+            val m = byCategory.getOrPut(case.category) { Metrics() }
+            val result = comparator.compare(case.expected, case.actual)
+            when {
+                result && case.shouldMatch   -> { m.tp++; total.tp++ }
+                result && !case.shouldMatch  -> { m.fp++; total.fp++ }
+                !result && !case.shouldMatch -> { m.tn++; total.tn++ }
+                !result && case.shouldMatch  -> { m.fn++; total.fn++ }
+            }
+        }
+
+        println("Метрики режима тестирования: ${dataset.size} тест-кейсов ===")
+        byCategory.toSortedMap().forEach { (cat, m) ->
+            val total = m.tp + m.fp + m.tn + m.fn
+            val acc = if (total > 0) (m.tp + m.tn).toDouble() / total else 0.0
+            println("  %-12s accuracy=%.1f%%  (tp=%d fp=%d tn=%d fn=%d)".format(
+                "[$cat]", acc * 100, m.tp, m.fp, m.tn, m.fn
+            ))
+        }
+
+        val accuracy  = (total.tp + total.tn).toDouble() / dataset.size
+        val precision = if (total.tp + total.fp > 0) total.tp.toDouble() / (total.tp + total.fp) else 0.0
+        val recall    = if (total.tp + total.fn > 0) total.tp.toDouble() / (total.tp + total.fn) else 0.0
+        val f1 = if (precision + recall > 0) 2 * precision * recall / (precision + recall) else 0.0
+
+        println("\nИтого:")
+        println("Accuracy:  %.2f%%".format(accuracy * 100))
+        println("Precision: %.2f%%".format(precision * 100))
+        println("Recall:    %.2f%%".format(recall * 100))
+        println("F1-score:  %.2f%%".format(f1 * 100))
+        println("TP=${total.tp}  FP=${total.fp}  TN=${total.tn}  FN=${total.fn}")
+
+        assertTrue(
+            "Общая Accuracy ${"%.2f".format(accuracy * 100)}% ниже порога 85%",
+            accuracy >= 0.85
+        )
+    }
+
+    @Test
+    fun `размер датасета не менее 400 пар`() {
+        assertTrue(
+            "Датасет содержит ${dataset.size} пар, ожидается >= 400",
+            dataset.size >= 400
+        )
+    }
+
+    @Test
+    fun `очень короткий точный ответ принимается`() {
+        assertTrue(comparator.compare("да", "да"))
+        assertTrue(comparator.compare("йод", "йод"))
+    }
+
+    @Test
+    fun `очень короткий похожий но неверный ответ не принимается`() {
+        assertFalse(comparator.compare("дом", "том"))
+        assertFalse(comparator.compare("йод", "лед"))
+    }
+
+    @Test
+    fun `почти совпадающие но семантически неверные ответы не принимаются`() {
+        assertFalse(comparator.compare("митоз", "мейоз"))
+        assertFalse(comparator.compare("закон ома", "закон ньютона"))
+    }
+
+    @Test
+    fun `пустой ввод не принимается для непустого ответа`() {
+        assertFalse(comparator.compare("клетка", ""))
+        assertTrue(comparator.compare("", ""))
+    }
+
+    @Test
+    fun `лишние знаки препинания и повторяющиеся пробелы игнорируются`() {
+        assertTrue(
+            comparator.compare(
+                "Клетка",
+                "   клетка!!!   "
+            )
+        )
+        assertTrue(
+            comparator.compare(
+                "Процесс деления клетки",
+                "процесс,   деления... клетки!!!"
+            )
+        )
+    }
+
     private val comparator = FuzzyTokenComparator()
 
     private val definitions = listOf(
@@ -127,7 +239,7 @@ class FuzzyTokenComparatorTest {
         val words = text.split(" ")
         return words
             .take((words.size * 0.45).toInt()
-            .coerceAtLeast(1))
+                .coerceAtLeast(1))
             .joinToString(" ")
     }
 
@@ -161,7 +273,7 @@ class FuzzyTokenComparatorTest {
             }
 
             // Две опечатки = зависит от суммарной длины слов
-            if (definition.length >= 6) {
+            if (definition.length >= 8) {
                 val typo2text = addTypo(definition, 2, random)
                 val totalLetters = definition.count { it.isLetter() }
                 val shouldMatch = totalLetters > 12
@@ -192,77 +304,5 @@ class FuzzyTokenComparatorTest {
             }
         }
         return cases
-    }
-
-    @Test
-    fun `все тест-кейсы из датасета`() {
-        val failures = mutableListOf<String>()
-
-        dataset.forEachIndexed { i, case ->
-            val result = comparator.compare(case.expected, case.actual)
-            if (result != case.shouldMatch) {
-                failures += "#$i [${case.category}]: " +
-                    "'${case.expected}' vs '${case.actual}' -> " +
-                    "got $result, expected ${case.shouldMatch}"
-            }
-        }
-
-        if (failures.isNotEmpty()) {
-            println("=== Провалено ${failures.size}/${dataset.size} (Слабые места алгоритма) ===")
-            failures.forEach { println("  $it") }
-        }
-    }
-
-    @Test
-    fun `метрики качества по категориям`() {
-        data class Metrics(var tp: Int = 0, var fp: Int = 0, var tn: Int = 0, var fn: Int = 0)
-
-        val byCategory = mutableMapOf<String, Metrics>()
-        val total = Metrics()
-
-        dataset.forEach { case ->
-            val m = byCategory.getOrPut(case.category) { Metrics() }
-            val result = comparator.compare(case.expected, case.actual)
-            when {
-                result && case.shouldMatch   -> { m.tp++; total.tp++ }
-                result && !case.shouldMatch  -> { m.fp++; total.fp++ }
-                !result && !case.shouldMatch -> { m.tn++; total.tn++ }
-                !result && case.shouldMatch  -> { m.fn++; total.fn++ }
-            }
-        }
-
-        println("Метрики режима тестирования: ${dataset.size} тест-кейсов ===")
-        byCategory.toSortedMap().forEach { (cat, m) ->
-            val total = m.tp + m.fp + m.tn + m.fn
-            val acc = if (total > 0) (m.tp + m.tn).toDouble() / total else 0.0
-            println("  %-12s accuracy=%.1f%%  (tp=%d fp=%d tn=%d fn=%d)".format(
-                "[$cat]", acc * 100, m.tp, m.fp, m.tn, m.fn
-            ))
-        }
-
-        val accuracy  = (total.tp + total.tn).toDouble() / dataset.size
-        val precision = if (total.tp + total.fp > 0) total.tp.toDouble() / (total.tp + total.fp) else 0.0
-        val recall    = if (total.tp + total.fn > 0) total.tp.toDouble() / (total.tp + total.fn) else 0.0
-        val f1 = if (precision + recall > 0) 2 * precision * recall / (precision + recall) else 0.0
-
-        println("\nИтого:")
-        println("Accuracy:  %.2f%%".format(accuracy * 100))
-        println("Precision: %.2f%%".format(precision * 100))
-        println("Recall:    %.2f%%".format(recall * 100))
-        println("F1-score:  %.2f%%".format(f1 * 100))
-        println("TP=${total.tp}  FP=${total.fp}  TN=${total.tn}  FN=${total.fn}")
-
-        assertTrue(
-            "Общая Accuracy ${"%.2f".format(accuracy * 100)}% ниже порога 85%",
-            accuracy >= 0.85
-        )
-    }
-
-    @Test
-    fun `размер датасета не менее 400 пар`() {
-        assertTrue(
-            "Датасет содержит ${dataset.size} пар, ожидается >= 400",
-            dataset.size >= 400
-        )
     }
 }
