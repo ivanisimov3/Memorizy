@@ -73,7 +73,7 @@ class FuzzyTokenComparator(
     // Вычисляет балл похожести двух токенов от 0.0 до 1.0
     private fun getTokenSimilarity(exp: Token, act: Token): Double {
         val maxDistStem = maxDistance(minOf(exp.stem.length, act.stem.length))
-        val distStem = levenshtein(exp.stem, act.stem)
+        val distStem = damerauLevenshtein(exp.stem, act.stem)
         val scoreStem = when {
             distStem <= maxDistStem -> 1.0
             distStem == maxDistStem + 1 -> 0.5
@@ -82,7 +82,7 @@ class FuzzyTokenComparator(
 
         // Оценка по целым словам (raw)
         val maxDistRaw = maxDistance(minOf(exp.raw.length, act.raw.length))
-        val distRaw = levenshtein(exp.raw, act.raw)
+        val distRaw = damerauLevenshtein(exp.raw, act.raw)
         val scoreRaw = when {
             distRaw <= maxDistRaw -> 1.0
             distRaw == maxDistRaw + 1 -> 0.5
@@ -98,32 +98,62 @@ class FuzzyTokenComparator(
         return when {
             length <= 3 -> 0
             length <= 7 -> 1
-            else -> 2
+            length <= 12 -> 2
+            else -> 3
         }
     }
 
-    // Расстояние Левенштейна
-    private fun levenshtein(a: String, b: String): Int {
+    // Расстояние Дамерау-Левенштейна
+    private fun damerauLevenshtein(a: String, b: String): Int {
         val m = a.length
         val n = b.length
 
-        val dp = Array(m + 1) { IntArray(n + 1) }
+        if (m == 0) return n
+        if (n == 0) return m
 
-        for (i in 0..m) dp[i][0] = i
-        for (j in 0..n) dp[0][j] = j
+        val maxDistance = m + n // Максимальное локальное расстояние между сравниваемыми словами
+        val lastRowByChar = mutableMapOf<Char, Int>()
+        val dp = Array(m + 2) { IntArray(n + 2) }
 
-        for (i in 1..m) {
-            for (j in 1..n) {
-                val cost = if (a[i - 1] == b[j - 1]) 0 else 1
-                dp[i][j] = minOf(
-                    dp[i - 1][j] + 1,   // удаление
-                    dp[i][j - 1] + 1,   // вставка
-                    dp[i - 1][j - 1] + cost // замена
-                )
-            }
+        dp[0][0] = maxDistance
+
+        for (i in 0..m) {
+            dp[i + 1][0] = maxDistance
+            dp[i + 1][1] = i
         }
 
-        return dp[m][n]
+        for (j in 0..n) {
+            dp[0][j + 1] = maxDistance
+            dp[1][j + 1] = j
+        }
+
+        for (i in 1..m) {
+            var lastMatchingColumn = 0
+
+            for (j in 1..n) {
+                val lastMatchingRow = lastRowByChar[b[j - 1]] ?: 0
+                val lastSwapColumn = lastMatchingColumn
+
+                val cost = if (a[i - 1] == b[j - 1]) {
+                    lastMatchingColumn = j
+                    0
+                } else {
+                    1
+                }
+
+                dp[i + 1][j + 1] = minOf(
+                    dp[i][j] + cost, // замена
+                    dp[i + 1][j] + 1, // вставка
+                    dp[i][j + 1] + 1, // удаление
+                    dp[lastMatchingRow][lastSwapColumn] + (i - lastMatchingRow - 1) + 1 +
+                        (j - lastSwapColumn - 1) // перестановка соседних символов
+                )
+            }
+
+            lastRowByChar[a[i - 1]] = i
+        }
+
+        return dp[m + 1][n + 1]
     }
 
     // Токенизация: нормализация, удаление стоп-слов, стемминг

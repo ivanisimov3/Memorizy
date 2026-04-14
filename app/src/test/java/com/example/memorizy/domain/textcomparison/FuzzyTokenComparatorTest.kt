@@ -93,6 +93,16 @@ class FuzzyTokenComparatorTest {
     }
 
     @Test
+    fun `перестановка соседних символов в слове считается одной опечаткой`() {
+        assertTrue(comparator.compare("клетка", "клекта"))
+    }
+
+    @Test
+    fun `перестановка соседних символов в очень коротком слове не принимается`() {
+        assertFalse(comparator.compare("дом", "дмо"))
+    }
+
+    @Test
     fun `почти совпадающие но семантически неверные ответы не принимаются`() {
         assertFalse(comparator.compare("митоз", "мейоз"))
         assertFalse(comparator.compare("закон ома", "закон ньютона"))

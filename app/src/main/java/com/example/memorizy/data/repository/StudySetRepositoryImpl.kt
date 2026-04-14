@@ -166,7 +166,6 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
             )
             throw SyncRetryException("Не удалось получить изменения наборов", e)
         }
-
     }
 
     private fun handleSyncException(
