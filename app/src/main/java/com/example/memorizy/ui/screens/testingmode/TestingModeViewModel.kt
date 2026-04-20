@@ -8,7 +8,7 @@ import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.repository.SessionRepository
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.source.local.room.entity.SessionRecord
-import com.example.memorizy.domain.textcomparison.FuzzyTokenComparator
+import com.example.memorizy.domain.textcomparison.TextComparator
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.utils.SESSION_TYPE_TESTING
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,8 +23,9 @@ import kotlinx.coroutines.launch
 class TestingModeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle, // Аргументы навигации
     private val cardRepository: CardRepository,
-    private val sessionRepository: SessionRepository
-) : ViewModel(){
+    private val sessionRepository: SessionRepository,
+    private val textComparator: TextComparator
+) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<Routes.TestingMode>()
     private val setId = route.setId
@@ -32,7 +33,6 @@ class TestingModeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TestingModeState())
     val uiState = _uiState.asStateFlow()
 
-    private val textComparator = FuzzyTokenComparator()
     private var originalCards: List<Card> = emptyList()
 
     // Блок инициализации

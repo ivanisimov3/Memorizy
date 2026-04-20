@@ -15,12 +15,12 @@ interface SessionRecordDao {
     Сохранить результат сессии локально
     */
     @Insert
-    suspend fun insert(record: SessionRecord)
+    suspend fun insertRecord(record: SessionRecord)
 
     /*
     Получить все сессии для определённого набора, отсортированные по времени,
     Чтобы построить линейный график прогресса
     */
     @Query("SELECT * FROM session_records WHERE setId = :setId ORDER BY timestamp ASC")
-    fun getSessionsForSet(setId: Long): Flow<List<SessionRecord>>
+    fun getRecordsForSet(setId: Long): Flow<List<SessionRecord>>
 }

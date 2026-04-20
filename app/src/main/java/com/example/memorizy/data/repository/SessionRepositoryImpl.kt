@@ -12,10 +12,10 @@ class SessionRepositoryImpl @Inject constructor(
 ) : SessionRepository {
 
     override suspend fun saveSession(record: SessionRecord) {
-        sessionRecordDao.insert(record)
+        sessionRecordDao.insertRecord(record)
     }
 
     override fun getSessionsForSet(setId: Long): Flow<List<SessionRecord>> {
-        return sessionRecordDao.getSessionsForSet(setId)
+        return sessionRecordDao.getRecordsForSet(setId)
     }
 }

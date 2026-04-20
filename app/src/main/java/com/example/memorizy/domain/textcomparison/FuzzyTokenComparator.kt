@@ -1,11 +1,12 @@
 package com.example.memorizy.domain.textcomparison
 
+import jakarta.inject.Inject
+
 // Реализация сравнения текстов
 
-class FuzzyTokenComparator(
-    private val threshold: Double = 0.75
-) : TextComparator {
+class FuzzyTokenComparator @Inject constructor() : TextComparator {
 
+    private val threshold: Double = 0.75
     private val stemmer = RussianStemmer()
 
     private data class Token(
