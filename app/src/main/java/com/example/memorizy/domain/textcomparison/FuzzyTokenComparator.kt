@@ -73,6 +73,7 @@ class FuzzyTokenComparator @Inject constructor() : TextComparator {
 
     // Вычисляет балл похожести двух токенов от 0.0 до 1.0
     private fun getTokenSimilarity(exp: Token, act: Token): Double {
+        // Оценка по стемам (stem)
         val maxDistStem = maxDistance(minOf(exp.stem.length, act.stem.length))
         val distStem = damerauLevenshtein(exp.stem, act.stem)
         val scoreStem = when {

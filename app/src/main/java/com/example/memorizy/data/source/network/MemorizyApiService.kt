@@ -47,13 +47,13 @@ interface MemorizyApiService{
         @Path("id") id: Long
     )
 
-    // CardController
-    @GET("api/cards/by-set/{setId}")
+    @GET("api/sets/{setId}/cards")
     suspend fun getCardsBySet(
         @Header("Authorization") token: String,
         @Path("setId") setId: Long
     ): List<CardDto>
 
+    // CardController
     @POST("api/cards")
     suspend fun createCard(
         @Header("Authorization") token: String,
