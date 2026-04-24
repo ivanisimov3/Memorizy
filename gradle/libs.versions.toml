@@ -15,6 +15,7 @@ navigationCompose = "2.9.6"
 runtime = "1.9.4"
 foundation = "1.10.0"
 foundationVersion = "1.10.2"
+leakcanary = "2.14"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -38,9 +39,9 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationVersion" }
+leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
