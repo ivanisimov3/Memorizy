@@ -5,5 +5,7 @@ data class SettingsState(
     val username: String? = null,
     val lastSyncTime: Long? = null,
     val isDarkTheme: Boolean = false,
-    val notificationsEnabled: Boolean = false
+    val notificationsEnabled: Boolean = false,
+    val isLogoutInProgress: Boolean = false,
+    val showLogoutSyncErrorDialog: Boolean = false
 )

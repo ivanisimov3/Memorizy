@@ -26,7 +26,7 @@ interface StudySetDao {
     Выбрать все несинхронизированные наборы,
     Чтобы попытаться их отправить на сервер
     */
-    @Query("SELECT * FROM study_sets WHERE remoteId IS NULL")
+    @Query("SELECT * FROM study_sets WHERE remoteId IS NULL AND isDeleted = 0")
     suspend fun getUnsyncedSets(): List<StudySet>
 
     /*

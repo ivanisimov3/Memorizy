@@ -148,7 +148,7 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
 
                     if (localCard == null){
                         dao.insertCard(dto.toEntity(localSet.id))
-                    } else if (!localCard.isEdited) {
+                    } else if (!localCard.isEdited && !localCard.isDeleted) {
                         val updatedCard = localCard.copy(
                             term = dto.term,
                             definition = dto.definition,

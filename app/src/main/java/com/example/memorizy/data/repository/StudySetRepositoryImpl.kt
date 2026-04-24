@@ -134,7 +134,7 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
 
                 if (localSet == null) {
                     dao.insertSet(dto.toEntity())
-                } else if (!localSet.isEdited) {
+                } else if (!localSet.isEdited && !localSet.isDeleted) {
                     val updatedSet = localSet.copy(
                         name = dto.name,
                         description = dto.description,

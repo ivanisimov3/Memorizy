@@ -44,6 +44,11 @@
     <string name="logout_question">Выйти из аккаунта?</string>
     <string name="logout_warning">Вы действительно хотите выйти? Локальные данные останутся, но синхронизация отключится</string>
     <string name="logout">Выйти</string>
+    <string name="logout_syncing">Синхронизация...</string>
+    <string name="logout_sync_failed_title">Данные не синхронизированы</string>
+    <string name="logout_sync_failed_warning">Перед выходом не удалось сохранить изменения в облаке. Если выйти сейчас, несинхронизированные локальные изменения останутся на устройстве и не будут отправлены до следующего входа.</string>
+    <string name="logout_anyway">Выйти без синхронизации</string>
+    <string name="stay_in_account">Остаться</string>
     <string name="account_text">Аккаунт</string>
     <string name="settings_guest_warning">Вы используете приложение как Гость</string>
     <string name="settings_user_warning">Вы вошли как: %1$s</string>

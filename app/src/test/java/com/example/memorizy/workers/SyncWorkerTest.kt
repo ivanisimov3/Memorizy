@@ -6,9 +6,8 @@ import android.content.Context
 import android.util.Log
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
-import com.example.memorizy.data.repository.CardRepository
-import com.example.memorizy.data.repository.StudySetRepository
 import com.example.memorizy.data.sync.SyncAuthException
+import com.example.memorizy.data.sync.SyncCoordinator
 import com.example.memorizy.data.sync.SyncRetryException
 import io.mockk.coEvery
 import io.mockk.coVerifyOrder
@@ -26,8 +25,7 @@ class SyncWorkerTest {
 
     private val context = mockk<Context>(relaxed = true)
     private val params = mockk<WorkerParameters>(relaxed = true)
-    private val studySetRepository = mockk<StudySetRepository>()
-    private val cardRepository = mockk<CardRepository>()
+    private val syncCoordinator = mockk<SyncCoordinator>()
 
     private lateinit var worker: SyncWorker
 
@@ -37,7 +35,7 @@ class SyncWorkerTest {
         every { Log.w(any(), any(), any<Throwable>()) } returns 0
         every { Log.e(any(), any(), any<Throwable>()) } returns 0
 
-        worker = SyncWorker(context, params, studySetRepository, cardRepository)
+        worker = SyncWorker(context, params, syncCoordinator)
     }
 
     @After
@@ -47,25 +45,19 @@ class SyncWorkerTest {
 
     @Test
     fun `SyncWorker returns success when all sync steps complete`() = runTest {
-        coEvery { studySetRepository.syncLocalChanges() } returns Unit
-        coEvery { studySetRepository.fetchRemoteChanges() } returns Unit
-        coEvery { cardRepository.syncLocalChanges() } returns Unit
-        coEvery { cardRepository.fetchRemoteChanges() } returns Unit
+        coEvery { syncCoordinator.syncAll() } returns Unit
 
         val result = worker.doWork()
 
         assertEquals(ListenableWorker.Result.success()::class, result::class)
         coVerifyOrder {
-            studySetRepository.syncLocalChanges()
-            studySetRepository.fetchRemoteChanges()
-            cardRepository.syncLocalChanges()
-            cardRepository.fetchRemoteChanges()
+            syncCoordinator.syncAll()
         }
     }
 
     @Test
     fun `SyncWorker returns failure on SyncAuthException`() = runTest {
-        coEvery { studySetRepository.syncLocalChanges() } throws SyncAuthException("auth")
+        coEvery { syncCoordinator.syncAll() } throws SyncAuthException("auth")
 
         val result = worker.doWork()
 
@@ -74,7 +66,7 @@ class SyncWorkerTest {
 
     @Test
     fun `SyncWorker returns retry on SyncRetryException`() = runTest {
-        coEvery { studySetRepository.syncLocalChanges() } throws SyncRetryException("retry")
+        coEvery { syncCoordinator.syncAll() } throws SyncRetryException("retry")
 
         val result = worker.doWork()
 
@@ -83,7 +75,7 @@ class SyncWorkerTest {
 
     @Test
     fun `SyncWorker returns retry on unexpected exception`() = runTest {
-        coEvery { studySetRepository.syncLocalChanges() } throws IllegalStateException("boom")
+        coEvery { syncCoordinator.syncAll() } throws IllegalStateException("boom")
 
         val result = worker.doWork()
 

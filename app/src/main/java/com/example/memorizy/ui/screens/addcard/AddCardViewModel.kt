@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.source.local.room.entity.Card
-import com.example.memorizy.data.sync.SyncManager
 import com.example.memorizy.ui.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -22,7 +21,6 @@ import com.example.memorizy.domain.importer.usecase.ParseCardsFileUseCase
 class AddCardViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val cardRepository: CardRepository,
-    private val syncManager: SyncManager,
     private val parseCardsFileUseCase: ParseCardsFileUseCase
 ) : ViewModel(){
     private val route = savedStateHandle.toRoute<Routes.AddCard>()
@@ -111,8 +109,6 @@ class AddCardViewModel @Inject constructor(
         viewModelScope.launch {
             cardRepository.insertCard(newCard)
 
-            syncManager.scheduleOneTimeSync()
-
             _uiState.update { it.copy(isCardCreated = true) }
         }
     }
@@ -170,7 +166,6 @@ class AddCardViewModel @Inject constructor(
 
             if (cardsToInsert.isNotEmpty()) {
                 cardRepository.insertCards(cardsToInsert)
-                syncManager.scheduleOneTimeSync()
             }
             
             _uiState.update {

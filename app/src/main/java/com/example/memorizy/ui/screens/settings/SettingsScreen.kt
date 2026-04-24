@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
@@ -27,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +50,8 @@ import com.example.memorizy.ui.utils.DateUtils
 fun SettingsScreen(
     onLoginClick: () -> Unit,
     onLogoutClick: () -> Unit,
+    onLogoutAnywayClick: () -> Unit,
+    onDismissLogoutSyncError: () -> Unit,
     onBackClick: () -> Unit,
     uiState: SettingsState,
     onSyncClick: () -> Unit,
@@ -53,6 +59,12 @@ fun SettingsScreen(
     onNotificationsChange: (Boolean) -> Unit
 ){
     var showLogoutDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState.isLoggedIn, uiState.showLogoutSyncErrorDialog) {
+        if (!uiState.isLoggedIn || uiState.showLogoutSyncErrorDialog) {
+            showLogoutDialog = false
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -97,13 +109,22 @@ fun SettingsScreen(
 
     if (showLogoutDialog){
         LogoutDialog(
+            isLogoutInProgress = uiState.isLogoutInProgress,
             onConfirmLogout = {
                 onLogoutClick()
-                showLogoutDialog = false
             },
             onDismiss = {
-                showLogoutDialog = false
+                if (!uiState.isLogoutInProgress) {
+                    showLogoutDialog = false
+                }
             }
+        )
+    }
+
+    if (uiState.showLogoutSyncErrorDialog) {
+        LogoutSyncErrorDialog(
+            onConfirmLogoutAnyway = onLogoutAnywayClick,
+            onDismiss = onDismissLogoutSyncError
         )
     }
 }
@@ -296,12 +317,17 @@ private fun SettingsSection(
 
 @Composable
 private fun LogoutDialog(
+    isLogoutInProgress: Boolean,
     onConfirmLogout: () -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
         shape = RoundedCornerShape(18.dp),
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            if (!isLogoutInProgress) {
+                onDismiss()
+            }
+        },
         title = {
             Text(
                 text = stringResource(R.string.logout_question),
@@ -318,12 +344,78 @@ private fun LogoutDialog(
        },
         confirmButton = {
             OutlinedButton(
+                enabled = !isLogoutInProgress,
                 onClick = onConfirmLogout
             ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (isLogoutInProgress) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+
+                    Text(
+                        text = if (isLogoutInProgress) {
+                            stringResource(R.string.logout_syncing)
+                        } else {
+                            stringResource(R.string.logout)
+                        },
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+        },
+        dismissButton = {
+            FilledTonalButton(
+                enabled = !isLogoutInProgress,
+                onClick = onDismiss
+            ) {
                 Text(
-                    text = stringResource(R.string.logout),
+                    text = stringResource(R.string.cancel_text),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    )
+}
+
+@Composable
+private fun LogoutSyncErrorDialog(
+    onConfirmLogoutAnyway: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        shape = RoundedCornerShape(18.dp),
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.logout_sync_failed_title),
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
+        },
+        text = {
+            Text(
+                text = stringResource(R.string.logout_sync_failed_warning),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
+        },
+        confirmButton = {
+            OutlinedButton(
+                onClick = onConfirmLogoutAnyway
+            ) {
+                Text(
+                    text = stringResource(R.string.logout_anyway),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error
                 )
             }
         },
@@ -332,7 +424,7 @@ private fun LogoutDialog(
                 onClick = onDismiss
             ) {
                 Text(
-                    text = stringResource(R.string.cancel_text),
+                    text = stringResource(R.string.stay_in_account),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary
                 )

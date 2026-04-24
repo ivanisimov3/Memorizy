@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.os.Build
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.example.memorizy.data.sync.SyncManager
 import dagger.hilt.android.HiltAndroidApp
 import jakarta.inject.Inject
 
@@ -17,9 +18,13 @@ class MemorizyApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory   // Учим WorkManager работать с Hilt
 
+    @Inject
+    lateinit var syncManager: SyncManager
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannels()
+        syncManager.scheduleDailySync()
     }
 
     private fun createNotificationChannels() {

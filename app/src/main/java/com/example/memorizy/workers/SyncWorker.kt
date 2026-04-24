@@ -5,9 +5,8 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.example.memorizy.data.repository.CardRepository
-import com.example.memorizy.data.repository.StudySetRepository
 import com.example.memorizy.data.sync.SyncAuthException
+import com.example.memorizy.data.sync.SyncCoordinator
 import com.example.memorizy.data.sync.SyncRetryException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -28,8 +27,7 @@ and should be passed as constructor parameters.
 class SyncWorker @AssistedInject constructor(
     @Assisted ctx: Context,
     @Assisted params: WorkerParameters,
-    private val studySetRepository: StudySetRepository,
-    private val cardRepository: CardRepository
+    private val syncCoordinator: SyncCoordinator
 ) : CoroutineWorker(ctx , params) {
 
     companion object {
@@ -39,11 +37,7 @@ class SyncWorker @AssistedInject constructor(
     // Метод, где код работы, воспроизввдимой на заднем плане
     override suspend fun doWork(): Result {
         return try {
-            studySetRepository.syncLocalChanges()
-            studySetRepository.fetchRemoteChanges()
-
-            cardRepository.syncLocalChanges()
-            cardRepository.fetchRemoteChanges()
+            syncCoordinator.syncAll()
 
             Result.success()
         } catch (e: SyncAuthException) {

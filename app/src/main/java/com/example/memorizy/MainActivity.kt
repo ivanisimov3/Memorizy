@@ -16,20 +16,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.memorizy.data.sync.SyncManager
 import com.example.memorizy.ui.MemorizyApp
 import com.example.memorizy.ui.main.MainViewModel
 import com.example.memorizy.ui.theme.MemorizyTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jakarta.inject.Inject
 
 // Единственная Activity
 
 @AndroidEntryPoint  // Говорим Hilt где вклиниться в приложение
 class MainActivity : ComponentActivity() {
-    @Inject
-    lateinit var syncManager: SyncManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -70,11 +65,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        syncManager.scheduleOneTimeSync()
     }
 }

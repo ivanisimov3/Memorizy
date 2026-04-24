@@ -7,7 +7,6 @@ import androidx.navigation.toRoute
 import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.repository.StudySetRepository
-import com.example.memorizy.data.sync.SyncManager
 import com.example.memorizy.domain.spacedrepetition.SpacedRepetitionScheduler
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.utils.DateUtils
@@ -28,8 +27,7 @@ private const val DEADLINE_REFRESH_INTERVAL_MS = 60_000L
 class SetDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle, // Аргументы навигации
     private val studySetRepository: StudySetRepository,
-    private val cardRepository: CardRepository,
-    private val syncManager: SyncManager
+    private val cardRepository: CardRepository
 ) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<Routes.SetDetails>()
@@ -89,8 +87,6 @@ class SetDetailsViewModel @Inject constructor(
             } else {
                 cardRepository.markAsDeleted(card.id)
             }
-
-            syncManager.scheduleOneTimeSync()
         }
     }
 
@@ -265,8 +261,6 @@ class SetDetailsViewModel @Inject constructor(
                     cardRepository.updateCard(recalculated)
                 }
             }
-
-            syncManager.scheduleOneTimeSync()
         }
     }
 

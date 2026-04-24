@@ -64,6 +64,8 @@ fun MemorizyApp() {
             SettingsScreen(
                 onLoginClick = { navController.navigate(Routes.Auth) },
                 onLogoutClick = viewModel::onLogout,
+                onLogoutAnywayClick = viewModel::onLogoutAnyway,
+                onDismissLogoutSyncError = viewModel::onDismissLogoutSyncError,
                 onBackClick = { navController.popBackStack() },
                 uiState = uiState,
                 onSyncClick = viewModel::onSyncNow,

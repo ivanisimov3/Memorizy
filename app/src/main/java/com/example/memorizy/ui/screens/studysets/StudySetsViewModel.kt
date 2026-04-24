@@ -6,7 +6,6 @@ import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.repository.SettingsRepository
 import com.example.memorizy.data.repository.StudySetRepository
-import com.example.memorizy.data.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,8 +20,7 @@ import kotlinx.coroutines.launch
 class StudySetsViewModel @Inject constructor(
     private val studySetRepository: StudySetRepository,
     private val cardRepository: CardRepository,
-    private val settingsRepository: SettingsRepository,
-    private val syncManager: SyncManager
+    private val settingsRepository: SettingsRepository
 ) : ViewModel(){
 
     private val _isLoggedIn = settingsRepository.token.map { it != null }
@@ -81,8 +79,6 @@ class StudySetsViewModel @Inject constructor(
             } else {
                 studySetRepository.markAsDeleted(studySet.id)
             }
-
-            syncManager.scheduleOneTimeSync()
         }
     }
 }

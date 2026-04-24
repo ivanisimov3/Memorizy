@@ -9,7 +9,6 @@ import com.example.memorizy.data.repository.SessionRepository
 import com.example.memorizy.data.repository.StudySetRepository
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.source.local.room.entity.SessionRecord
-import com.example.memorizy.data.sync.SyncManager
 import com.example.memorizy.domain.spacedrepetition.SpacedRepetitionScheduler
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.utils.SESSION_TYPE_LEARNING
@@ -26,7 +25,6 @@ class LearningModeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val cardRepository: CardRepository,
     private val studySetRepository: StudySetRepository,
-    private val syncManager: SyncManager,
     private val sessionRepository: SessionRepository
 ) : ViewModel(){
 
@@ -48,8 +46,7 @@ class LearningModeViewModel @Inject constructor(
             val now = System.currentTimeMillis()
             if (targetDate != null && targetDate!! < now) {
                 targetDate = null
-                studySetRepository.updateSet(studySet.copy(targetDate = null))
-                syncManager.scheduleOneTimeSync()
+                studySetRepository.updateSet(studySet.copy(targetDate = null, isEdited = true))
             }
 
             allCards = cardRepository.getAllCardsForSet(setId).first()
@@ -90,7 +87,6 @@ class LearningModeViewModel @Inject constructor(
 
             viewModelScope.launch {
                 cardRepository.updateCard(updatedCard)
-                syncManager.scheduleOneTimeSync()
             }
         }
 

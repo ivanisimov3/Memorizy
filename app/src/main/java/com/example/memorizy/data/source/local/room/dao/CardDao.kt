@@ -32,7 +32,7 @@ interface CardDao {
     Выбрать все несинхронизированные карточки,
     Чтобы попытаться их отправить на сервер
     */
-    @Query("SELECT * FROM cards WHERE remoteId IS NULL")
+    @Query("SELECT * FROM cards WHERE remoteId IS NULL AND isDeleted = 0")
     suspend fun getUnsyncedCards(): List<Card>
 
     /*
