@@ -4,5 +4,5 @@ package com.example.memorizy.domain.textcomparison
 
 interface TextComparator {
 
-    fun compare(expected: String, actual: String): Boolean
+    suspend fun compare(expected: String, actual: String): Boolean
 }

@@ -69,32 +69,43 @@ class TestingModeViewModel @Inject constructor(
 
     // Нажали к Следующему
     fun onSubmitAnswer() {
-        _uiState.update { state ->
-            val currentCard = state.currentCard ?: return@update state  // Вернуть текущее состояние без изменений
+        val state = _uiState.value
+        val currentCard = state.currentCard ?: return
 
+        if (state.isCheckingAnswer) return
+
+        _uiState.update { current ->
+            current.copy(isCheckingAnswer = true)
+        }
+
+        viewModelScope.launch {
             val isCorrect = matchesExpectedAnswer(
                 currentCard = currentCard,
                 userAnswer = state.userAnswer
             )
 
-            val testAnswer = TestAnswer(
-                card = currentCard,
-                userAnswer = state.userAnswer.trim(),
-                isCorrect = isCorrect
-            )
+            _uiState.update { current ->
+                if (current.currentCard?.id != currentCard.id) {
+                    return@update current.copy(isCheckingAnswer = false)
+                }
 
-            val updatedAnswers = state.userAnswers + testAnswer
-            val nextIndex = state.currentIndex + 1
-            val isFinished = (nextIndex >= state.cards.size)
-            val nextCard = if (isFinished) null else state.cards[nextIndex]
+                val testAnswer = TestAnswer(
+                    card = currentCard,
+                    userAnswer = state.userAnswer.trim(),
+                    isCorrect = isCorrect
+                )
 
-            val newCorrect = if (isCorrect) state.correctCount + 1 else state.correctCount
-            val newIncorrect = if (!isCorrect) state.incorrectCount + 1 else state.incorrectCount
+                val updatedAnswers = current.userAnswers + testAnswer
+                val nextIndex = current.currentIndex + 1
+                val isFinished = (nextIndex >= current.cards.size)
+                val nextCard = if (isFinished) null else current.cards[nextIndex]
 
-            if (isFinished) {
-                val total = state.cards.size
-                val percentage = if (total > 0) newCorrect.toFloat() / total * 100f else 0f
-                viewModelScope.launch {
+                val newCorrect = if (isCorrect) current.correctCount + 1 else current.correctCount
+                val newIncorrect = if (!isCorrect) current.incorrectCount + 1 else current.incorrectCount
+
+                if (isFinished) {
+                    val total = current.cards.size
+                    val percentage = if (total > 0) newCorrect.toFloat() / total * 100f else 0f
                     sessionRepository.saveSession(
                         SessionRecord(
                             setId = setId,
@@ -105,21 +116,22 @@ class TestingModeViewModel @Inject constructor(
                         )
                     )
                 }
-            }
 
-            state.copy(
-                correctCount = newCorrect,
-                incorrectCount = newIncorrect,
-                currentIndex = nextIndex,
-                currentCard = nextCard,
-                isFinished = isFinished,
-                userAnswer = "",
-                userAnswers = updatedAnswers
-            )
+                current.copy(
+                    correctCount = newCorrect,
+                    incorrectCount = newIncorrect,
+                    currentIndex = nextIndex,
+                    currentCard = nextCard,
+                    isFinished = isFinished,
+                    userAnswer = "",
+                    userAnswers = updatedAnswers,
+                    isCheckingAnswer = false
+                )
+            }
         }
     }
 
-    private fun matchesExpectedAnswer(
+    private suspend fun matchesExpectedAnswer(
         currentCard: Card,
         userAnswer: String
     ): Boolean {

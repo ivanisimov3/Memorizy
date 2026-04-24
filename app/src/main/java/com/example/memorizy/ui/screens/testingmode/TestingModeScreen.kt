@@ -273,17 +273,26 @@ private fun QuestionContent(
             GlassContainer(
                 modifier = Modifier
                     .size(56.dp),
+                enabled = !uiState.isCheckingAnswer,
                 onClick = onSubmitAnswer,
                 shape = CircleShape,
                 containerColor = MaterialTheme.colorScheme.secondary
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_back),
-                    contentDescription = stringResource(R.string.testing_next_button),
-                    modifier = Modifier
-                        .graphicsLayer { scaleX = -1f },
-                    tint = MaterialTheme.colorScheme.secondary
-                )
+                if (uiState.isCheckingAnswer) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_back),
+                        contentDescription = stringResource(R.string.testing_next_button),
+                        modifier = Modifier
+                            .graphicsLayer { scaleX = -1f },
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
             }
         }
     }

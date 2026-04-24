@@ -1,6 +1,6 @@
 package com.example.memorizy.di
 
-import com.example.memorizy.domain.textcomparison.FuzzyTokenComparator
+import com.example.memorizy.domain.textcomparison.HybridTextComparator
 import com.example.memorizy.domain.textcomparison.TextComparator
 import dagger.Binds
 import dagger.Module
@@ -17,6 +17,6 @@ abstract class TextComparisonModule {
     @Binds
     @Singleton
     abstract fun bindTextComparator(
-        impl: FuzzyTokenComparator
+        impl: HybridTextComparator
     ): TextComparator
 }

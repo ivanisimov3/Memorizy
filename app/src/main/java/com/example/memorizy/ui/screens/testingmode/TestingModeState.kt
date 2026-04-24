@@ -20,5 +20,6 @@ data class TestingModeState(
     val isEmpty: Boolean = false,
     val userAnswer: String = "",
     val userAnswers: List<TestAnswer> = emptyList(),
-    val isShowingAnswers: Boolean = false
+    val isShowingAnswers: Boolean = false,
+    val isCheckingAnswer: Boolean = false
 )

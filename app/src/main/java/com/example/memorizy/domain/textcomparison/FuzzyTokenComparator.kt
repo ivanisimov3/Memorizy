@@ -4,7 +4,7 @@ import jakarta.inject.Inject
 
 // Реализация сравнения текстов
 
-class FuzzyTokenComparator @Inject constructor() : TextComparator {
+class FuzzyTokenComparator @Inject constructor() : TextScorer {
 
     private val threshold: Double = 0.75
     private val stemmer = RussianStemmer()
@@ -14,12 +14,12 @@ class FuzzyTokenComparator @Inject constructor() : TextComparator {
         val raw: String
     )
 
-    override fun compare(expected: String, actual: String): Boolean {
+    override fun score(expected: String, actual: String): Float {
         val expectedTokens = tokenize(expected)
         val actualTokens = tokenize(actual)
 
-        if (expectedTokens.isEmpty() && actualTokens.isEmpty()) return true
-        if (expectedTokens.isEmpty() || actualTokens.isEmpty()) return false
+        if (expectedTokens.isEmpty() && actualTokens.isEmpty()) return 1f
+        if (expectedTokens.isEmpty() || actualTokens.isEmpty()) return 0f
 
         val matchedExpectedIndices = mutableSetOf<Int>()
         val matchedActualIndices = mutableSetOf<Int>()
@@ -68,7 +68,11 @@ class FuzzyTokenComparator @Inject constructor() : TextComparator {
         }
 
         val dice = (2.0 * totalScore) / (expectedTokens.size + actualTokens.size).toDouble()
-        return dice >= threshold
+        return dice.toFloat()
+    }
+
+    fun compare(expected: String, actual: String): Boolean {
+        return score(expected, actual) >= threshold
     }
 
     // Вычисляет балл похожести двух токенов от 0.0 до 1.0
