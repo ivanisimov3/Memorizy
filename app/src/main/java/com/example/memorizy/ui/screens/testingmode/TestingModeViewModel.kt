@@ -52,22 +52,12 @@ class TestingModeViewModel @Inject constructor(
             } else {
                 _uiState.update { state ->
                     state.copy(
-                        isLoading = false,
-                        isChoosingMode = true
+                        isLoading = false
                     )
                 }
+                startTestingSession()
             }
         }
-    }
-
-    // Нажали Термины
-    fun onTermsSelected() {
-        startTestingSession(isTermChecked = true)
-    }
-
-    /// Нажали Определения
-    fun onDefinitionsSelected() {
-        startTestingSession(isTermChecked = false)
     }
 
     // Изменили Ответ
@@ -84,7 +74,6 @@ class TestingModeViewModel @Inject constructor(
 
             val isCorrect = matchesExpectedAnswer(
                 currentCard = currentCard,
-                isTermChecked = state.isTermChecked,
                 userAnswer = state.userAnswer
             )
 
@@ -132,16 +121,8 @@ class TestingModeViewModel @Inject constructor(
 
     private fun matchesExpectedAnswer(
         currentCard: Card,
-        isTermChecked: Boolean,
         userAnswer: String
     ): Boolean {
-        if (isTermChecked) {
-            return textComparator.compare(
-                expected = currentCard.term,
-                actual = userAnswer
-            )
-        }
-
         val acceptedDefinitions = buildList {
             add(currentCard.definition)
             addAll(currentCard.definitionVariants)
@@ -157,10 +138,7 @@ class TestingModeViewModel @Inject constructor(
 
     // Нажали Пройти тестирование снова
     fun restartTesting() {
-        _uiState.value = TestingModeState(
-            isLoading = false,
-            isChoosingMode = true
-        )
+        startTestingSession()
     }
 
     // Нажали Посмотреть ответы
@@ -170,7 +148,7 @@ class TestingModeViewModel @Inject constructor(
         }
     }
 
-    private fun startTestingSession(isTermChecked: Boolean) {
+    private fun startTestingSession() {
         val cards = originalCards.shuffled()
 
         _uiState.value = TestingModeState(
@@ -178,8 +156,6 @@ class TestingModeViewModel @Inject constructor(
             cards = cards,
             currentIndex = 0,
             currentCard = cards.first(),
-            isTermChecked = isTermChecked,
-            isChoosingMode = false,
             isEmpty = false
         )
     }

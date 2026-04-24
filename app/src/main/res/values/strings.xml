@@ -86,9 +86,6 @@
     <string name="go_back_to_set_text">Вернуться к набору</string>
     <string name="this_count_text">%1$d</string>
     <string name="testing_mode">Тестирование</string>
-    <string name="testing_choose_title">Знание чего хотите протестировать?</string>
-    <string name="testing_terms_button">Термины</string>
-    <string name="testing_definitions_button">Определения</string>
     <string name="testing_answer_hint">Ваш ответ</string>
     <string name="testing_next_button">Следующий вопрос</string>
     <string name="testing_restart">Пройти тестирование снова</string>

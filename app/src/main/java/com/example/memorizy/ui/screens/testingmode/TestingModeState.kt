@@ -16,10 +16,8 @@ data class TestingModeState(
     val currentIndex: Int = 0,
     val correctCount: Int = 0,
     val incorrectCount: Int = 0,
-    val isTermChecked: Boolean = true,
     val isFinished: Boolean = false,
     val isEmpty: Boolean = false,
-    val isChoosingMode: Boolean = false,
     val userAnswer: String = "",
     val userAnswers: List<TestAnswer> = emptyList(),
     val isShowingAnswers: Boolean = false

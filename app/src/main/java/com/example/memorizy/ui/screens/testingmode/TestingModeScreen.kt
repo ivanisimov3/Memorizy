@@ -38,7 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -49,8 +48,6 @@ import com.example.memorizy.ui.utils.GlassContainer
 fun TestingModeScreen(
     onBackClick: () -> Unit,
     uiState: TestingModeState,
-    onTermsSelected: () -> Unit,
-    onDefinitionsSelected: () -> Unit,
     onAnswerChanged: (String) -> Unit,
     onSubmitAnswer: () -> Unit,
     restartTesting: () -> Unit,
@@ -62,8 +59,7 @@ fun TestingModeScreen(
             onBackClick = onBackClick
         )
     } else {
-        val isQuestionActive = !uiState.isLoading && !uiState.isEmpty
-                && !uiState.isChoosingMode && !uiState.isFinished
+        val isQuestionActive = !uiState.isLoading && !uiState.isEmpty && !uiState.isFinished
 
         Scaffold(
             topBar = {
@@ -76,8 +72,6 @@ fun TestingModeScreen(
                 paddingValues = paddingValues,
                 uiState = uiState,
                 onBackClick = onBackClick,
-                onTermsSelected = onTermsSelected,
-                onDefinitionsSelected = onDefinitionsSelected,
                 onAnswerChanged = onAnswerChanged,
                 onSubmitAnswer = onSubmitAnswer,
                 restartTesting = restartTesting,
@@ -116,8 +110,6 @@ private fun TestingModeScreenBody(
     paddingValues: PaddingValues,
     uiState: TestingModeState,
     onBackClick: () -> Unit,
-    onTermsSelected: () -> Unit,
-    onDefinitionsSelected: () -> Unit,
     onAnswerChanged: (String) -> Unit,
     onSubmitAnswer: () -> Unit,
     restartTesting: () -> Unit,
@@ -136,13 +128,6 @@ private fun TestingModeScreenBody(
             uiState.isEmpty -> {
                 EmptyStateMessage(
                     onBackClick = onBackClick
-                )
-            }
-
-            uiState.isChoosingMode -> {
-                ChoosingModeContent(
-                    onTermsSelected = onTermsSelected,
-                    onDefinitionsSelected = onDefinitionsSelected
                 )
             }
 
@@ -211,59 +196,6 @@ private fun EmptyStateMessage(
 }
 
 @Composable
-private fun ChoosingModeContent(
-    onTermsSelected: () -> Unit,
-    onDefinitionsSelected: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = stringResource(R.string.testing_choose_title),
-            style = MaterialTheme.typography.displayMedium,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        Spacer(Modifier.height(32.dp))
-
-        GlassContainer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            onClick = onTermsSelected,
-            containerColor = MaterialTheme.colorScheme.primary
-        ) {
-            Text(
-                text = stringResource(R.string.testing_terms_button),
-                style = MaterialTheme.typography.displayLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        GlassContainer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            onClick = onDefinitionsSelected,
-            containerColor = MaterialTheme.colorScheme.secondary
-        ) {
-            Text(
-                text = stringResource(R.string.testing_definitions_button),
-                style = MaterialTheme.typography.displayLarge,
-                color = MaterialTheme.colorScheme.secondary
-            )
-        }
-    }
-}
-
-@Composable
 private fun QuestionContent(
     uiState: TestingModeState,
     onAnswerChanged: (String) -> Unit,
@@ -272,21 +204,9 @@ private fun QuestionContent(
 ) {
     val currentCard = uiState.currentCard ?: return
 
-    val questionText =
-        if (uiState.isTermChecked)
-            currentCard.definition
-        else
-            currentCard.term
-    val questionLabel =
-        if (uiState.isTermChecked)
-            stringResource(R.string.definition_text)
-        else
-            stringResource(R.string.term_text)
-    val answerLabel =
-        if (uiState.isTermChecked)
-            stringResource(R.string.term_text)
-        else
-            stringResource(R.string.definition_text)
+    val questionText = currentCard.term
+    val questionLabel = stringResource(R.string.term_text)
+    val answerLabel = stringResource(R.string.definition_text)
 
     Column(
         modifier = Modifier
@@ -570,19 +490,13 @@ private fun AnswersReviewContent(
             )
         ) {
             itemsIndexed(uiState.userAnswers) { index, testAnswer ->
-                val questionText = if (uiState.isTermChecked)
-                    testAnswer.card.definition
-                else
-                    testAnswer.card.term
+                val questionText = testAnswer.card.term
 
-                val correctAnswer = if (uiState.isTermChecked) {
-                    testAnswer.card.term
-                } else {
+                val correctAnswer =
                     buildList {
                         add(testAnswer.card.definition)
                         addAll(testAnswer.card.definitionVariants)
                     }.joinToString(separator = "\n")
-                }
 
                 GlassContainer(
                     modifier = Modifier

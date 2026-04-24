@@ -184,8 +184,6 @@ fun MemorizyApp() {
             TestingModeScreen(
                 onBackClick = { navController.popBackStack() },
                 uiState = uiState,
-                onTermsSelected = viewModel::onTermsSelected,
-                onDefinitionsSelected = viewModel::onDefinitionsSelected,
                 onAnswerChanged = viewModel::onAnswerChanged,
                 onSubmitAnswer = viewModel::onSubmitAnswer,
                 restartTesting = viewModel::restartTesting,
