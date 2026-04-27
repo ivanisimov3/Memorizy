@@ -42,6 +42,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
+import com.example.memorizy.domain.textcomparison.TextComparisonCategory
+import com.example.memorizy.ui.theme.orange
 import com.example.memorizy.ui.utils.GlassContainer
 
 @Composable
@@ -500,22 +502,13 @@ private fun AnswersReviewContent(
         ) {
             itemsIndexed(uiState.userAnswers) { index, testAnswer ->
                 val questionText = testAnswer.card.term
-
-                val correctAnswer =
-                    buildList {
-                        add(testAnswer.card.definition)
-                        addAll(testAnswer.card.definitionVariants)
-                    }.joinToString(separator = "\n")
+                val resultColor = testAnswer.category.resultColor()
 
                 GlassContainer(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 6.dp),
-                    containerColor =
-                        if (testAnswer.isCorrect)
-                            Color.Green
-                        else
-                            Color.Red
+                    containerColor = resultColor
                 ) {
                     Column(
                         modifier = Modifier
@@ -530,11 +523,16 @@ private fun AnswersReviewContent(
 
                         Spacer(Modifier.height(8.dp))
 
+                        Text(
+                            text = stringResource(testAnswer.category.labelResId()),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = resultColor
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
                         HorizontalDivider(
-                            color = if (testAnswer.isCorrect)
-                                Color.Green.copy(alpha = 0.5f)
-                            else
-                                Color.Red.copy(alpha = 0.5f)
+                            color = resultColor.copy(alpha = 0.5f)
                         )
 
                         Spacer(Modifier.height(8.dp))
@@ -553,23 +551,21 @@ private fun AnswersReviewContent(
                             color = MaterialTheme.colorScheme.onSurface
                         )
 
-                        if (!testAnswer.isCorrect) {
-                            Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(8.dp))
 
-                            Text(
-                                text = stringResource(R.string.testing_correct_answer_label),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                        Text(
+                            text = stringResource(R.string.testing_correct_answer_label),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
 
-                            Spacer(Modifier.height(4.dp))
+                        Spacer(Modifier.height(4.dp))
 
-                            Text(
-                                text = correctAnswer,
-                                style = MaterialTheme.typography.displayMedium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
+                        Text(
+                            text = testAnswer.expectedAnswer,
+                            style = MaterialTheme.typography.displayMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }
@@ -592,5 +588,23 @@ private fun AnswersReviewContent(
                 }
             }
         }
+    }
+}
+
+private fun TextComparisonCategory.labelResId(): Int {
+    return when (this) {
+        TextComparisonCategory.CORRECT -> R.string.testing_result_correct
+        TextComparisonCategory.CORRECT_PARAPHRASE -> R.string.testing_result_correct_paraphrase
+        TextComparisonCategory.SEMANTIC_ERROR -> R.string.testing_result_semantic_error
+        TextComparisonCategory.INCORRECT -> R.string.testing_result_incorrect
+    }
+}
+
+private fun TextComparisonCategory.resultColor(): Color {
+    return when (this) {
+        TextComparisonCategory.CORRECT -> Color.Green
+        TextComparisonCategory.CORRECT_PARAPHRASE -> Color.Green
+        TextComparisonCategory.SEMANTIC_ERROR -> orange
+        TextComparisonCategory.INCORRECT -> Color.Red
     }
 }

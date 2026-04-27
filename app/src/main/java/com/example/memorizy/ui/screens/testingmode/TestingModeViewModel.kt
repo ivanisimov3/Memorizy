@@ -8,6 +8,8 @@ import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.repository.SessionRepository
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.source.local.room.entity.SessionRecord
+import com.example.memorizy.domain.textcomparison.TextComparisonCategory
+import com.example.memorizy.domain.textcomparison.TextComparisonResult
 import com.example.memorizy.domain.textcomparison.TextComparator
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.utils.SESSION_TYPE_TESTING
@@ -79,7 +81,7 @@ class TestingModeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val isCorrect = matchesExpectedAnswer(
+            val answerCheck = checkExpectedAnswer(
                 currentCard = currentCard,
                 userAnswer = state.userAnswer
             )
@@ -92,7 +94,9 @@ class TestingModeViewModel @Inject constructor(
                 val testAnswer = TestAnswer(
                     card = currentCard,
                     userAnswer = state.userAnswer.trim(),
-                    isCorrect = isCorrect
+                    expectedAnswer = answerCheck.expectedAnswer,
+                    category = answerCheck.result.category,
+                    isCorrect = answerCheck.result.isCorrect
                 )
 
                 val updatedAnswers = current.userAnswers + testAnswer
@@ -100,8 +104,10 @@ class TestingModeViewModel @Inject constructor(
                 val isFinished = (nextIndex >= current.cards.size)
                 val nextCard = if (isFinished) null else current.cards[nextIndex]
 
-                val newCorrect = if (isCorrect) current.correctCount + 1 else current.correctCount
-                val newIncorrect = if (!isCorrect) current.incorrectCount + 1 else current.incorrectCount
+                val newCorrect =
+                    if (answerCheck.result.isCorrect) current.correctCount + 1 else current.correctCount
+                val newIncorrect =
+                    if (!answerCheck.result.isCorrect) current.incorrectCount + 1 else current.incorrectCount
 
                 if (isFinished) {
                     val total = current.cards.size
@@ -131,21 +137,36 @@ class TestingModeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun matchesExpectedAnswer(
+    private suspend fun checkExpectedAnswer(
         currentCard: Card,
         userAnswer: String
-    ): Boolean {
+    ): AnswerCheck {
         val acceptedDefinitions = buildList {
             add(currentCard.definition)
             addAll(currentCard.definitionVariants)
         }
 
-        return acceptedDefinitions.any { expectedDefinition ->
-            textComparator.compare(
-                expected = expectedDefinition,
-                actual = userAnswer
+        val results = acceptedDefinitions.map { expectedDefinition ->
+            AnswerCheck(
+                expectedAnswer = expectedDefinition,
+                result = textComparator.compareDetailed(
+                    expected = expectedDefinition,
+                    actual = userAnswer
+                )
             )
         }
+
+        return results.maxWithOrNull(answerCheckComparator) ?: AnswerCheck(
+            expectedAnswer = currentCard.definition,
+            result = TextComparisonResult(
+                category = TextComparisonCategory.INCORRECT,
+                isCorrect = false,
+                fuzzyScore = 0f,
+                entailmentScore = 0f,
+                contradictionScore = 0f,
+                neutralScore = 0f
+            )
+        )
     }
 
     // Нажали Пройти тестирование снова
@@ -170,5 +191,27 @@ class TestingModeViewModel @Inject constructor(
             currentCard = cards.first(),
             isEmpty = false
         )
+    }
+
+    private data class AnswerCheck(
+        val expectedAnswer: String,
+        val result: TextComparisonResult
+    )
+
+    private companion object {
+        val answerCheckComparator = compareBy<AnswerCheck>(
+            { it.result.isCorrect },
+            { it.result.category.priority },
+            { it.result.entailmentScore },
+            { it.result.fuzzyScore }
+        )
+
+        val TextComparisonCategory.priority: Int
+            get() = when (this) {
+                TextComparisonCategory.CORRECT -> 3
+                TextComparisonCategory.CORRECT_PARAPHRASE -> 2
+                TextComparisonCategory.SEMANTIC_ERROR -> 1
+                TextComparisonCategory.INCORRECT -> 0
+            }
     }
 }

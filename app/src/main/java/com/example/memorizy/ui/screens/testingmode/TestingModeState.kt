@@ -1,11 +1,14 @@
 package com.example.memorizy.ui.screens.testingmode
 
 import com.example.memorizy.data.source.local.room.entity.Card
+import com.example.memorizy.domain.textcomparison.TextComparisonCategory
 
 // UI может иметь свои собственные модели, разработанные специально для представления состояния интерфейса.
 data class TestAnswer(  // Модель, зависящая от UI
     val card: Card,
     val userAnswer: String,
+    val expectedAnswer: String,
+    val category: TextComparisonCategory,
     val isCorrect: Boolean
 )
 
