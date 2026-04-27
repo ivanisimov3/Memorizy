@@ -1,4 +1,4 @@
-package com.example.memorizy.domain.textcomparison
+package com.example.memorizy.domain.textcomparison.algorithm
 
 interface TextScorer {
 

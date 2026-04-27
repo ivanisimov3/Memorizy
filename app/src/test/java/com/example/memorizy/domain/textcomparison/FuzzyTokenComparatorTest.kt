@@ -2,6 +2,7 @@
 
 package com.example.memorizy.domain.textcomparison
 
+import com.example.memorizy.domain.textcomparison.algorithm.FuzzyTokenComparator
 import org.junit.Assert.*
 import org.junit.Test
 import kotlin.random.Random
@@ -128,6 +129,12 @@ class FuzzyTokenComparatorTest {
                 "процесс,   деления... клетки!!!"
             )
         )
+    }
+
+    @Test
+    fun `дефис и тире считаются разделителями слов а не склеивают их`() {
+        assertTrue(comparator.compare("научно-технический прогресс", "научно технический прогресс"))
+        assertTrue(comparator.compare("какое-то явление", "какое то явление"))
     }
 
     private val comparator = FuzzyTokenComparator()

@@ -1,4 +1,4 @@
-package com.example.memorizy.domain.textcomparison
+package com.example.memorizy.domain.textcomparison.algorithm
 
 import jakarta.inject.Inject
 
@@ -6,7 +6,6 @@ import jakarta.inject.Inject
 
 class FuzzyTokenComparator @Inject constructor() : TextScorer {
 
-    private val threshold: Double = 0.75
     private val stemmer = RussianStemmer()
 
     private data class Token(
@@ -30,7 +29,7 @@ class FuzzyTokenComparator @Inject constructor() : TextScorer {
         for ((actIdx, act) in actualTokens.withIndex()) {
             for ((expIdx, exp) in expectedTokens.withIndex()) {
                 if (expIdx in matchedExpectedIndices) continue
-                
+
                 if (exp.stem == act.stem || exp.raw == act.raw) {
                     totalScore += 1.0
                     matchedExpectedIndices.add(expIdx)
@@ -42,13 +41,13 @@ class FuzzyTokenComparator @Inject constructor() : TextScorer {
 
         // Ищем частичные совпадения
         val partialMatches = mutableListOf<Triple<Int, Int, Double>>() // expIdx, actIdx, score
-        
+
         for ((actIdx, act) in actualTokens.withIndex()) {
             if (actIdx in matchedActualIndices) continue
-            
+
             for ((expIdx, exp) in expectedTokens.withIndex()) {
                 if (expIdx in matchedExpectedIndices) continue
-                
+
                 val score = getTokenSimilarity(exp, act)
                 if (score > 0.0) {
                     partialMatches.add(Triple(expIdx, actIdx, score))
@@ -69,10 +68,6 @@ class FuzzyTokenComparator @Inject constructor() : TextScorer {
 
         val dice = (2.0 * totalScore) / (expectedTokens.size + actualTokens.size).toDouble()
         return dice.toFloat()
-    }
-
-    fun compare(expected: String, actual: String): Boolean {
-        return score(expected, actual) >= threshold
     }
 
     // Вычисляет балл похожести двух токенов от 0.0 до 1.0
@@ -177,8 +172,16 @@ class FuzzyTokenComparator @Inject constructor() : TextScorer {
         return text
             .lowercase()
             .replace('ё', 'е')
-            .replace(Regex("[^a-zа-яa-z0-9\\s]"), "")
+            .replace(Regex("[^\\p{L}\\p{N}\\s]"), " ")
             .replace(Regex("\\s+"), " ")
             .trim()
+    }
+
+    /* ----------------------------------------- */
+
+    // Legacy код для тестирования алгоритмов и вывода Boolean значения уверенности
+    private val threshold: Double = 0.9
+    fun compare(expected: String, actual: String): Boolean {
+        return score(expected, actual) >= threshold
     }
 }
