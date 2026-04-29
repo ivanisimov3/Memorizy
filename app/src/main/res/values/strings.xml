@@ -149,6 +149,8 @@
     <string name="level_distribution_title">Распределение уровней</string>
     <string name="session_progress_title">Прогресс по сессиям</string>
     <string name="statistics_card_details_button">Детализация по карточкам</string>
+    <string name="statistics_tab_general">Общее</string>
+    <string name="statistics_tab_cards">Карточки</string>
     <string name="overall_progress_title">Общий прогресс</string>
     <string name="not_enough_sessions">Для построения графика нужно пройти сессии как минимум в два разных дня</string>
     <string name="learning_label">Заучивание</string>

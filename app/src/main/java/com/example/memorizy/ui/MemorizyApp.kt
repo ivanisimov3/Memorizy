@@ -13,8 +13,6 @@ import com.example.memorizy.ui.screens.addcard.AddCardViewModel
 import com.example.memorizy.ui.screens.addstudyset.AddStudySetScreen
 import com.example.memorizy.ui.screens.addstudyset.AddStudySetViewModel
 import com.example.memorizy.ui.navigation.Routes
-import com.example.memorizy.ui.screens.carddetailsstatistics.CardDetailsStatisticsScreen
-import com.example.memorizy.ui.screens.carddetailsstatistics.CardDetailsStatisticsViewModel
 import com.example.memorizy.ui.screens.auth.AuthScreen
 import com.example.memorizy.ui.screens.auth.AuthViewModel
 import com.example.memorizy.ui.screens.learningmode.LearningModeScreen
@@ -199,22 +197,8 @@ fun MemorizyApp() {
         composable<Routes.Statistics> {
             val viewModel: StatisticsViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsState()
-            val route: Routes.Statistics = it.toRoute()
 
             StatisticsScreen(
-                onBackClick = { navController.popBackStack() },
-                onCardDetailsClick = {
-                    navController.navigate(Routes.CardDetailsStatistics(setId = route.setId))
-                },
-                uiState = uiState
-            )
-        }
-
-        composable<Routes.CardDetailsStatistics> {
-            val viewModel: CardDetailsStatisticsViewModel = hiltViewModel()
-            val uiState by viewModel.uiState.collectAsState()
-
-            CardDetailsStatisticsScreen(
                 onBackClick = { navController.popBackStack() },
                 onSortOptionClicked = viewModel::onSortOptionClicked,
                 uiState = uiState

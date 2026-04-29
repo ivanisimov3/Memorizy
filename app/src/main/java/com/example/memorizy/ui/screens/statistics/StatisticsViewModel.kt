@@ -8,12 +8,14 @@ import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.repository.SessionRepository
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.source.local.room.entity.SessionRecord
+import com.example.memorizy.domain.cardrisk.CardRiskAnalyzer
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.utils.DateUtils.dayKey
 import com.example.memorizy.ui.utils.SESSION_TYPE_LEARNING
 import com.example.memorizy.ui.utils.SESSION_TYPE_TESTING
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -23,22 +25,31 @@ import java.util.SortedMap
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val cardRepository: CardRepository,
-    private val sessionRepository: SessionRepository
+    cardRepository: CardRepository,
+    sessionRepository: SessionRepository
 ) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<Routes.Statistics>()
     private val setId = route.setId
 
+    private val _sortState = MutableStateFlow(
+        StatisticsCardsSortState(
+            option = StatisticsCardsSortOption.LEVEL,
+            isAscending = false
+        )
+    )
+
     val uiState: StateFlow<StatisticsState> = combine(
         cardRepository.getAllCardsForSet(setId),
-        sessionRepository.getSessionsForSet(setId)
-    ) { cards, sessions ->
+        sessionRepository.getSessionsForSet(setId),
+        _sortState
+    ) { cards, sessions, sort ->
         StatisticsState(
             isLoading = false,
             levelDistribution = calculateLevelDistribution(cards),
             isLevelDistributionEmpty = cards.isEmpty(),
-            sessionChartData = calculateSessionChartData(sessions)
+            sessionChartData = calculateSessionChartData(sessions),
+            cardsState = calculateCardsState(cards, sort)
         )
     }.stateIn(
         scope = viewModelScope,
@@ -111,6 +122,70 @@ class StatisticsViewModel @Inject constructor(
     private fun createYAxis(allDays: List<Long>, dataMap: Map<Long, Float>): List<Float> {
         return allDays.mapIndexedNotNull { _, day ->
             dataMap[day]
+        }
+    }
+
+    private fun calculateCardsState(
+        cards: List<Card>,
+        sort: StatisticsCardsSortState
+    ): StatisticsCardsState {
+        val items = cards
+            .map { card ->
+                StatisticsCardItemUi(
+                    id = card.id,
+                    term = card.term,
+                    level = card.level,
+                    risk = CardRiskAnalyzer.calculateRisk(card.level),
+                    nextReviewDate = card.nextReviewDate
+                )
+            }
+            .sortedWith(buildCardComparator(sort))
+
+        return StatisticsCardsState(
+            isLoading = false,
+            cards = items,
+            isEmpty = items.isEmpty(),
+            sortOption = sort.option,
+            isAscending = sort.isAscending
+        )
+    }
+
+    private fun buildCardComparator(
+        sort: StatisticsCardsSortState
+    ): Comparator<StatisticsCardItemUi> {
+        return when (sort.option) {
+            StatisticsCardsSortOption.LEVEL -> {
+                if (sort.isAscending) {
+                    compareBy<StatisticsCardItemUi> { it.level }
+                        .thenBy { it.nextReviewDate }
+                        .thenBy { it.term.lowercase() }
+                } else {
+                    compareByDescending<StatisticsCardItemUi> { it.level }
+                        .thenBy { it.nextReviewDate }
+                        .thenBy { it.term.lowercase() }
+                }
+            }
+
+            StatisticsCardsSortOption.DATE -> {
+                if (sort.isAscending) {
+                    compareBy<StatisticsCardItemUi> { it.nextReviewDate }
+                        .thenByDescending { it.level }
+                        .thenBy { it.term.lowercase() }
+                } else {
+                    compareByDescending<StatisticsCardItemUi> { it.nextReviewDate }
+                        .thenByDescending { it.level }
+                        .thenBy { it.term.lowercase() }
+                }
+            }
+        }
+    }
+
+    fun onSortOptionClicked(option: StatisticsCardsSortOption) {
+        val current = _sortState.value
+        _sortState.value = if (current.option == option) {
+            current.copy(isAscending = !current.isAscending)
+        } else {
+            StatisticsCardsSortState(option = option, isAscending = false)
         }
     }
 }
