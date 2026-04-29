@@ -152,39 +152,29 @@ private fun StatisticsBody(
 
     var selectedTab by rememberSaveable { mutableStateOf(StatisticsTab.General) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                top = paddingValues.calculateTopPadding() + 16.dp,
-                bottom = paddingValues.calculateBottomPadding()
-            )
-    ) {
-        StatisticsTabSelector(
-            selectedTab = selectedTab,
-            onTabSelected = { selectedTab = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        )
+    Crossfade(
+        targetState = selectedTab,
+        label = "statistics_tab_content",
+        modifier = Modifier.fillMaxSize()
+    ) { tab ->
+        when (tab) {
+            StatisticsTab.General -> {
+                StatisticsChartsContent(
+                    paddingValues = paddingValues,
+                    selectedTab = selectedTab,
+                    onTabSelected = { selectedTab = it },
+                    uiState = uiState
+                )
+            }
 
-        Crossfade(
-            targetState = selectedTab,
-            label = "statistics_tab_content",
-            modifier = Modifier.weight(1f)
-        ) { tab ->
-            when (tab) {
-                StatisticsTab.General -> {
-                    StatisticsChartsContent(uiState = uiState)
-                }
-
-                StatisticsTab.Cards -> {
-                    StatisticsCardsContent(
-                        paddingValues = PaddingValues(0.dp),
-                        onSortOptionClicked = onSortOptionClicked,
-                        uiState = uiState.cardsState
-                    )
-                }
+            StatisticsTab.Cards -> {
+                StatisticsCardsContent(
+                    paddingValues = paddingValues,
+                    selectedTab = selectedTab,
+                    onTabSelected = { selectedTab = it },
+                    onSortOptionClicked = onSortOptionClicked,
+                    uiState = uiState.cardsState
+                )
             }
         }
     }
@@ -278,18 +268,28 @@ private fun StatisticsTabItem(
 
 @Composable
 private fun StatisticsChartsContent(
+    paddingValues: PaddingValues,
+    selectedTab: StatisticsTab,
+    onTabSelected: (StatisticsTab) -> Unit,
     uiState: StatisticsState
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
-            top = 16.dp,
-            bottom = 0.dp,
+            top = paddingValues.calculateTopPadding() + 16.dp,
+            bottom = paddingValues.calculateBottomPadding(),
             start = 16.dp,
             end = 16.dp
         ),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        item {
+            StatisticsTabSelector(
+                selectedTab = selectedTab,
+                onTabSelected = onTabSelected,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         item {
             SectionCard(title = stringResource(R.string.level_distribution_title)) {
                 LevelDistributionChart(
@@ -504,50 +504,57 @@ private fun LegendItem(color: Color, label: String) {
 @Composable
 private fun StatisticsCardsContent(
     paddingValues: PaddingValues,
+    selectedTab: StatisticsTab,
+    onTabSelected: (StatisticsTab) -> Unit,
     onSortOptionClicked: (StatisticsCardsSortOption) -> Unit,
     uiState: StatisticsCardsState
 ) {
-    when {
-        uiState.isLoading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            top = paddingValues.calculateTopPadding() + 16.dp,
+            bottom = paddingValues.calculateBottomPadding(),
+            start = 16.dp,
+            end = 16.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            StatisticsTabSelector(
+                selectedTab = selectedTab,
+                onTabSelected = onTabSelected,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
 
-        uiState.isEmpty -> {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        top = paddingValues.calculateTopPadding(),
-                        bottom = paddingValues.calculateBottomPadding(),
-                        start = 16.dp,
-                        end = 16.dp
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.card_details_statistics_empty),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+        when {
+            uiState.isLoading -> {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
-        }
 
-        else -> {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(
-                    top = paddingValues.calculateTopPadding() + 8.dp,
-                    bottom = paddingValues.calculateBottomPadding(),
-                    start = 16.dp,
-                    end = 16.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            uiState.isEmpty -> {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.card_details_statistics_empty),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            else -> {
                 item {
                     SortSection(
                         selectedOption = uiState.sortOption,
