@@ -157,7 +157,10 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
                             remoteId = dto.id,
                             isEdited = false,
                             level = dto.level,
-                            nextReviewDate = dto.nextReviewDate ?: localCard.nextReviewDate
+                            nextReviewDate = dto.nextReviewDate ?: localCard.nextReviewDate,
+                            reviewCount = dto.reviewCount,
+                            mistakeCount = dto.mistakeCount,
+                            recentAnswerHistory = dto.recentAnswerHistory
                         )
                         dao.updateCard(updatedCard)
                     }

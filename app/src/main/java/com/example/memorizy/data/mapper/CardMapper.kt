@@ -13,7 +13,10 @@ fun Card.toDto(parentRemoteId: Long): CardDto {
         studySetId = parentRemoteId,
         createdAt = this.createdAt,
         level = this.level,
-        nextReviewDate = this.nextReviewDate
+        nextReviewDate = this.nextReviewDate,
+        reviewCount = this.reviewCount,
+        mistakeCount = this.mistakeCount,
+        recentAnswerHistory = this.recentAnswerHistory
     )
 }
 
@@ -28,6 +31,9 @@ fun CardDto.toEntity(parentLocalId: Long): Card {
         createdAt = this.createdAt ?: System.currentTimeMillis(),
         remoteId = this.id,
         level = this.level,
-        nextReviewDate = this.nextReviewDate ?: System.currentTimeMillis()
+        nextReviewDate = this.nextReviewDate ?: System.currentTimeMillis(),
+        reviewCount = this.reviewCount,
+        mistakeCount = this.mistakeCount,
+        recentAnswerHistory = this.recentAnswerHistory
     )
 }

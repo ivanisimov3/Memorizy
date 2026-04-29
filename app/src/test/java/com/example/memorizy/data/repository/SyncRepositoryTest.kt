@@ -118,7 +118,15 @@ class SyncRepositoryTest {
         coEvery { cardDao.getCardsToDelete() } returns emptyList()
         coEvery { studySetDao.getSetByIdSimple(1) } returns parentSet
         coEvery {
-            api.createCard("Bearer token", match { it.term == "Первая" })
+            api.createCard(
+                "Bearer token",
+                match {
+                    it.term == "Первая" &&
+                        it.reviewCount == firstCard.reviewCount &&
+                        it.mistakeCount == firstCard.mistakeCount &&
+                        it.recentAnswerHistory == firstCard.recentAnswerHistory
+                }
+            )
         } returns CardDto(
             id = 501,
             term = "Первая",
@@ -127,7 +135,10 @@ class SyncRepositoryTest {
             studySetId = 100,
             createdAt = firstCard.createdAt,
             level = firstCard.level,
-            nextReviewDate = firstCard.nextReviewDate
+            nextReviewDate = firstCard.nextReviewDate,
+            reviewCount = firstCard.reviewCount,
+            mistakeCount = firstCard.mistakeCount,
+            recentAnswerHistory = firstCard.recentAnswerHistory
         )
         coEvery {
             api.createCard("Bearer token", match { it.term == "Вторая" })
@@ -177,6 +188,9 @@ class SyncRepositoryTest {
         definition = "Определение $id",
         remoteId = remoteId,
         level = 1,
-        nextReviewDate = 1_000_000L
+        nextReviewDate = 1_000_000L,
+        reviewCount = 4,
+        mistakeCount = 1,
+        recentAnswerHistory = "1101"
     )
 }

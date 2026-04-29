@@ -13,5 +13,8 @@ data class CardDto (
     val studySetId: Long,
     val createdAt: Long? = null,
     val level: Int = 0,
-    val nextReviewDate: Long? = null
+    val nextReviewDate: Long? = null,
+    val reviewCount: Int = 0,
+    val mistakeCount: Int = 0,
+    val recentAnswerHistory: String = ""
 )
