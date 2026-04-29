@@ -1,5 +1,7 @@
 package com.example.memorizy.ui.screens.setdetails
 
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,12 +39,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -84,20 +88,57 @@ fun SetDetailsScreen(
     onSaveChanges: () -> Unit,
     onLearningModeClick: () -> Unit,
     onTestingModeClick: () -> Unit,
-    onStatisticsClick: () -> Unit
+    onStatisticsClick: () -> Unit,
+    onShareCsvClick: () -> Unit,
+    onExportCsvShared: () -> Unit,
+    onDismissExportCsvError: () -> Unit
 ){
+    val context = LocalContext.current
     var cardToDelete by remember { mutableStateOf<Card?>(null) }
     var showIconDialog by rememberSaveable { mutableStateOf(false) }
+    val exportErrorMessage = stringResource(R.string.export_csv_error)
+    val shareTitle = stringResource(R.string.share_set_csv)
+
+    LaunchedEffect(uiState.exportedCsvFile) {
+        val exportedCsvFile = uiState.exportedCsvFile ?: return@LaunchedEffect
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/csv"
+            putExtra(Intent.EXTRA_STREAM, exportedCsvFile.uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // Даем право читать файл внешнему приложению
+        }
+        val chooserIntent = Intent.createChooser(   // Builds a new ACTION_CHOOSER Intent that wraps the given target intent, also optionally supplying a title.
+            shareIntent,
+            shareTitle
+        ).apply {
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+
+        runCatching {   // Попытка открыть окно Поделиться
+            context.startActivity(chooserIntent)
+        }.onFailure {
+            Toast.makeText(context, exportErrorMessage, Toast.LENGTH_SHORT).show()
+        }
+        onExportCsvShared()
+    }
+
+    LaunchedEffect(uiState.exportCsvError) {
+        if (uiState.exportCsvError != null) {
+            Toast.makeText(context, exportErrorMessage, Toast.LENGTH_SHORT).show()
+            onDismissExportCsvError()
+        }
+    }
 
     Scaffold(
         topBar = {
             SetDetailsTopBar(
                 onBackClick = onBackClick,
-                isEditing = uiState.isEditing,
                 onCancelEditing = onCancelEditing,
                 onSaveChanges = onSaveChanges,
                 onStartEditing = onStartEditing,
-                onStatisticsClick = onStatisticsClick
+                onStatisticsClick = onStatisticsClick,
+                onShareCsvClick = onShareCsvClick,
+                isExportingCsv = uiState.isExportingCsv,
+                isEditing = uiState.isEditing
             )
         },
         floatingActionButton = {
@@ -173,6 +214,8 @@ private fun SetDetailsTopBar(
     onSaveChanges: () -> Unit,
     onStartEditing: () -> Unit,
     onStatisticsClick: () -> Unit,
+    onShareCsvClick: () -> Unit,
+    isExportingCsv: Boolean,
     isEditing: Boolean
 ){
     TopAppBar(
@@ -223,6 +266,15 @@ private fun SetDetailsTopBar(
                     Icon(
                         painter = painterResource(R.drawable.ic_edit),
                         contentDescription = stringResource(R.string.start_edit_mode)
+                    )
+                }
+                IconButton(
+                    onClick = onShareCsvClick,
+                    enabled = !isExportingCsv
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_share),
+                        contentDescription = stringResource(R.string.export_csv)
                     )
                 }
             }

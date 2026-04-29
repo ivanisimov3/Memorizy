@@ -49,8 +49,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
-import com.example.memorizy.domain.importer.model.ParseResult
-import com.example.memorizy.domain.importer.model.ParsedCard
+import com.example.memorizy.domain.data_exchange.importer.model.ParseResult
+import com.example.memorizy.domain.data_exchange.importer.model.ParsedCard
 import com.example.memorizy.ui.utils.GlassContainer
 
 @OptIn(ExperimentalMaterial3Api::class)

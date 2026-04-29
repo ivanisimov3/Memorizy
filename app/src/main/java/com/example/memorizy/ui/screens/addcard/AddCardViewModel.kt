@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.net.Uri
-import com.example.memorizy.domain.importer.usecase.ParseCardsFileUseCase
+import com.example.memorizy.domain.data_exchange.importer.usecase.ParseCardsFileUseCase
 
 @HiltViewModel
 class AddCardViewModel @Inject constructor(

@@ -1,10 +1,10 @@
-package com.example.memorizy.domain.importer.usecase
+package com.example.memorizy.domain.data_exchange.importer.usecase
 
 import android.content.Context
 import android.net.Uri
-import com.example.memorizy.domain.importer.model.CardImportError
-import com.example.memorizy.domain.importer.model.ParseResult
-import com.example.memorizy.domain.importer.model.ParsedCard
+import com.example.memorizy.domain.data_exchange.importer.model.CardImportError
+import com.example.memorizy.domain.data_exchange.importer.model.ParseResult
+import com.example.memorizy.domain.data_exchange.importer.model.ParsedCard
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

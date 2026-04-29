@@ -2,6 +2,7 @@ package com.example.memorizy.ui.screens.setdetails
 
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.source.local.room.entity.StudySet
+import com.example.memorizy.domain.data_exchange.exporter.model.ExportedCsvFile
 
 data class DeadlineUiState(
     val remainingDays: Long,
@@ -17,5 +18,8 @@ data class SetDetailsState(
     val draftCards: List<Card> = emptyList(),
     val overallProgress: Float = 0f,
     val overallProgressPercentage: String = "0 %",
-    val deadline: DeadlineUiState? = null
+    val deadline: DeadlineUiState? = null,
+    val isExportingCsv: Boolean = false,
+    val exportedCsvFile: ExportedCsvFile? = null,
+    val exportCsvError: String? = null
 )

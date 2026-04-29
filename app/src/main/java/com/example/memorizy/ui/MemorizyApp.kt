@@ -139,7 +139,10 @@ fun MemorizyApp() {
                 updateDraftDefinitionVariant = viewModel::updateDraftDefinitionVariant,
                 removeDraftDefinitionVariant = viewModel::removeDraftDefinitionVariant,
                 onCancelEditing = viewModel::onCancelEditing,
-                onSaveChanges = viewModel::onSaveChanges
+                onSaveChanges = viewModel::onSaveChanges,
+                onShareCsvClick = viewModel::onShareCsvClick,
+                onExportCsvShared = viewModel::onExportCsvShared,
+                onDismissExportCsvError = viewModel::onDismissExportCsvError
             )
         }
 

@@ -143,6 +143,9 @@
 
     <string name="statistics_title">Статистика</string>
     <string name="statistics_ic">Иконка статистики</string>
+    <string name="export_csv">Экспорт CSV</string>
+    <string name="share_set_csv">Поделиться набором</string>
+    <string name="export_csv_error">Не удалось подготовить CSV файл</string>
     <string name="level_distribution_title">Распределение уровней</string>
     <string name="session_progress_title">Прогресс по сессиям</string>
     <string name="statistics_card_details_button">Детализация по карточкам</string>

@@ -1,6 +1,6 @@
 package com.example.memorizy.ui.screens.addcard
 
-import com.example.memorizy.domain.importer.model.ParseResult
+import com.example.memorizy.domain.data_exchange.importer.model.ParseResult
 
 data class AddCardState (
     val term: String = "",

@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.repository.StudySetRepository
+import com.example.memorizy.domain.data_exchange.exporter.usecase.ExportCardsCsvUseCase
 import com.example.memorizy.domain.spacedrepetition.SpacedRepetitionScheduler
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.utils.DateUtils
@@ -27,7 +28,8 @@ private const val DEADLINE_REFRESH_INTERVAL_MS = 60_000L
 class SetDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle, // Аргументы навигации
     private val studySetRepository: StudySetRepository,
-    private val cardRepository: CardRepository
+    private val cardRepository: CardRepository,
+    private val exportCardsCsvUseCase: ExportCardsCsvUseCase
 ) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<Routes.SetDetails>()
@@ -261,6 +263,54 @@ class SetDetailsViewModel @Inject constructor(
                     cardRepository.updateCard(recalculated)
                 }
             }
+        }
+    }
+
+    fun onShareCsvClick() {
+        val state = _uiState.value
+        val studySet = state.studySet ?: return
+
+        if (state.isExportingCsv) return
+
+        _uiState.update {
+            it.copy(
+                isExportingCsv = true,
+                exportCsvError = null
+            )
+        }
+
+        viewModelScope.launch {
+            try {
+                val exportedFile = exportCardsCsvUseCase(
+                    studySet = studySet,
+                    cards = state.cards
+                )
+                _uiState.update {
+                    it.copy(
+                        isExportingCsv = false,
+                        exportedCsvFile = exportedFile
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isExportingCsv = false,
+                        exportCsvError = e.message
+                    )
+                }
+            }
+        }
+    }
+
+    fun onExportCsvShared() {
+        _uiState.update {
+            it.copy(exportedCsvFile = null)
+        }
+    }
+
+    fun onDismissExportCsvError() {
+        _uiState.update {
+            it.copy(exportCsvError = null)
         }
     }
 

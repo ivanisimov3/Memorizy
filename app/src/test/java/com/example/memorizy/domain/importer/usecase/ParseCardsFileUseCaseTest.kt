@@ -5,7 +5,8 @@ package com.example.memorizy.domain.importer.usecase
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
-import com.example.memorizy.domain.importer.model.ParsedCard
+import com.example.memorizy.domain.data_exchange.importer.model.ParsedCard
+import com.example.memorizy.domain.data_exchange.importer.usecase.ParseCardsFileUseCase
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
