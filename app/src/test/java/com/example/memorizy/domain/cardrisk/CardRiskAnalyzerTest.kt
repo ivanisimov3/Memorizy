@@ -9,54 +9,44 @@ import org.junit.Test
 class CardRiskAnalyzerTest {
 
     @Test
-    fun `границы диапазонов риска обрабатываются корректно`() {
-        assertEquals(CardRisk.HIGH, CardRiskAnalyzer.calculateRisk(2))
-        assertEquals(CardRisk.MEDIUM, CardRiskAnalyzer.calculateRisk(3))
-        assertEquals(CardRisk.MEDIUM, CardRiskAnalyzer.calculateRisk(5))
-        assertEquals(CardRisk.LOW, CardRiskAnalyzer.calculateRisk(6))
+    fun `новая карточка без истории имеет низкое знание`() {
+        assertEquals(CardRisk.HIGH, CardRiskAnalyzer.calculateRisk(level = 0, recentAnswerHistory = ""))
     }
 
     @Test
-    fun `уровни 0 и 2 относятся к высокому риску`() {
-        assertEquals(CardRisk.HIGH, CardRiskAnalyzer.calculateRisk(0))
-        assertEquals(CardRisk.HIGH, CardRiskAnalyzer.calculateRisk(2))
+    fun `пять правильных ответов и максимальный уровень дают высокое знание`() {
+        assertEquals(CardRisk.LOW, CardRiskAnalyzer.calculateRisk(level = 7, recentAnswerHistory = "11111"))
     }
 
     @Test
-    fun `уровни 3 и 5 относятся к среднему риску`() {
-        assertEquals(CardRisk.MEDIUM, CardRiskAnalyzer.calculateRisk(3))
-        assertEquals(CardRisk.MEDIUM, CardRiskAnalyzer.calculateRisk(5))
+    fun `уровень 5 и пять правильных ответов дают среднее знание при пороге 90`() {
+        assertEquals(CardRisk.MEDIUM, CardRiskAnalyzer.calculateRisk(level = 5, recentAnswerHistory = "11111"))
     }
 
     @Test
-    fun `уровни 6 и 7 относятся к низкому риску`() {
-        assertEquals(CardRisk.LOW, CardRiskAnalyzer.calculateRisk(6))
-        assertEquals(CardRisk.LOW, CardRiskAnalyzer.calculateRisk(7))
+    fun `меньше пяти ответов искусственно занижают стабильность`() {
+        val score = CardRiskAnalyzer.calculateKnowledgeScore(level = 5, recentAnswerHistory = "111")
+
+        assertEquals(0.645f, score, 0.001f)
+        assertEquals(CardRisk.MEDIUM, CardRiskAnalyzer.calculateRisk(level = 5, recentAnswerHistory = "111"))
     }
 
     @Test
-    fun `все уровни от 0 до 7 попадают в ожидаемые категории`() {
-        val expected = listOf(
-            CardRisk.HIGH,
-            CardRisk.HIGH,
-            CardRisk.HIGH,
-            CardRisk.MEDIUM,
-            CardRisk.MEDIUM,
-            CardRisk.MEDIUM,
-            CardRisk.LOW,
-            CardRisk.LOW
-        )
+    fun `последние пять ответов важнее старой истории`() {
+        val score = CardRiskAnalyzer.calculateKnowledgeScore(level = 7, recentAnswerHistory = "0000011111")
 
-        val actual = (0..7).map { level ->
-            CardRiskAnalyzer.calculateRisk(level)
-        }
-
-        assertEquals(expected, actual)
+        assertEquals(1.0f, score, 0.001f)
+        assertEquals(CardRisk.LOW, CardRiskAnalyzer.calculateRisk(level = 7, recentAnswerHistory = "0000011111"))
     }
 
     @Test
-    fun `некорректные уровни сейчас трактуются как низкий риск`() {
-        assertEquals(CardRisk.LOW, CardRiskAnalyzer.calculateRisk(-1))
-        assertEquals(CardRisk.LOW, CardRiskAnalyzer.calculateRisk(999))
+    fun `ошибка после максимального уровня переводит знание в низкую категорию`() {
+        assertEquals(CardRisk.HIGH, CardRiskAnalyzer.calculateRisk(level = 0, recentAnswerHistory = "11110"))
+    }
+
+    @Test
+    fun `некорректный уровень ограничивается допустимым диапазоном`() {
+        assertEquals(CardRisk.HIGH, CardRiskAnalyzer.calculateRisk(level = -1, recentAnswerHistory = ""))
+        assertEquals(CardRisk.LOW, CardRiskAnalyzer.calculateRisk(level = 999, recentAnswerHistory = "11111"))
     }
 }

@@ -1,7 +1,6 @@
 package com.example.memorizy.ui.screens.statistics
 
 import com.example.memorizy.data.source.local.room.entity.SessionRecord
-import com.example.memorizy.domain.cardrisk.CardRiskAnalyzer.CardRisk
 
 enum class StatisticsCardsSortOption {
     LEVEL,
@@ -12,8 +11,10 @@ data class StatisticsCardItemUi(
     val id: Long,
     val term: String,
     val level: Int,
-    val risk: CardRisk,
-    val nextReviewDate: Long
+    val knowledgePercent: Int,
+    val nextReviewDate: Long,
+    val reviewCount: Int,
+    val mistakeCount: Int
 )
 
 data class StatisticsCardsSortState(

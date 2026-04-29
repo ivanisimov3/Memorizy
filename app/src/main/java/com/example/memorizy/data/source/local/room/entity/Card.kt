@@ -30,5 +30,8 @@ data class Card(
     val isDeleted: Boolean = false,
     val isEdited: Boolean = false,
     val level: Int = 0,
-    val nextReviewDate: Long = System.currentTimeMillis()
+    val nextReviewDate: Long = System.currentTimeMillis(),
+    val reviewCount: Int = 0,
+    val mistakeCount: Int = 0,
+    val recentAnswerHistory: String = ""
 )

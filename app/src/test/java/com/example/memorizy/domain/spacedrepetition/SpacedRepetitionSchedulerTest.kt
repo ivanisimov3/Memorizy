@@ -81,6 +81,38 @@ class SpacedRepetitionSchedulerTest {
     }
 
     @Test
+    fun `ответ обновляет счетчики и историю последних ответов`() {
+        val original = card(
+            level = 2,
+            reviewCount = 8,
+            mistakeCount = 2,
+            recentAnswerHistory = "1010"
+        )
+
+        val result = SpacedRepetitionScheduler.processAnswer(
+            card = original, isCorrect = true, now = NOW, targetDate = null
+        )
+
+        assertEquals(9, result.reviewCount)
+        assertEquals(2, result.mistakeCount)
+        assertEquals("10101", result.recentAnswerHistory)
+    }
+
+    @Test
+    fun `история последних ответов хранит только пять последних значений`() {
+        val original = card(
+            level = 2,
+            recentAnswerHistory = "01010"
+        )
+
+        val result = SpacedRepetitionScheduler.processAnswer(
+            card = original, isCorrect = true, now = NOW, targetDate = null
+        )
+
+        assertEquals("10101", result.recentAnswerHistory)
+    }
+
+    @Test
     fun `интервал уровня 0 без дедлайна равен MIN_INTERVAL`() { // BASE_INTERVALS[0] = 0, но coerceAtLeast(MIN_INTERVAL) = 30 минут
         val interval = SpacedRepetitionScheduler.calculateInterval(
             level = 0, now = NOW, targetDate = null
@@ -363,11 +395,18 @@ class SpacedRepetitionSchedulerTest {
 
     private fun card(
         level: Int = 0,
-        nextReviewDate: Long = NOW
+        nextReviewDate: Long = NOW,
+        reviewCount: Int = 0,
+        mistakeCount: Int = 0,
+        recentAnswerHistory: String = ""
     ) = Card(
         id = 1, setId = 1,
         term = "test", definition = "тест",
-        level = level, nextReviewDate = nextReviewDate
+        level = level,
+        nextReviewDate = nextReviewDate,
+        reviewCount = reviewCount,
+        mistakeCount = mistakeCount,
+        recentAnswerHistory = recentAnswerHistory
     )
 
     private val DAY_MS = 86_400_000L

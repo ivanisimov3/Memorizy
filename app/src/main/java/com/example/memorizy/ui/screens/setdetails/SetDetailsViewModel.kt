@@ -237,7 +237,10 @@ class SetDetailsViewModel @Inject constructor(
                     normalizedDraftCard.copy(
                         isEdited = true,
                         level = 0,
-                        nextReviewDate = System.currentTimeMillis()
+                        nextReviewDate = System.currentTimeMillis(),
+                        reviewCount = 0,
+                        mistakeCount = 0,
+                        recentAnswerHistory = ""
                     )
                 } else {
                     normalizedDraftCard.copy(isEdited = true)
@@ -266,6 +269,7 @@ class SetDetailsViewModel @Inject constructor(
         }
     }
 
+    // Нажали Экспортировать
     fun onShareCsvClick() {
         val state = _uiState.value
         val studySet = state.studySet ?: return
@@ -302,12 +306,14 @@ class SetDetailsViewModel @Inject constructor(
         }
     }
 
+    // Подтвердили экспорт
     fun onExportCsvShared() {
         _uiState.update {
             it.copy(exportedCsvFile = null)
         }
     }
 
+    // Убрать окно ошибки экспорта
     fun onDismissExportCsvError() {
         _uiState.update {
             it.copy(exportCsvError = null)

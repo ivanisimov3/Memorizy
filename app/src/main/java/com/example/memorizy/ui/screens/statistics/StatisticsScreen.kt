@@ -30,6 +30,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -56,7 +57,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
-import com.example.memorizy.domain.cardrisk.CardRiskAnalyzer.CardRisk
 import com.example.memorizy.ui.utils.DateUtils
 import com.example.memorizy.ui.utils.GlassContainer
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
@@ -660,7 +660,8 @@ private fun SortAction(
 private fun CardRiskItem(
     card: StatisticsCardItemUi
 ) {
-    val riskColor = riskColor(card.risk)
+    val progress = card.knowledgePercent / 100f
+    val progressColor = masteryColor(card.knowledgePercent)
 
     GlassContainer(
         modifier = Modifier.fillMaxWidth(),
@@ -671,61 +672,93 @@ private fun CardRiskItem(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(
-                text = card.term,
-                style = MaterialTheme.typography.displayMedium,
-                color = MaterialTheme.colorScheme.primary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp),
+                gapSize = (-15).dp,
+                drawStopIndicator = {},
+                color = progressColor
             )
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.card_level_value, card.level),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
+                    text = card.term,
+                    style = MaterialTheme.typography.displayMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-                Text(
-                    text = stringResource(R.string.card_risk_value, riskLabel(card.risk)),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = riskColor
-                )
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            Column{
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(
+                            R.string.card_level_value,
+                            card.level,
+                            card.reviewCount,
+                            card.mistakeCount
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = stringResource(
+                            R.string.card_tries_summary,
+                            card.reviewCount,
+                            card.mistakeCount
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
 
             Spacer(Modifier.height(6.dp))
 
-            Text(
-                text = stringResource(
-                    R.string.card_next_review_value,
-                    DateUtils.formatFullDateTime(card.nextReviewDate)
-                ),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(
+                    text = stringResource(
+                        R.string.card_next_review_value,
+                        DateUtils.formatFullDateTime(card.nextReviewDate)
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = DateUtils.formatFullDateTime(card.nextReviewDate),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun riskLabel(risk: CardRisk): String {
-    return when (risk) {
-        CardRisk.HIGH -> stringResource(R.string.card_knowledge_low)
-        CardRisk.MEDIUM -> stringResource(R.string.card_knowledge_medium)
-        CardRisk.LOW -> stringResource(R.string.card_knowledge_high)
-    }
-}
-
-@Composable
-private fun riskColor(risk: CardRisk): Color {
-    return when (risk) {
-        CardRisk.HIGH -> MaterialTheme.colorScheme.error
-        CardRisk.MEDIUM -> MaterialTheme.colorScheme.secondary
-        CardRisk.LOW -> MaterialTheme.colorScheme.primary
+private fun masteryColor(percent: Int): Color {
+    return when {
+        percent < 50 -> MaterialTheme.colorScheme.error
+        percent < 90 -> MaterialTheme.colorScheme.secondary
+        else -> MaterialTheme.colorScheme.primary
     }
 }

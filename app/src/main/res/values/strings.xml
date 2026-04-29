@@ -164,11 +164,13 @@
     <string name="card_sort_level">Уровень</string>
     <string name="card_sort_date">Дата</string>
     <string name="card_level_value">Уровень: %1$d</string>
-    <string name="card_risk_value">Знание: %1$s</string>
-    <string name="card_next_review_value">Следующее повторение: %1$s</string>
-    <string name="card_knowledge_low">Низкое</string>
-    <string name="card_knowledge_medium">Среднее</string>
-    <string name="card_knowledge_high">Высокое</string>
+    <string name="card_risk_value">%1$s</string>
+    <string name="card_mastery_percent">%1$d%%</string>
+    <string name="card_tries_summary">%1$d ответов / %2$d ошибок</string>
+    <string name="card_review_count_value">Ответов: %1$d</string>
+    <string name="card_mistake_count_value">Ошибок: %1$d</string>
+    <string name="card_next_review_value">Следующее повторение:</string>
+    <string name="card_next_review_short_value">Следующее: %1$s</string>
     <string name="sort_descending">Сортировать по убыванию</string>
     <string name="sort_ascending">Сортировать по возрастанию</string>
 

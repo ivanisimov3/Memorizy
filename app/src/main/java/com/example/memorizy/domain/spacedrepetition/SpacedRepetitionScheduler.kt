@@ -54,16 +54,34 @@ object SpacedRepetitionScheduler {
 
     // Обрабатываем ответ пользователя и возвращаем обновлённую карточку.
     fun processAnswer(card: Card, isCorrect: Boolean, now: Long, targetDate: Long?): Card {
+        val reviewCount = card.reviewCount + 1
+        val mistakeCount = card.mistakeCount + if (isCorrect) 0 else 1
+        val recentAnswerHistory = appendRecentAnswer(card.recentAnswerHistory, isCorrect)
+
         return if (isCorrect) {
             val newLevel = (card.level + 1).coerceAtMost(MAX_LEVEL)
             val interval = calculateInterval(newLevel, now, targetDate)
-            card.copy(level = newLevel, nextReviewDate = now + interval)
+            card.copy(
+                level = newLevel,
+                nextReviewDate = now + interval,
+                reviewCount = reviewCount,
+                mistakeCount = mistakeCount,
+                recentAnswerHistory = recentAnswerHistory
+            )
         } else {
             card.copy(
                 level = 0,
-                nextReviewDate = now + MIN_INTERVAL
+                nextReviewDate = now + MIN_INTERVAL,
+                reviewCount = reviewCount,
+                mistakeCount = mistakeCount,
+                recentAnswerHistory = recentAnswerHistory
             )
         }
+    }
+
+    private fun appendRecentAnswer(history: String, isCorrect: Boolean): String {
+        val answer = if (isCorrect) "1" else "0"
+        return (history.filter { it == '0' || it == '1' } + answer).takeLast(5)
     }
 
     // Возвращаем карточки, которые пора повторять

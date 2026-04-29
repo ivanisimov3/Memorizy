@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import java.util.SortedMap
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
@@ -135,8 +136,13 @@ class StatisticsViewModel @Inject constructor(
                     id = card.id,
                     term = card.term,
                     level = card.level,
-                    risk = CardRiskAnalyzer.calculateRisk(card.level),
-                    nextReviewDate = card.nextReviewDate
+                    knowledgePercent = (CardRiskAnalyzer.calculateKnowledgeScore(
+                        level = card.level,
+                        recentAnswerHistory = card.recentAnswerHistory
+                    ) * 100).roundToInt().coerceIn(0, 100),
+                    nextReviewDate = card.nextReviewDate,
+                    reviewCount = card.reviewCount,
+                    mistakeCount = card.mistakeCount
                 )
             }
             .sortedWith(buildCardComparator(sort))
