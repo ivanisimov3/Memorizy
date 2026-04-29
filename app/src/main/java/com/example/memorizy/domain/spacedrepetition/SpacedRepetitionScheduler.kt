@@ -8,7 +8,7 @@ import com.example.memorizy.data.source.local.room.entity.Card
  * Принцип работы:
  * - Каждая карточка имеет уровень (level 0..7)
  * - Правильный ответ → level + 1
- * - Неправильный ответ → level - 1
+ * - Неправильный ответ → сброс к level 0
  * - Если набор имеет дедлайн (targetDate), интервалы пропорционально сжимаются
  */
 
@@ -17,6 +17,7 @@ object SpacedRepetitionScheduler {
     private const val MINUTE_MS = 60_000L
     private const val DAY_MS = 86_400_000L
     private const val MIN_INTERVAL = 30 * MINUTE_MS
+    private const val DEADLINE_BUFFER = DAY_MS
     const val MAX_LEVEL = 7
 
     // Базовые интервалы для каждого уровня
@@ -39,7 +40,7 @@ object SpacedRepetitionScheduler {
         // Стандартный режим
         if (targetDate == null) return maxOf(baseInterval, MIN_INTERVAL)
 
-        val remainingTime = targetDate - now
+        val remainingTime = targetDate - now - DEADLINE_BUFFER
         if (remainingTime <= 0) return MIN_INTERVAL
 
         // Сумма всех дней от текущего уровня до максимального при стандартном режиме
@@ -48,7 +49,7 @@ object SpacedRepetitionScheduler {
 
         // Высчитываем срок для следующей сессии заучивания
         val compressed = (remainingTime * (baseInterval.toDouble() / remainingSum)).toLong()
-        return compressed.coerceAtLeast(MIN_INTERVAL)
+        return compressed.coerceIn(MIN_INTERVAL, maxOf(baseInterval, MIN_INTERVAL))
     }
 
     // Обрабатываем ответ пользователя и возвращаем обновлённую карточку.
@@ -58,11 +59,9 @@ object SpacedRepetitionScheduler {
             val interval = calculateInterval(newLevel, now, targetDate)
             card.copy(level = newLevel, nextReviewDate = now + interval)
         } else {
-            val newLevel = (card.level - 1).coerceAtLeast(0)
-            val halfInterval = calculateInterval(newLevel, now, targetDate) / 2 // Делим на 2 интервал как штраф
             card.copy(
-                level = newLevel,
-                nextReviewDate = now + halfInterval.coerceAtLeast(MIN_INTERVAL)
+                level = 0,
+                nextReviewDate = now + MIN_INTERVAL
             )
         }
     }

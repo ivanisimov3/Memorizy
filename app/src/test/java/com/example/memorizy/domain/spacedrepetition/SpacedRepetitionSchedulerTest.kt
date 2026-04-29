@@ -18,12 +18,12 @@ class SpacedRepetitionSchedulerTest {
     }
 
     @Test
-    fun `неправильный ответ понижает уровень на 1`() {
+    fun `неправильный ответ сбрасывает уровень до 0`() {
         val original = card(level = 3)
         val result = SpacedRepetitionScheduler.processAnswer(
             card = original, isCorrect = false, now = NOW, targetDate = null
         )
-        assertEquals(2, result.level)
+        assertEquals(0, result.level)
     }
 
     @Test
@@ -69,17 +69,15 @@ class SpacedRepetitionSchedulerTest {
     }
 
     @Test
-    fun `неправильный ответ использует половину интервала как штраф`() {
+    fun `неправильный ответ назначает минимальный интервал`() {
         val original = card(level = 4)
         val result = SpacedRepetitionScheduler.processAnswer(
             card = original, isCorrect = false, now = NOW, targetDate = null
         )
 
-        val expectedLevel3Interval = 7 * DAY_MS
-        val expectedHalf = expectedLevel3Interval / 2
         val actualInterval = result.nextReviewDate - NOW
 
-        assertEquals(expectedHalf, actualInterval)
+        assertEquals(MIN_INTERVAL, actualInterval)
     }
 
     @Test
@@ -131,6 +129,26 @@ class SpacedRepetitionSchedulerTest {
                 "должен быть меньше, чем при далёком ($intervalFar)",
             intervalClose < intervalFar
         )
+    }
+
+    @Test
+    fun `дальний дедлайн не увеличивает интервал выше базового`() {
+        val farDeadline = NOW + 365 * DAY_MS
+        val interval = SpacedRepetitionScheduler.calculateInterval(
+            level = 3, now = NOW, targetDate = farDeadline
+        )
+
+        assertEquals(7 * DAY_MS, interval)
+    }
+
+    @Test
+    fun `дедлайн учитывает буфер в 1 день`() {
+        val deadline = NOW + 1 * DAY_MS
+        val interval = SpacedRepetitionScheduler.calculateInterval(
+            level = 3, now = NOW, targetDate = deadline
+        )
+
+        assertEquals(MIN_INTERVAL, interval)
     }
 
     @Test
@@ -275,7 +293,7 @@ class SpacedRepetitionSchedulerTest {
     }
 
     @Test
-    fun `повторные неправильные ответы подряд последовательно понижают уровень`() {
+    fun `повторные неправильные ответы подряд оставляют карточку на минимальном уровне`() {
         val firstStep = SpacedRepetitionScheduler.processAnswer(
             card = card(level = 4),
             isCorrect = false,
@@ -289,10 +307,10 @@ class SpacedRepetitionSchedulerTest {
             targetDate = null
         )
 
-        assertEquals(3, firstStep.level)
-        assertEquals(2, secondStep.level)
-        assertEquals((7 * DAY_MS) / 2, firstStep.nextReviewDate - NOW)
-        assertEquals((3 * DAY_MS) / 2, secondStep.nextReviewDate - firstStep.nextReviewDate)
+        assertEquals(0, firstStep.level)
+        assertEquals(0, secondStep.level)
+        assertEquals(MIN_INTERVAL, firstStep.nextReviewDate - NOW)
+        assertEquals(MIN_INTERVAL, secondStep.nextReviewDate - firstStep.nextReviewDate)
     }
 
     @Test
@@ -310,7 +328,7 @@ class SpacedRepetitionSchedulerTest {
     }
 
     @Test
-    fun `карточка максимального уровня при ошибке понижается и получает новый интервал`() {
+    fun `карточка максимального уровня при ошибке сбрасывается и получает минимальный интервал`() {
         val result = SpacedRepetitionScheduler.processAnswer(
             card = card(level = SpacedRepetitionScheduler.MAX_LEVEL),
             isCorrect = false,
@@ -318,8 +336,8 @@ class SpacedRepetitionSchedulerTest {
             targetDate = null
         )
 
-        assertEquals(SpacedRepetitionScheduler.MAX_LEVEL - 1, result.level)
-        assertEquals((90 * DAY_MS) / 2, result.nextReviewDate - NOW)
+        assertEquals(0, result.level)
+        assertEquals(MIN_INTERVAL, result.nextReviewDate - NOW)
     }
 
     @Test
