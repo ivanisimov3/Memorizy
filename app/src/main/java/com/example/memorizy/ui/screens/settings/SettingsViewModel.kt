@@ -74,7 +74,7 @@ class SettingsViewModel @Inject constructor(
             }
 
             val syncResult = runCatching {
-                syncCoordinator.syncAll()
+                syncCoordinator.uploadLocalChanges()
             }
 
             if (syncResult.isSuccess) {

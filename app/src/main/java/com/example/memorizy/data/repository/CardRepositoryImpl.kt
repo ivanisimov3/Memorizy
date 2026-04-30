@@ -77,15 +77,20 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
 
                 val syncedCard = localCard.copy(
                     remoteId = remoteDto.id,
-                    createdAt = remoteDto.createdAt ?: localCard.createdAt
+                    createdAt = remoteDto.createdAt ?: localCard.createdAt,
+                    isEdited = false
                 )
                 cardDao.updateCard(syncedCard)
             } catch (e: Exception) {
-                handleSyncException(
-                    exception = e,
-                    contextMessage = "Не удалось синхронизировать новую карточку id=${localCard.id}"
-                )
-                shouldRetry = true
+                if (e.isNotFoundError()) {
+                    parentSet?.let { studySetDao.deleteSet(it) }
+                } else {
+                    handleSyncException(
+                        exception = e,
+                        contextMessage = "Не удалось синхронизировать новую карточку id=${localCard.id}"
+                    )
+                    shouldRetry = true
+                }
             }
         }
 
@@ -107,11 +112,15 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
                 )
                 cardDao.updateCard(syncedCard)
             } catch (e: Exception) {
-                handleSyncException(
-                    exception = e,
-                    contextMessage = "Не удалось синхронизировать измененную карточку id=${localCard.id}"
-                )
-                shouldRetry = true
+                if (e.isNotFoundError()) {
+                    cardDao.deleteCard(localCard)
+                } else {
+                    handleSyncException(
+                        exception = e,
+                        contextMessage = "Не удалось синхронизировать измененную карточку id=${localCard.id}"
+                    )
+                    shouldRetry = true
+                }
             }
         }
 
@@ -122,11 +131,15 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
 
                 cardDao.deleteCard(localCard)
             } catch (e: Exception) {
-                handleSyncException(
-                    exception = e,
-                    contextMessage = "Не удалось удалить карточку на сервере id=${localCard.id}"
-                )
-                shouldRetry = true
+                if (e.isNotFoundError()) {
+                    cardDao.deleteCard(localCard)
+                } else {
+                    handleSyncException(
+                        exception = e,
+                        contextMessage = "Не удалось удалить карточку на сервере id=${localCard.id}"
+                    )
+                    shouldRetry = true
+                }
             }
         }
 
@@ -213,5 +226,9 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
 
     private fun Exception.isAuthError(): Boolean {
         return this is HttpException && (code() == 401 || code() == 403)
+    }
+
+    private fun Exception.isNotFoundError(): Boolean {
+        return this is HttpException && code() == 404
     }
 }

@@ -8,6 +8,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.example.memorizy.workers.SyncWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -23,12 +24,13 @@ class SyncManager @Inject constructor(
 ) {
     companion object {
         private const val ONE_TIME_SYNC_WORK_NAME = "OneTimeSync"
-        private const val DAILY_SYNC_WORK_NAME = "DailySync"
+        private const val DAILY_UPLOAD_WORK_NAME = "DailyUploadSync"
     }
 
     fun scheduleOneTimeSync() {
         val request = OneTimeWorkRequestBuilder<SyncWorker>()   // WorkRequest
             .setConstraints(syncConstraints())
+            .setInputData(workDataOf(SyncWorker.KEY_SYNC_MODE to SyncMode.FULL.name))
             .build()
 
         WorkManager.getInstance(context).enqueueUniqueWork( // WorkManager
@@ -44,10 +46,11 @@ class SyncManager @Inject constructor(
             TimeUnit.HOURS
         )
             .setConstraints(syncConstraints())
+            .setInputData(workDataOf(SyncWorker.KEY_SYNC_MODE to SyncMode.UPLOAD_ONLY.name))
             .build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            DAILY_SYNC_WORK_NAME,
+            DAILY_UPLOAD_WORK_NAME,
             ExistingPeriodicWorkPolicy.KEEP,
             request
         )

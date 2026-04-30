@@ -7,6 +7,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.memorizy.data.sync.SyncAuthException
 import com.example.memorizy.data.sync.SyncCoordinator
+import com.example.memorizy.data.sync.SyncMode
 import com.example.memorizy.data.sync.SyncRetryException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -31,13 +32,17 @@ class SyncWorker @AssistedInject constructor(
 ) : CoroutineWorker(ctx , params) {
 
     companion object {
+        const val KEY_SYNC_MODE = "sync_mode"
         private const val TAG = "SyncWorker"
     }
 
-    // Метод, где код работы, воспроизввдимой на заднем плане
+    // Метод, где код работы, воспроизводимой на заднем плане
     override suspend fun doWork(): Result {
         return try {
-            syncCoordinator.syncAll()
+            when (resolveSyncMode()) {
+                SyncMode.UPLOAD_ONLY -> syncCoordinator.uploadLocalChanges()
+                SyncMode.FULL -> syncCoordinator.syncAll()
+            }
 
             Result.success()
         } catch (e: SyncAuthException) {
@@ -50,6 +55,13 @@ class SyncWorker @AssistedInject constructor(
             Log.e(TAG, "Неожиданная ошибка синхронизации", e)
 
             Result.retry()  // Должна быть попытка повторить работу
+        }
+    }
+
+    private fun resolveSyncMode(): SyncMode {
+        return when (inputData.getString(KEY_SYNC_MODE)) {
+            SyncMode.UPLOAD_ONLY.name -> SyncMode.UPLOAD_ONLY
+            else -> SyncMode.FULL
         }
     }
 }

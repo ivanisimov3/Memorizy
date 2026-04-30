@@ -66,7 +66,8 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
 
                 val syncedSet = localSet.copy(
                     remoteId = remoteDto.id,
-                    createdAt = remoteDto.createdAt ?: localSet.createdAt
+                    createdAt = remoteDto.createdAt ?: localSet.createdAt,
+                    isEdited = false
                 )
                 dao.updateSet(syncedSet)
             } catch (e: Exception) {
@@ -93,11 +94,15 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
                 )
                 dao.updateSet(syncedSet)
             } catch (e: Exception) {
-                handleSyncException(
-                    exception = e,
-                    contextMessage = "Не удалось синхронизировать измененный набор id=${localSet.id}"
-                )
-                shouldRetry = true
+                if (e.isNotFoundError()) {
+                    dao.deleteSet(localSet)
+                } else {
+                    handleSyncException(
+                        exception = e,
+                        contextMessage = "Не удалось синхронизировать измененный набор id=${localSet.id}"
+                    )
+                    shouldRetry = true
+                }
             }
         }
 
@@ -108,11 +113,15 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
 
                 dao.deleteSet(localSet)
             } catch (e: Exception) {
-                handleSyncException(
-                    exception = e,
-                    contextMessage = "Не удалось удалить набор на сервере id=${localSet.id}"
-                )
-                shouldRetry = true
+                if (e.isNotFoundError()) {
+                    dao.deleteSet(localSet)
+                } else {
+                    handleSyncException(
+                        exception = e,
+                        contextMessage = "Не удалось удалить набор на сервере id=${localSet.id}"
+                    )
+                    shouldRetry = true
+                }
             }
         }
 
@@ -157,8 +166,6 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
                 if (localSet.remoteId!! !in remoteIds)
                     dao.deleteSet(localSet)
             }
-
-            settingsRepository.updateLastSyncTime()
         } catch (e: Exception) {
             handleSyncException(
                 exception = e,
@@ -186,5 +193,9 @@ class StudySetRepositoryImpl @Inject constructor(   // Inject позволяет
 
     private fun Exception.isAuthError(): Boolean {
         return this is HttpException && (code() == 401 || code() == 403)
+    }
+
+    private fun Exception.isNotFoundError(): Boolean {
+        return this is HttpException && code() == 404
     }
 }

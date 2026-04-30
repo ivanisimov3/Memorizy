@@ -57,11 +57,15 @@ class SessionRepositoryImpl @Inject constructor(
                 )
                 sessionRecordDao.updateRecord(syncedRecord)
             } catch (e: Exception) {
-                handleSyncException(
-                    exception = e,
-                    contextMessage = "Не удалось синхронизировать запись сессии id=${localRecord.id}"
-                )
-                shouldRetry = true
+                if (e.isNotFoundError()) {
+                    parentSet?.let { studySetDao.deleteSet(it) }
+                } else {
+                    handleSyncException(
+                        exception = e,
+                        contextMessage = "Не удалось синхронизировать запись сессии id=${localRecord.id}"
+                    )
+                    shouldRetry = true
+                }
             }
         }
 
@@ -123,5 +127,9 @@ class SessionRepositoryImpl @Inject constructor(
 
     private fun Exception.isAuthError(): Boolean {
         return this is HttpException && (code() == 401 || code() == 403)
+    }
+
+    private fun Exception.isNotFoundError(): Boolean {
+        return this is HttpException && code() == 404
     }
 }
