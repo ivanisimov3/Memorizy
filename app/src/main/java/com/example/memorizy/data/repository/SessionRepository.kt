@@ -10,4 +10,8 @@ interface SessionRepository {
     suspend fun saveSession(record: SessionRecord)
 
     fun getSessionsForSet(setId: Long): Flow<List<SessionRecord>>
+
+    suspend fun syncLocalChanges()
+
+    suspend fun fetchRemoteChanges()
 }

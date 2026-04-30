@@ -16,8 +16,8 @@ import javax.inject.Inject
 
 // Реализация репозитория карточка
 
-class CardRepositoryImpl @Inject constructor(   // Inject позволяет связать создание этого репозитория с dao
-    private val dao: CardDao,
+class CardRepositoryImpl @Inject constructor(   // Inject позволяет связать создание этого репозитория с cardDao
+    private val cardDao: CardDao,
     private val studySetDao: StudySetDao,
     private val api: MemorizyApiService,
     private val settingsRepository: SettingsRepository
@@ -28,35 +28,35 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
     }
 
     override suspend fun insertCard(card: Card) {
-        return dao.insertCard(card)
+        return cardDao.insertCard(card)
     }
 
     override suspend fun insertCards(cards: List<Card>) {
-        dao.insertCards(cards)
+        cardDao.insertCards(cards)
     }
 
     override suspend fun updateCard(card: Card) {
-        return dao.updateCard(card)
+        return cardDao.updateCard(card)
     }
 
     override suspend fun markAsDeleted(id: Long) {
-        dao.markAsDeletedCard(id)
+        cardDao.markAsDeletedCard(id)
     }
 
     override suspend fun deleteCard(card: Card) {
-        return dao.deleteCard(card)
+        return cardDao.deleteCard(card)
     }
 
     override fun getAllCardsForSet(setId: Long): Flow<List<Card>> {
-        return dao.getAllCardsForSet(setId)
+        return cardDao.getAllCardsForSet(setId)
     }
 
     override fun getAllNonDeletedCards(): Flow<List<Card>> {
-        return dao.getAllNonDeletedCards()
+        return cardDao.getAllNonDeletedCards()
     }
 
     override suspend fun getAllNonDeletedCardsSuspend(): List<Card> {
-        return dao.getAllNonDeletedCardsSuspend()
+        return cardDao.getAllNonDeletedCardsSuspend()
     }
 
     override suspend fun syncLocalChanges() {
@@ -64,19 +64,22 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
         val authHeader = "Bearer $tokenString"
         var shouldRetry = false
 
-        val unsyncedCards = dao.getUnsyncedCards()
+        val unsyncedCards = cardDao.getUnsyncedCards()
         unsyncedCards.forEach { localCard ->
             val parentSet = studySetDao.getSetByIdSimple(localCard.setId)
             val parentRemoteId = parentSet?.remoteId ?: return@forEach  // Буквально аналог continue, переходим к следующей карточке если null
 
             try {
-                val remoteDto = api.createCard(token = authHeader, dto = localCard.toDto(parentRemoteId))
+                val remoteDto = api.createCard(
+                    token = authHeader,
+                    dto = localCard.toDto(parentRemoteId)
+                )
 
                 val syncedCard = localCard.copy(
                     remoteId = remoteDto.id,
                     createdAt = remoteDto.createdAt ?: localCard.createdAt
                 )
-                dao.updateCard(syncedCard)
+                cardDao.updateCard(syncedCard)
             } catch (e: Exception) {
                 handleSyncException(
                     exception = e,
@@ -86,7 +89,7 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
             }
         }
 
-        val editedCards = dao.getEditedCards()
+        val editedCards = cardDao.getEditedCards()
         editedCards.forEach { localCard ->
             val parentSet = studySetDao.getSetByIdSimple(localCard.setId)
             val parentRemoteId = parentSet?.remoteId ?: return@forEach
@@ -102,7 +105,7 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
                     isEdited = false,
                     createdAt = remoteDto.createdAt ?: localCard.createdAt
                 )
-                dao.updateCard(syncedCard)
+                cardDao.updateCard(syncedCard)
             } catch (e: Exception) {
                 handleSyncException(
                     exception = e,
@@ -112,12 +115,12 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
             }
         }
 
-        val deletedCards = dao.getCardsToDelete()
+        val deletedCards = cardDao.getCardsToDelete()
         deletedCards.forEach { localCard ->
             try{
                 api.deleteCard(token = authHeader, id = localCard.remoteId!!)
 
-                dao.deleteCard(localCard)
+                cardDao.deleteCard(localCard)
             } catch (e: Exception) {
                 handleSyncException(
                     exception = e,
@@ -141,13 +144,16 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
 
         syncedSets.forEach { localSet->
             try {
-                val remoteCards = api.getCardsBySet(token = authHeader, setId = localSet.remoteId!!)
+                val remoteCards = api.getCardsBySet(
+                    token = authHeader,
+                    setId = localSet.remoteId!!
+                )
 
                 remoteCards.forEach { dto ->
-                    val localCard = dao.getCardByRemoteId(dto.id!!)
+                    val localCard = cardDao.getCardByRemoteId(dto.id!!)
 
                     if (localCard == null){
-                        dao.insertCard(dto.toEntity(localSet.id))
+                        cardDao.insertCard(dto.toEntity(localSet.id))
                     } else if (!localCard.isEdited && !localCard.isDeleted) {
                         val updatedCard = localCard.copy(
                             term = dto.term,
@@ -162,17 +168,17 @@ class CardRepositoryImpl @Inject constructor(   // Inject позволяет с�
                             mistakeCount = dto.mistakeCount,
                             recentAnswerHistory = dto.recentAnswerHistory
                         )
-                        dao.updateCard(updatedCard)
+                        cardDao.updateCard(updatedCard)
                     }
                 }
 
                 // Множество всех Id карточек на сервере
                 val remoteIds = remoteCards.mapNotNull { it.id }.toSet()
-                val localSyncedCards = dao.getSyncedCardsBySet(localSet.id)
+                val localSyncedCards = cardDao.getSyncedCardsBySet(localSet.id)
 
                 localSyncedCards.forEach { localCard ->
                     if (localCard.remoteId!! !in remoteIds)
-                        dao.deleteCard(localCard)
+                        cardDao.deleteCard(localCard)
                 }
 
             } catch (e: Exception) {

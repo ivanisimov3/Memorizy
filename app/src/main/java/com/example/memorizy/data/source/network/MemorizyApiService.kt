@@ -3,6 +3,7 @@ package com.example.memorizy.data.source.network
 import com.example.memorizy.data.source.network.dto.AuthRequest
 import com.example.memorizy.data.source.network.dto.AuthResponse
 import com.example.memorizy.data.source.network.dto.CardDto
+import com.example.memorizy.data.source.network.dto.SessionRecordDto
 import com.example.memorizy.data.source.network.dto.StudySetDto
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -53,6 +54,12 @@ interface MemorizyApiService{
         @Path("setId") setId: Long
     ): List<CardDto>
 
+    @GET("api/sets/{setId}/sessions")
+    suspend fun getSessionRecordsBySet(
+        @Header("Authorization") token: String,
+        @Path("setId") setId: Long
+    ): List<SessionRecordDto>
+
     // CardController
     @POST("api/cards")
     suspend fun createCard(
@@ -72,4 +79,11 @@ interface MemorizyApiService{
         @Header("Authorization") token: String,
         @Path("id") id: Long
     )
+
+    // SessionRecordController
+    @POST("api/sessions")
+    suspend fun createSessionRecord(
+        @Header("Authorization") token: String,
+        @Body dto: SessionRecordDto
+    ): SessionRecordDto
 }

@@ -26,5 +26,6 @@ data class SessionRecord(
     val correctCount: Int,
     val totalCount: Int,
     val percentage: Float,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val remoteId: Long? = null
 )

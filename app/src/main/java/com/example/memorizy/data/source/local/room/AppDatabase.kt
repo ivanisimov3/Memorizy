@@ -12,7 +12,7 @@ import com.example.memorizy.data.source.local.room.entity.StudySet
 
 // Конфигурация локальной БД Room
 
-@Database(entities = [StudySet::class, Card::class, SessionRecord::class], version = 5, exportSchema = false)
+@Database(entities = [StudySet::class, Card::class, SessionRecord::class], version = 6, exportSchema = false)
 @TypeConverters(CardDefinitionVariantsConverter::class) // Конвертер на уровне всей базы данных
 abstract class AppDatabase : RoomDatabase() {
     abstract fun studySetDao(): StudySetDao

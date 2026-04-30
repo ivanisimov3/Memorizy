@@ -1,6 +1,7 @@
 package com.example.memorizy.data.sync
 
 import com.example.memorizy.data.repository.CardRepository
+import com.example.memorizy.data.repository.SessionRepository
 import com.example.memorizy.data.repository.StudySetRepository
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
@@ -10,7 +11,8 @@ import kotlinx.coroutines.sync.withLock
 @Singleton
 class SyncCoordinator @Inject constructor(
     private val studySetRepository: StudySetRepository,
-    private val cardRepository: CardRepository
+    private val cardRepository: CardRepository,
+    private val sessionRepository: SessionRepository
 ) {
     private val syncMutex = Mutex() // Гарантировать только одну корутину одновременно
 
@@ -21,6 +23,9 @@ class SyncCoordinator @Inject constructor(
 
             cardRepository.syncLocalChanges()
             cardRepository.fetchRemoteChanges()
+
+            sessionRepository.syncLocalChanges()
+            sessionRepository.fetchRemoteChanges()
         }
     }
 }
