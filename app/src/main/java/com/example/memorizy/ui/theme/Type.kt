@@ -9,47 +9,50 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.memorizy.R
 
-val MarmeladRegular = FontFamily(
-    Font(R.font.marmelad_regular)
+val GoogleSansRegular = FontFamily(
+    Font(R.font.google_sans_regular)
+)
+
+val GoogleSansBold = FontFamily(
+    Font(R.font.google_sans_bold)
+)
+
+val GoogleSansItalic = FontFamily(
+    Font(R.font.google_sans_italic)
 )
 
 // Set of Material typography styles to start with
 val Typography = Typography(
     displayLarge = TextStyle(
-        fontFamily = MarmeladRegular,
+        fontFamily = GoogleSansBold,
         fontSize = 28.sp
     ),
     displayMedium = TextStyle(
-        fontFamily = MarmeladRegular,
-        fontWeight = FontWeight.Bold,
+        fontFamily = GoogleSansBold,
         fontSize = 24.sp
     ),
     displaySmall = TextStyle(
-        fontFamily = MarmeladRegular,
-        fontWeight = FontWeight.Bold,
+        fontFamily = GoogleSansBold,
         fontSize = 18.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily = MarmeladRegular,
+        fontFamily = GoogleSansRegular,
         fontSize = 24.sp
     ),
     bodySmall = TextStyle(
-        fontFamily = MarmeladRegular,
+        fontFamily = GoogleSansRegular,
         fontSize = 18.sp
     ),
     labelLarge = TextStyle(
-        fontFamily = MarmeladRegular,
-        fontSize = 28.sp,
-        fontStyle = FontStyle.Italic
+        fontFamily = GoogleSansItalic,
+        fontSize = 28.sp
     ),
     labelMedium = TextStyle(
-        fontFamily = MarmeladRegular,
-        fontSize = 24.sp,
-        fontStyle = FontStyle.Italic
+        fontFamily = GoogleSansItalic,
+        fontSize = 24.sp
     ),
     labelSmall = TextStyle(
-        fontFamily = MarmeladRegular,
-        fontSize = 18.sp,
-        fontStyle = FontStyle.Italic
+        fontFamily = GoogleSansItalic,
+        fontSize = 18.sp
     )
 )
