@@ -1,39 +1,39 @@
 # Memorizy Android
 
-Android client for Memorizy, a mobile application for intelligent memorization using spaced repetition, answer checking, learning statistics, notifications, and remote synchronization.
+Android-клиент Memorizy - мобильное приложение для интеллектуального запоминания с использованием интервального повторения, проверки ответов, статистики обучения, уведомлений и удалённого хранения данных.
 
-## Tech Stack
+## Технологический стек
 
-- Kotlin, Jetpack Compose
-- MVVM with repositories
-- Room, DataStore
-- Retrofit, OkHttp
-- WorkManager
-- Hilt
-- ONNX Runtime for local NLP-assisted answer checking
+* Kotlin, Jetpack Compose
+* MVVM с репозиториями
+* Room, DataStore
+* Retrofit, OkHttp
+* WorkManager
+* Hilt
+* ONNX Runtime для локальной NLP-проверки ответов
 
-## Configuration
+## Конфигурация
 
-The API base URL is configured at build time. For emulator development the default is:
+Базовый URL API задаётся во время сборки. Для разработки в эмуляторе по умолчанию используется:
 
 ```text
 http://10.0.2.2:8080/
 ```
 
-Override it with a Gradle property or environment variable:
+Его можно переопределить с помощью Gradle-свойства или переменной окружения:
 
 ```powershell
 .\gradlew.bat :app:assembleDebug -PMEMORIZY_BASE_URL=https://your-server.example/
 ```
 
-or:
+или:
 
 ```powershell
 $env:MEMORIZY_BASE_URL="https://your-server.example/"
 .\gradlew.bat :app:assembleDebug
 ```
 
-## Useful Commands
+## Полезные команды
 
 ```powershell
 .\gradlew.bat :app:compileDebugKotlin
@@ -41,6 +41,6 @@ $env:MEMORIZY_BASE_URL="https://your-server.example/"
 .\gradlew.bat :app:assembleDebug
 ```
 
-## Notes
+## Примечания
 
-Room is the local source of truth. Local entities include synchronization metadata and learning progress fields because the application supports offline-first behavior.
+Room является локальным источником истины. Локальные сущности включают метаданные синхронизации и поля прогресса обучения, поскольку приложение поддерживает offline-first подход.
