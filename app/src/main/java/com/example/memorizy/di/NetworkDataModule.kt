@@ -24,11 +24,15 @@ object NetworkDataModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().apply {    // Смотреть логи
+        val builder = OkHttpClient.Builder()
+
+        if (BuildConfig.DEBUG) {
+            builder.addInterceptor(HttpLoggingInterceptor().apply {    // Смотреть логи
                 level = HttpLoggingInterceptor.Level.BODY
             })
-            .build()
+        }
+
+        return builder.build()
     }
 
     // Учим создавать MemorizyApiService

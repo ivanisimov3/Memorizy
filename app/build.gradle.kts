@@ -7,6 +7,11 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
+val memorizyBaseUrl = providers.gradleProperty("MEMORIZY_BASE_URL")
+    .orElse(providers.environmentVariable("MEMORIZY_BASE_URL"))
+    .orElse("http://10.0.2.2:8080/")
+    .get()
+
 android {
     namespace = "com.example.memorizy"
     compileSdk {
@@ -19,7 +24,7 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-        buildConfigField("String", "BASE_URL", "\"http://192.168.1.72:8080/\"")
+        buildConfigField("String", "BASE_URL", "\"$memorizyBaseUrl\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
