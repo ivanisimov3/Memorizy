@@ -48,7 +48,7 @@ object DateUtils {
     )
 
     private val shortDateFormatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    private val fullDateTimeFormatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
+    private val fullDateTimeFormatter = SimpleDateFormat("dd.MM HH:mm:ss", Locale.getDefault())
 
     fun formatShortDate(timestamp: Long): String {
         return shortDateFormatter.format(Date(timestamp))

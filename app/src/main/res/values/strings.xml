@@ -31,7 +31,7 @@
     <string name="remove_definition_variant">Удалить дополнительное определение</string>
     <string name="expand_additional_definitions">Раскрыть дополнительные определения</string>
     <string name="collapse_additional_definitions">Скрыть дополнительные определения</string>
-    <string name="set_detalization_text">Просмотр набора</string>
+    <string name="set_detalization_text">Набор</string>
     <string name="expand_more_ic">Раскрыть описание</string>
     <string name="register_screen_lable">Вход в личный аккаунт</string>
     <string name="login_text">Логин</string>
@@ -169,7 +169,7 @@
     <string name="card_tries_summary">%1$d ответов / %2$d ошибок</string>
     <string name="card_review_count_value">Ответов: %1$d</string>
     <string name="card_mistake_count_value">Ошибок: %1$d</string>
-    <string name="card_next_review_value">Следующее повторение:</string>
+    <string name="card_next_review_value">Повторение:</string>
     <string name="card_next_review_short_value">Следующее: %1$s</string>
     <string name="sort_descending">Сортировать по убыванию</string>
     <string name="sort_ascending">Сортировать по возрастанию</string>
