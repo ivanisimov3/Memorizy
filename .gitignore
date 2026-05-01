@@ -17,3 +17,6 @@
 .cxx
 local.properties
 /outputs
+*.jks
+*.keystore
+release-signing.properties

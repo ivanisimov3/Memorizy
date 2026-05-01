@@ -1,0 +1,4 @@
+MEMORIZY_RELEASE_STORE_FILE=release/memorizy-release.jks
+MEMORIZY_RELEASE_STORE_PASSWORD=replace-with-keystore-password
+MEMORIZY_RELEASE_KEY_ALIAS=memorizy
+MEMORIZY_RELEASE_KEY_PASSWORD=replace-with-key-password

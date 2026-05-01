@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -11,6 +13,31 @@ val memorizyBaseUrl = providers.gradleProperty("MEMORIZY_BASE_URL")
     .orElse(providers.environmentVariable("MEMORIZY_BASE_URL"))
     .orElse("http://10.0.2.2:8080/")
     .get()
+
+val releaseSigningPropertiesFile = rootProject.file("release-signing.properties")
+val releaseSigningProperties = Properties().apply {
+    if (releaseSigningPropertiesFile.exists()) {
+        releaseSigningPropertiesFile.inputStream().use(::load)
+    }
+}
+
+fun releaseSigningProperty(name: String): String? {
+    return providers.gradleProperty(name)
+        .orElse(providers.environmentVariable(name))
+        .orNull
+        ?: releaseSigningProperties.getProperty(name)
+}
+
+val releaseStoreFilePath = releaseSigningProperty("MEMORIZY_RELEASE_STORE_FILE")
+val releaseStorePassword = releaseSigningProperty("MEMORIZY_RELEASE_STORE_PASSWORD")
+val releaseKeyAlias = releaseSigningProperty("MEMORIZY_RELEASE_KEY_ALIAS")
+val releaseKeyPassword = releaseSigningProperty("MEMORIZY_RELEASE_KEY_PASSWORD")
+val hasReleaseSigning = listOf(
+    releaseStoreFilePath,
+    releaseStorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword
+).all { !it.isNullOrBlank() }
 
 android {
     namespace = "com.example.memorizy"
@@ -29,6 +56,17 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = rootProject.file(releaseStoreFilePath!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         debug {
             manifestPlaceholders["usesCleartextTraffic"] = "true"
@@ -36,6 +74,9 @@ android {
         release {
             isMinifyEnabled = false
             manifestPlaceholders["usesCleartextTraffic"] = "false"
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -58,7 +99,7 @@ android {
             isEnable = true
             reset()
             include("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
-            isUniversalApk = false
+            isUniversalApk = true
         }
     }
 }
