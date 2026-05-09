@@ -8,7 +8,7 @@ import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.repository.SessionRepository
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.source.local.room.entity.SessionRecord
-import com.example.memorizy.domain.cardrisk.CardRiskAnalyzer
+import com.example.memorizy.domain.card_knowledge.CardKnowledgeAnalyzer
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.utils.DateUtils.dayKey
 import com.example.memorizy.ui.utils.SESSION_TYPE_LEARNING
@@ -136,7 +136,7 @@ class StatisticsViewModel @Inject constructor(
                     id = card.id,
                     term = card.term,
                     level = card.level,
-                    knowledgePercent = (CardRiskAnalyzer.calculateKnowledgeScore(
+                    knowledgePercent = (CardKnowledgeAnalyzer.calculateKnowledgeScore(
                         level = card.level,
                         recentAnswerHistory = card.recentAnswerHistory
                     ) * 100).roundToInt().coerceIn(0, 100),

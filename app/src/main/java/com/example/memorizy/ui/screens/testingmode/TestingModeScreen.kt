@@ -42,7 +42,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.memorizy.R
-import com.example.memorizy.domain.textcomparison.TextComparisonCategory
+import com.example.memorizy.domain.text_comparison.TextComparisonCategory
 import com.example.memorizy.ui.theme.orange
 import com.example.memorizy.ui.utils.GlassContainer
 

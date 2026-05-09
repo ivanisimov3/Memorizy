@@ -9,7 +9,7 @@ import com.example.memorizy.data.repository.SessionRepository
 import com.example.memorizy.data.repository.StudySetRepository
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.source.local.room.entity.SessionRecord
-import com.example.memorizy.domain.spacedrepetition.SpacedRepetitionScheduler
+import com.example.memorizy.domain.spaced_repetition.SpacedRepetitionScheduler
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.utils.SESSION_TYPE_LEARNING
 import dagger.hilt.android.lifecycle.HiltViewModel

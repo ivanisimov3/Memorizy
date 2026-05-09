@@ -4,8 +4,8 @@ import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OnnxValue
 import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
-import com.example.memorizy.domain.textcomparison.nli.EntailmentComparisonResult
-import com.example.memorizy.domain.textcomparison.nli.EntailmentTextClassifier
+import com.example.memorizy.domain.text_comparison.nli.EntailmentComparisonResult
+import com.example.memorizy.domain.text_comparison.nli.EntailmentTextClassifier
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers

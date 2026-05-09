@@ -1,4 +1,4 @@
-package com.example.memorizy.domain.textcomparison.nli
+package com.example.memorizy.domain.text_comparison.nli
 
 /*
 Результат трехклассовой NLI-модели: entailment означает, что эталонный ответ

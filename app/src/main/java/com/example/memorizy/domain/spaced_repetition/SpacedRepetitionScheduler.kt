@@ -1,4 +1,4 @@
-package com.example.memorizy.domain.spacedrepetition
+package com.example.memorizy.domain.spaced_repetition
 
 import com.example.memorizy.data.source.local.room.entity.Card
 

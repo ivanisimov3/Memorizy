@@ -8,9 +8,9 @@ import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.repository.SessionRepository
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.source.local.room.entity.SessionRecord
-import com.example.memorizy.domain.textcomparison.TextComparisonCategory
-import com.example.memorizy.domain.textcomparison.TextComparisonResult
-import com.example.memorizy.domain.textcomparison.TextComparator
+import com.example.memorizy.domain.text_comparison.TextComparisonCategory
+import com.example.memorizy.domain.text_comparison.TextComparisonResult
+import com.example.memorizy.domain.text_comparison.TextComparator
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.utils.SESSION_TYPE_TESTING
 import dagger.hilt.android.lifecycle.HiltViewModel

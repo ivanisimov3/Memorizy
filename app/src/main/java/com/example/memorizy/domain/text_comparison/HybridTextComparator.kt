@@ -1,7 +1,7 @@
-package com.example.memorizy.domain.textcomparison
+package com.example.memorizy.domain.text_comparison
 
-import com.example.memorizy.domain.textcomparison.algorithm.FuzzyTokenComparator
-import com.example.memorizy.domain.textcomparison.nli.EntailmentTextClassifier
+import com.example.memorizy.domain.text_comparison.algorithm.FuzzyTokenComparator
+import com.example.memorizy.domain.text_comparison.nli.EntailmentTextClassifier
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 

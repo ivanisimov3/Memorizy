@@ -8,7 +8,7 @@ import com.example.memorizy.data.repository.CardRepository
 import com.example.memorizy.data.source.local.room.entity.Card
 import com.example.memorizy.data.repository.StudySetRepository
 import com.example.memorizy.domain.data_exchange.exporter.usecase.ExportCardsCsvUseCase
-import com.example.memorizy.domain.spacedrepetition.SpacedRepetitionScheduler
+import com.example.memorizy.domain.spaced_repetition.SpacedRepetitionScheduler
 import com.example.memorizy.ui.navigation.Routes
 import com.example.memorizy.ui.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel

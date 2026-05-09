@@ -1,4 +1,4 @@
-package com.example.memorizy.domain.textcomparison.algorithm
+package com.example.memorizy.domain.text_comparison.algorithm
 
 // Реализация стеммера Портера
 // snowballstem.org/algorithms/russian/stemmer.html

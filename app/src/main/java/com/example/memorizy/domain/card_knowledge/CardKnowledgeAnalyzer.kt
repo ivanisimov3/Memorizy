@@ -1,27 +1,11 @@
-package com.example.memorizy.domain.cardrisk
+package com.example.memorizy.domain.card_knowledge
 
-object CardRiskAnalyzer {
-
-    enum class CardRisk {
-        HIGH,
-        MEDIUM,
-        LOW
-    }
+object CardKnowledgeAnalyzer {
 
     private const val MAX_LEVEL = 7
     private const val LEVEL_WEIGHT = 0.4f
     private const val STABILITY_WEIGHT = 0.6f
     private const val RECENT_ANSWER_LIMIT = 5
-
-    fun calculateRisk(level: Int, recentAnswerHistory: String): CardRisk {
-        val score = calculateKnowledgeScore(level, recentAnswerHistory)
-
-        return when {
-            score < 0.5f -> CardRisk.HIGH
-            score < 0.9f -> CardRisk.MEDIUM
-            else -> CardRisk.LOW
-        }
-    }
 
     fun calculateKnowledgeScore(level: Int, recentAnswerHistory: String): Float {
         val levelScore = level.coerceIn(0, MAX_LEVEL).toFloat() / MAX_LEVEL

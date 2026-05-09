@@ -1,8 +1,8 @@
 @file:Suppress("NonAsciiCharacters")
 
-package com.example.memorizy.domain.textcomparison
+package com.example.memorizy.domain.text_comparison
 
-import com.example.memorizy.domain.textcomparison.algorithm.FuzzyTokenComparator
+import com.example.memorizy.domain.text_comparison.algorithm.FuzzyTokenComparator
 import org.junit.Assert.*
 import org.junit.Test
 import kotlin.random.Random

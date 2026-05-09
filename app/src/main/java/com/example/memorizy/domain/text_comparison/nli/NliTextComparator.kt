@@ -1,4 +1,4 @@
-package com.example.memorizy.domain.textcomparison.nli
+package com.example.memorizy.domain.text_comparison.nli
 
 import jakarta.inject.Inject
 import jakarta.inject.Singleton

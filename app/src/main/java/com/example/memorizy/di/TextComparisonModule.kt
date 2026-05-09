@@ -1,7 +1,7 @@
 package com.example.memorizy.di
 
-import com.example.memorizy.domain.textcomparison.HybridTextComparator
-import com.example.memorizy.domain.textcomparison.TextComparator
+import com.example.memorizy.domain.text_comparison.HybridTextComparator
+import com.example.memorizy.domain.text_comparison.TextComparator
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

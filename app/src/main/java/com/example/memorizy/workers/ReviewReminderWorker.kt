@@ -16,7 +16,7 @@ import com.example.memorizy.data.repository.StudySetRepository
 import com.example.memorizy.data.source.local.room.entity.Card
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlin.math.ceil
+import kotlin.math.round
 
 /*
 Worker is a class that performs work synchronously on a background thread.
@@ -57,7 +57,7 @@ class ReviewReminderWorker @AssistedInject constructor(
             if (dueCards.isEmpty()) return false
 
             val threshold = minOf(
-                ceil(allCards.size / 2.0).toInt(),
+                round(allCards.size / 2.0).toInt(),
                 MAX_THRESHOLD
             ).coerceAtLeast(1)
 

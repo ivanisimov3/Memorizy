@@ -1,4 +1,4 @@
-package com.example.memorizy.domain.textcomparison.algorithm
+package com.example.memorizy.domain.text_comparison.algorithm
 
 import jakarta.inject.Inject
 

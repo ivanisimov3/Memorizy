@@ -1,4 +1,4 @@
-package com.example.memorizy.domain.textcomparison.algorithm
+package com.example.memorizy.domain.text_comparison.algorithm
 
 // Обработанное множество русских стоп-слов
 // https://github.com/stopwords-iso/stopwords-ru

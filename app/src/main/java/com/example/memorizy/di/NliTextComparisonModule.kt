@@ -1,7 +1,7 @@
 package com.example.memorizy.di
 
 import com.example.memorizy.data.ml.OnnxEntailmentTextClassifier
-import com.example.memorizy.domain.textcomparison.nli.EntailmentTextClassifier
+import com.example.memorizy.domain.text_comparison.nli.EntailmentTextClassifier
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
