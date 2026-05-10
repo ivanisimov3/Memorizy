@@ -6,8 +6,10 @@ import android.content.Context
 import android.util.Log
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.example.memorizy.data.sync.SyncAuthException
 import com.example.memorizy.data.sync.SyncCoordinator
+import com.example.memorizy.data.sync.SyncMode
 import com.example.memorizy.data.sync.SyncRetryException
 import io.mockk.coEvery
 import io.mockk.coVerifyOrder
@@ -52,6 +54,20 @@ class SyncWorkerTest {
         assertEquals(ListenableWorker.Result.success()::class, result::class)
         coVerifyOrder {
             syncCoordinator.syncAll()
+        }
+    }
+
+    @Test
+    fun `SyncWorker runs upload only mode when input data requests it`() = runTest {
+        every { params.inputData } returns workDataOf(SyncWorker.KEY_SYNC_MODE to SyncMode.UPLOAD_ONLY.name)
+        worker = SyncWorker(context, params, syncCoordinator)
+        coEvery { syncCoordinator.uploadLocalChanges() } returns Unit
+
+        val result = worker.doWork()
+
+        assertEquals(ListenableWorker.Result.success()::class, result::class)
+        coVerifyOrder {
+            syncCoordinator.uploadLocalChanges()
         }
     }
 

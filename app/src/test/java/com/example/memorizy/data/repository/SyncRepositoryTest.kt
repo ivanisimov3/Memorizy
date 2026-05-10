@@ -4,11 +4,15 @@ package com.example.memorizy.data.repository
 
 import android.util.Log
 import com.example.memorizy.data.source.local.room.dao.CardDao
+import com.example.memorizy.data.source.local.room.dao.SessionRecordDao
 import com.example.memorizy.data.source.local.room.dao.StudySetDao
 import com.example.memorizy.data.source.local.room.entity.Card
+import com.example.memorizy.data.source.local.room.entity.SessionRecord
 import com.example.memorizy.data.source.local.room.entity.StudySet
 import com.example.memorizy.data.source.network.MemorizyApiService
 import com.example.memorizy.data.source.network.dto.CardDto
+import com.example.memorizy.data.source.network.dto.SessionRecordDto
+import com.example.memorizy.data.source.network.dto.StudySetDto
 import com.example.memorizy.data.sync.SyncAuthException
 import com.example.memorizy.data.sync.SyncRetryException
 import io.mockk.coEvery
@@ -22,6 +26,7 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
@@ -33,11 +38,13 @@ class SyncRepositoryTest {
 
     private val studySetDao = mockk<StudySetDao>()
     private val cardDao = mockk<CardDao>()
+    private val sessionRecordDao = mockk<SessionRecordDao>()
     private val api = mockk<MemorizyApiService>()
     private val settingsRepository = mockk<SettingsRepository>()
 
     private lateinit var studySetRepository: StudySetRepositoryImpl
     private lateinit var cardRepository: CardRepositoryImpl
+    private lateinit var sessionRepository: SessionRepositoryImpl
 
     @Before
     fun setUp() {
@@ -47,6 +54,34 @@ class SyncRepositoryTest {
 
         studySetRepository = StudySetRepositoryImpl(studySetDao, api, settingsRepository)
         cardRepository = CardRepositoryImpl(cardDao, studySetDao, api, settingsRepository)
+        sessionRepository = SessionRepositoryImpl(sessionRecordDao, studySetDao, api, settingsRepository)
+    }
+
+    @Test
+    fun `StudySetRepositoryImpl syncLocalChanges сохраняет remoteId после успешной отправки набора`() = runTest {
+        val localSet = studySet(id = 1, remoteId = null)
+
+        every { settingsRepository.token } returns flowOf("token")
+        coEvery { studySetDao.getUnsyncedSets() } returns listOf(localSet)
+        coEvery { studySetDao.getEditedSets() } returns emptyList()
+        coEvery { studySetDao.getSetsToDelete() } returns emptyList()
+        coEvery { api.createSet("Bearer token", any()) } returns StudySetDto(
+            id = 101,
+            name = localSet.name,
+            description = localSet.description,
+            iconId = localSet.iconId,
+            createdAt = localSet.createdAt,
+            targetDate = localSet.targetDate
+        )
+        coEvery { studySetDao.updateSet(any()) } returns Unit
+
+        studySetRepository.syncLocalChanges()
+
+        coVerify {
+            studySetDao.updateSet(
+                match { it.id == localSet.id && it.remoteId == 101L && !it.isEdited }
+            )
+        }
     }
 
     @After
@@ -157,6 +192,107 @@ class SyncRepositoryTest {
         coVerify(exactly = 0) { cardDao.deleteCard(any()) }
     }
 
+    @Test
+    fun `StudySetRepositoryImpl fetchRemoteChanges добавляет новый серверный набор локально`() = runTest {
+        every { settingsRepository.token } returns flowOf("token")
+        coEvery { api.getAllSets("Bearer token") } returns listOf(
+            StudySetDto(
+                id = 201,
+                name = "Remote",
+                description = "From server",
+                iconId = 2,
+                createdAt = 10_000L,
+                targetDate = 20_000L
+            )
+        )
+        coEvery { studySetDao.getSetByRemoteId(201) } returns null
+        coEvery { studySetDao.insertSet(any()) } returns Unit
+        coEvery { studySetDao.getSyncedSets() } returns emptyList()
+
+        studySetRepository.fetchRemoteChanges()
+
+        coVerify {
+            studySetDao.insertSet(match { it.remoteId == 201L && it.name == "Remote" })
+        }
+    }
+
+    @Test
+    fun `CardRepositoryImpl fetchRemoteChanges не перезаписывает локально отредактированную карточку`() = runTest {
+        val localSet = studySet(id = 1, remoteId = 100)
+        val editedLocalCard = card(id = 1, setId = 1, remoteId = 501, term = "Локально").copy(isEdited = true)
+
+        every { settingsRepository.token } returns flowOf("token")
+        coEvery { studySetDao.getSyncedSets() } returns listOf(localSet)
+        coEvery { api.getCardsBySet("Bearer token", 100) } returns listOf(
+            CardDto(
+                id = 501,
+                term = "С сервера",
+                definition = "Определение с сервера",
+                definitionVariants = emptyList(),
+                studySetId = 100,
+                createdAt = editedLocalCard.createdAt,
+                level = 3,
+                nextReviewDate = editedLocalCard.nextReviewDate,
+                reviewCount = 10,
+                mistakeCount = 0,
+                recentAnswerHistory = "11111"
+            )
+        )
+        coEvery { cardDao.getCardByRemoteId(501) } returns editedLocalCard
+        coEvery { cardDao.getSyncedCardsBySet(1) } returns listOf(editedLocalCard)
+
+        cardRepository.fetchRemoteChanges()
+
+        coVerify(exactly = 0) { cardDao.updateCard(any()) }
+        assertEquals("Локально", editedLocalCard.term)
+    }
+
+    @Test
+    fun `SessionRepositoryImpl syncLocalChanges сохраняет remoteId после успешной отправки записи сессии`() = runTest {
+        val parentSet = studySet(id = 1, remoteId = 100)
+        val localRecord = sessionRecord(id = 1, setId = 1, remoteId = null)
+
+        every { settingsRepository.token } returns flowOf("token")
+        coEvery { sessionRecordDao.getUnsyncedRecords() } returns listOf(localRecord)
+        coEvery { studySetDao.getSetByIdSimple(1) } returns parentSet
+        coEvery { api.createSessionRecord("Bearer token", any()) } returns SessionRecordDto(
+            id = 701,
+            studySetId = 100,
+            type = localRecord.type,
+            correctCount = localRecord.correctCount,
+            totalCount = localRecord.totalCount,
+            percentage = localRecord.percentage,
+            timestamp = localRecord.timestamp
+        )
+        coEvery { sessionRecordDao.updateRecord(any()) } returns Unit
+
+        sessionRepository.syncLocalChanges()
+
+        coVerify {
+            sessionRecordDao.updateRecord(match { it.id == localRecord.id && it.remoteId == 701L })
+        }
+    }
+
+    @Test
+    fun `SessionRepositoryImpl syncLocalChanges throws SyncRetryException on network failure`() = runTest {
+        val parentSet = studySet(id = 1, remoteId = 100)
+        val localRecord = sessionRecord(id = 1, setId = 1, remoteId = null)
+
+        every { settingsRepository.token } returns flowOf("token")
+        coEvery { sessionRecordDao.getUnsyncedRecords() } returns listOf(localRecord)
+        coEvery { studySetDao.getSetByIdSimple(1) } returns parentSet
+        coEvery { api.createSessionRecord("Bearer token", any()) } throws IOException("network error")
+
+        try {
+            sessionRepository.syncLocalChanges()
+            fail("Ожидалось исключение SyncRetryException")
+        } catch (_: SyncRetryException) {
+            Unit
+        }
+
+        coVerify(exactly = 0) { sessionRecordDao.updateRecord(any()) }
+    }
+
     private fun httpException(code: Int): HttpException {
         val response = Response.error<Any>(
             code,
@@ -192,5 +328,20 @@ class SyncRepositoryTest {
         reviewCount = 4,
         mistakeCount = 1,
         recentAnswerHistory = "1101"
+    )
+
+    private fun sessionRecord(
+        id: Long,
+        setId: Long,
+        remoteId: Long? = null
+    ) = SessionRecord(
+        id = id,
+        setId = setId,
+        type = "testing",
+        correctCount = 8,
+        totalCount = 10,
+        percentage = 80f,
+        timestamp = 1_000_000L,
+        remoteId = remoteId
     )
 }
