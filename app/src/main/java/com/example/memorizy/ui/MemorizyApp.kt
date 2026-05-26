@@ -32,14 +32,14 @@ import com.example.memorizy.ui.screens.statistics.StatisticsViewModel
 
 @Composable
 fun MemorizyApp() {
-    val navController = rememberNavController()
+    val navController = rememberNavController() // Управление переходами
 
-    NavHost(
+    NavHost(    // Контейнер экранов, внутри определяется граф навигации
         navController = navController,
         startDestination = Routes.StudySets
     ) {
 
-        composable<Routes.StudySets> {
+        composable<Routes.StudySets> {  // Конкретный граф в навигации
             val viewModel: StudySetsViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsState()
 

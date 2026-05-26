@@ -1,7 +1,9 @@
 package com.example.memorizy.di
 
+import com.example.memorizy.data.ml.OnnxEntailmentTextClassifier
 import com.example.memorizy.domain.text_comparison.HybridTextComparator
 import com.example.memorizy.domain.text_comparison.TextComparator
+import com.example.memorizy.domain.text_comparison.nli.EntailmentTextClassifier
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -19,4 +21,10 @@ abstract class TextComparisonModule {
     abstract fun bindTextComparator(
         impl: HybridTextComparator
     ): TextComparator
+
+    @Binds
+    @Singleton
+    abstract fun bindEntailmentTextClassifier(
+        impl: OnnxEntailmentTextClassifier
+    ): EntailmentTextClassifier
 }

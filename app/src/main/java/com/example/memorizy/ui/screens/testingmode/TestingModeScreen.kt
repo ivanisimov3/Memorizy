@@ -1,5 +1,7 @@
 package com.example.memorizy.ui.screens.testingmode
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -523,11 +525,25 @@ private fun AnswersReviewContent(
 
                         Spacer(Modifier.height(8.dp))
 
-                        Text(
-                            text = stringResource(testAnswer.category.labelResId()),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = resultColor
-                        )
+                        Box(
+                            modifier = Modifier
+                                .border(
+                                    width = 1.dp,
+                                    color = resultColor.copy(alpha = 0.8f),
+                                    shape = RoundedCornerShape(4.dp)
+                                )
+                                .background(
+                                    color = resultColor.copy(alpha = 0.18f),
+                                    shape = RoundedCornerShape(4.dp)
+                                )
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = stringResource(testAnswer.category.labelResId()),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
 
                         Spacer(Modifier.height(8.dp))
 

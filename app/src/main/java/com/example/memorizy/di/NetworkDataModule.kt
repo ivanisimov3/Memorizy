@@ -50,7 +50,7 @@ object NetworkDataModule {
             .baseUrl(BuildConfig.BASE_URL)  // Базовый адрес сервера
             .client(client) // OkHttp реально отправляет запросы
             // Подключаем Kotlin Serialization
-            .addConverterFactory(json.asConverterFactory(contentType))  // Конвертер в котлин обхекты
+            .addConverterFactory(json.asConverterFactory(contentType))  // Конвертер в котлин объекты
             .build()    // Создание объекта Retforit
             .create(MemorizyApiService::class.java) // Генерация кода для HTTP запросов
     }

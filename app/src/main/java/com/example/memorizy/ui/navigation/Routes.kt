@@ -2,7 +2,7 @@ package com.example.memorizy.ui.navigation
 
 import kotlinx.serialization.Serializable
 
-// Карта всех экранов в приложении
+// Идентификаторы всех destination
 
 @Serializable
 object Routes {
